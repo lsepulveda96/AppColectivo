@@ -79,7 +79,8 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\PC\Documents\AndroidStudioProjects\AppColectivo\app\src\main\res\drawable\splash_icon.png" />
+                                                <entry key="imagePath" value="C:\Users\PC\Documents\AndroidStudioProjects\AppColectivo\app\src\main\res\drawable\logo_stcu_amarillo.png" />
+                                                <entry key="scalingPercent" value="79" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -111,7 +112,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="splash_icon_bus" />
+                                      <entry key="outputName" value="stcu_icon_amarillo" />
                                     </map>
                                   </option>
                                 </PersistentState>

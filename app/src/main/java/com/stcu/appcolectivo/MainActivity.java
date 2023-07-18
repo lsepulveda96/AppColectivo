@@ -53,7 +53,7 @@ public class MainActivity extends Activity implements MainInterface.View {
 
 //    private Button btnCargarListas;
     Button finServicio;
-    ArrayAdapter<String> adapter, adapter2;
+    ArrayAdapter<String> adapterSeleccionLinea, adapterSeleccionColectivo;
     private TextView tvColectivoSeleccionado, tvLineaSeleccionada;
     Long fechaUbicacionI;
     List<Coordenada> coordenadasSim;
@@ -136,41 +136,13 @@ public class MainActivity extends Activity implements MainInterface.View {
         finServicio = (Button) findViewById(R.id.fin_button);
         finServicio.setEnabled(false);
         btnIniciarServicio.setEnabled(false); // para que no pueda seleccionar una lista vacia
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
-        adapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
-        itemSeleccionLinea = (Spinner) findViewById(R.id.spinner);
-        itemSeleccionColectivo = (Spinner) findViewById(R.id.spinner2);
+        adapterSeleccionLinea = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
+        adapterSeleccionColectivo = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
+        itemSeleccionLinea = (Spinner) findViewById(R.id.spinnerSelLinea);
+        itemSeleccionColectivo = (Spinner) findViewById(R.id.spinnerSelColectivo);
         tvLineaSeleccionada = (TextView) findViewById(R.id.tvLineaSeleccionada);
         tvColectivoSeleccionado = (TextView) findViewById(R.id.tvColectivoSeleccionado);
         tvNetwork = (TextView)findViewById(R.id.tv_network);
-//        tvAccess = (TextView)findViewById(R.id.tv_access);
-//
-//        if(presenter.isOnlineNet()) {
-//            tvNet.setText( "Conectado a internet" );
-//        }else{
-//            tvNet.setText( "Sin conexion a internet" );
-//        }
-//
-//        // Consulta la disponiblidad de la red
-//        if(presenter.isNetAvailable()) {
-//            tvAccess.setText( "Red habilitada" );
-//        }else{
-//            tvAccess.setText("Red deshabilitada");
-//        }
-
-//        boolean redHab = isOnlineNet();
-//        if(redHab) {
-//            Toast.makeText( this, "Red habilitada", Toast.LENGTH_SHORT ).show();
-//        }else{
-//            Toast.makeText( this, "Red deshabilitada", Toast.LENGTH_SHORT ).show();
-//        }
-//
-//        boolean accesoInter = isNetDisponible();
-//        if(accesoInter) {
-//            Toast.makeText( this, "Conectado a internet", Toast.LENGTH_SHORT ).show();
-//        }else{
-//            Toast.makeText( this, "Sin conexion a internet", Toast.LENGTH_SHORT ).show();
-//        }
 
         //ver si esto anda- sino probar otro getExtra.
         HashSet<String> hashSetLineas = new HashSet<String>();
@@ -198,27 +170,19 @@ public class MainActivity extends Activity implements MainInterface.View {
             }
         }
 
-
-
-//        HashSet<String> hashSetLineas = new HashSet<String>();
-//        hashSetLineas.addAll(getIntent().getParcelableArrayListExtra("listaLineas"));
-
-//        HashSet<String> hashSetColectivos = new HashSet<String>();
-//        hashSetColectivos.addAll(getIntent().getParcelableArrayListExtra("listaColectivos"));
-
-        adapter.clear();
+        adapterSeleccionLinea.clear();
         for(String opcion: hashSetLineas){
-            adapter.add(opcion);
+            adapterSeleccionLinea.add(opcion);
         }
-        adapter2.clear();
+        adapterSeleccionColectivo.clear();
         for(String opcion2: hashSetColectivos){
-            adapter2.add(opcion2);
+            adapterSeleccionColectivo.add(opcion2);
         }
-        itemSeleccionLinea.setAdapter(adapter);
-        itemSeleccionColectivo.setAdapter(adapter2);
+        itemSeleccionLinea.setAdapter(adapterSeleccionLinea);
+        itemSeleccionColectivo.setAdapter(adapterSeleccionColectivo);
 
         // si los dos estan vacios
-        if(adapter.isEmpty() || adapter2.isEmpty()){
+        if(adapterSeleccionLinea.isEmpty() || adapterSeleccionColectivo.isEmpty()){
             Toast.makeText( getApplicationContext() ,"No se pudo cargar el listado de lineas y colectivos", Toast.LENGTH_SHORT ).show();
         }else {
 
@@ -232,46 +196,48 @@ public class MainActivity extends Activity implements MainInterface.View {
         swipe = (SwipeRefreshLayout) findViewById(R.id.swipe);
         swipe.setOnRefreshListener(() -> {
 
-            new Task1().execute();
+//            new Task1().execute();
             //esto anda bien!! si no llega a andar lo del asyntask probar esto.
-//            final List<String> opcionesLineas = presenter.consultaLineasActivas();
-//            final List<String> opcionesColectivos = presenter.consultaColectivosActivos();
-//
-//
-//            dialog2 = new ProgressDialog( this );
-//            dialog2.setMessage( "Cargando listado de lineas y colectivos" );
-//            dialog2.show();
-//
-//            final Handler handler2 = new Handler();
-//            final Runnable r2 = new Runnable(){
-//                public void run() {
-//                    swipe.setRefreshing(false);
-//                    dialog2.cancel();
-//                    Set<String> hs = new HashSet<String>();
-//                    hs.addAll(opcionesLineas);
-//                    Set<String> hs2 = new HashSet<String>();
-//                    hs2.addAll(opcionesColectivos);
-//                    adapter.clear();
-//                    for(String opcion: hs){
-//                        adapter.add(opcion);
-//                    }
-//                    adapter2.clear();
-//                    for(String opcion2: hs2){
-//                        adapter2.add(opcion2);
-//                    }
-//                    itemSeleccionLinea.setAdapter(adapter);
-//                    itemSeleccionColectivo.setAdapter(adapter2);
-//
-//                    // si los dos estan vacios
-//                    if(adapter.isEmpty() || adapter2.isEmpty()){
-//                        Toast.makeText( getApplicationContext() ,"No se pudo cargar el listado de lineas y colectivos", Toast.LENGTH_SHORT ).show();
-//                    }else {
-//                        btnIniciarServicio.setEnabled( true ); // para que pueda guardar la eleccion
-//                        finServicio.setEnabled( true );
-//                    }
-//                }
-//            };
-//            handler2.postDelayed(r2,4000);
+            final List<String> opcionesLineas = presenter.consultaLineasActivas();
+            final List<String> opcionesColectivos = presenter.consultaColectivosActivos();
+
+
+            dialog2 = new ProgressDialog( this );
+            dialog2.setMessage( "Cargando listado de lineas y colectivos" );
+            dialog2.show();
+
+            final Handler handler2 = new Handler();
+            final Runnable r2 = new Runnable(){
+                public void run() {
+                    swipe.setRefreshing(false);
+                    dialog2.cancel();
+                    Set<String> hs = new HashSet<String>();
+                    hs.addAll(opcionesLineas);
+                    Set<String> hs2 = new HashSet<String>();
+                    hs2.addAll(opcionesColectivos);
+                    adapterSeleccionLinea.clear();
+                    for(String opcion: hs){
+                        adapterSeleccionLinea.add(opcion);
+                    }
+                    adapterSeleccionColectivo.clear();
+                    for(String opcion2: hs2){
+                        adapterSeleccionColectivo.add(opcion2);
+                    }
+                    itemSeleccionLinea.setAdapter(adapterSeleccionLinea);
+                    adapterSeleccionLinea.setDropDownViewResource(R.layout.textview_spinner_selected);
+                    itemSeleccionColectivo.setAdapter(adapterSeleccionColectivo);
+                    adapterSeleccionColectivo.setDropDownViewResource(R.layout.textview_spinner_selected);
+
+                    // si los dos estan vacios
+                    if(adapterSeleccionLinea.isEmpty() || adapterSeleccionColectivo.isEmpty()){
+                        Toast.makeText( getApplicationContext() ,"No se pudo cargar el listado de lineas y colectivos", Toast.LENGTH_SHORT ).show();
+                    }else {
+                        btnIniciarServicio.setEnabled( true ); // para que pueda guardar la eleccion
+                        finServicio.setEnabled( true );
+                    }
+                }
+            };
+            handler2.postDelayed(r2,4000);
         });
     }
 
@@ -290,7 +256,7 @@ public class MainActivity extends Activity implements MainInterface.View {
 //        final MainFragment fragment = (MainFragment) getFragmentManager().findFragmentById( R.id.main_fragment );
 
         // si uno de los dos es vacio
-        if(adapter.isEmpty() || adapter2.isEmpty()){
+        if(adapterSeleccionLinea.isEmpty() || adapterSeleccionColectivo.isEmpty()){
             Toast.makeText( getApplicationContext() ,"Seleccione linea y colectivo para continuar", Toast.LENGTH_SHORT ).show();
         }else {
 
@@ -690,24 +656,25 @@ public class MainActivity extends Activity implements MainInterface.View {
 
                         MainActivity.this.runOnUiThread(new Runnable() {
                     public void run() {
-                        adapter.clear();
-                        adapter2.clear();
+                        adapterSeleccionLinea.clear();
+                        adapterSeleccionColectivo.clear();
                         for(String opcion: hs){
-                            adapter.add(opcion);
+                            adapterSeleccionLinea.add(opcion);
                         }
 
                         for(String opcion2: hs2){
-                            adapter2.add(opcion2);
+                            adapterSeleccionColectivo.add(opcion2);
                         }
-                        itemSeleccionLinea.setAdapter(adapter);
-                        itemSeleccionColectivo.setAdapter(adapter2);
+                        itemSeleccionLinea.setAdapter(adapterSeleccionLinea);
+                        adapterSeleccionLinea.setDropDownViewResource(R.layout.textview_spinner_selected);
+                        itemSeleccionColectivo.setAdapter(adapterSeleccionColectivo);
+                        adapterSeleccionColectivo.setDropDownViewResource(R.layout.textview_spinner_selected);
                     }
                 });
 
 
                         // si los dos estan vacios
-                        if(adapter.isEmpty() || adapter2.isEmpty()){
-//                            Toast.makeText( getApplicationContext() ,"No se pudo cargar el listado de lineas y colectivos", Toast.LENGTH_SHORT ).show();
+                        if(adapterSeleccionLinea.isEmpty() || adapterSeleccionColectivo.isEmpty()){
                             MainActivity.this.runOnUiThread(new Runnable() {
                                 public void run() {
                                     Toast.makeText(getApplicationContext(), "No se pudo cargar el listado de lineas y colectivos", Toast.LENGTH_SHORT).show();

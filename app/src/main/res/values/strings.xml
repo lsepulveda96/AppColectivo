@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Sistema Tracking Colectivos Urbanos</string>
+    <string name="app_name">App Colectivo</string>
     <string name="action_settings">Iniciar Simulacion</string>
+
+    <string name="title_activity_main">App colectivo - Menu Principal</string>
+    <string name="title_activity_simulacion_recorrido">App colectivo - Simulacion recorrido</string>
+    <string name="title_activity_colectivo_en_servicio">App colectivo - Colectivo en servicio</string>
+
 
 </resources>

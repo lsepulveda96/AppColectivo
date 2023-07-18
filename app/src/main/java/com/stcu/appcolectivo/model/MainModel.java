@@ -42,7 +42,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class MainModel implements MainInterface.Model {
-    public static String ipv4 = "http://stcu.mdn.unp.edu.ar:50002/stcu_app/";
+//    public static String ipv4 = "http://stcu.mdn.unp.edu.ar:50002/stcu_app/";
+    public static String ipv4 = "http://192.168.0.103:50000/v1/mobile/";
+
     Activity mActivity;
     Context mContext;
     RequestQueue requestQueue;
@@ -67,50 +69,47 @@ public class MainModel implements MainInterface.Model {
 
 
     public List<String> consultaLineasActivas() {
-        List<String> lineasActivas = new ArrayList<>();
 
-        String url = ipv4 + "rest/lineas/activas"; // ip uni
+        requestQueue = Volley.newRequestQueue(mContext);
 
-        //probar si esto anda- sino volver a como estaba antes.
-        //sale por timeout, ver si esta bien cuando haya servidor
-        RequestFuture<JSONObject> future = RequestFuture.newFuture();
-        JsonObjectRequest request = new JsonObjectRequest(url, new JSONObject(), future, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-            }
-        });
+        String url = ipv4+"lineas/activas";
 
-        requestQueue.add(request);
+        List<String> lineasDisponibles = new ArrayList<>();
 
-        try {
-            JSONObject response = future.get(5, TimeUnit.SECONDS); // this will block
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
 
-            for (int i = 0; i < response.length(); i++) {
-                                JSONObject linea = response.getJSONObject(String.valueOf(i));
-                                String id = linea.getString("id");
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+
+                            JSONArray ja = response.getJSONArray("data"); // get the JSONArray
+
+                            for(int i=0;i<ja.length();i++){
+                                JSONObject linea = ja.getJSONObject(i);
                                 String denominacion = linea.getString("denominacion");
-                                String enServicio = linea.getString("enServicio");
-                                listadoLineas.add(denominacion);
-            }
+                                lineasDisponibles.add(denominacion);
+                            }
 
-//            future.get(30, TimeUnit.SECONDS);
-//            return (List<String>) future.get(30, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            Log.e("interrupted exception.", String.valueOf(e));
-//            Log.e("Retrieve cards api call interrupted.", e);
-//            errorListener.onErrorResponse(new VolleyError(e));
-        } catch (ExecutionException e) {
-            Log.e("execution failed.", String.valueOf(e));
-//            Log.e("Retrieve cards api call failed.", e);
-//            errorListener.onErrorResponse(new VolleyError(e));
-        } catch (TimeoutException e) {
-            Log.e("timed out.", String.valueOf(e));
-//            errorListener.onErrorResponse(new VolleyError(e));
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
+//                            presenter.showLineasDisponibles(lineasDisponibles);
+                            System.out.println("Respuesta del servidor ok: " + lineasDisponibles.get(0));
 
-        return lineasActivas;
+
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        System.out.println("Respuesta del servidor con error: " + error.toString());
+
+                    }
+                });
+
+        requestQueue.add(jsonObjectRequest);
+        return lineasDisponibles;
     }
 
     //metodo que anda bien
@@ -154,87 +153,81 @@ public class MainModel implements MainInterface.Model {
 
     @Override
     public List<String> consultaColectivosActivos() {
-        List<String> colectivosActivos = new ArrayList<>();
-        String url = ipv4 + "rest/colectivos/activos";
+        requestQueue = Volley.newRequestQueue(mContext);
 
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
-                Request.Method.GET,
-                url,
-                (String) null,
-                new Response.Listener<JSONArray>() {
+        String url = ipv4+"colectivos";
+
+        List<String> colectivos = new ArrayList<>();
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
+
                     @Override
-                    public void onResponse(JSONArray response) {
+                    public void onResponse(JSONObject response) {
                         try {
-                            for (int i = 0; i < response.length(); i++) {
-                                JSONObject colectivo = response.getJSONObject(i);
+
+                            JSONArray ja = response.getJSONArray("data"); // get the JSONArray
+
+                            for(int i=0;i<ja.length();i++){
+                                JSONObject colectivo = ja.getJSONObject(i);
                                 String id = colectivo.getString("id");
                                 String patente = colectivo.getString("patente");
                                 String unidad = colectivo.getString("unidad");
-
-                                listadoColectivos.add(unidad);
-//                                presenter.showListadoColectivos(listadoColectivos);
-
+                                colectivos.add(unidad);
                             }
+
+//                            presenter.showLineasDisponibles(lineasDisponibles);
+
+                            System.out.println("Respuesta del servidor ok: " + colectivos.get(0));
+
                         } catch (JSONException e) {
-                            e.printStackTrace();
+                            throw new RuntimeException(e);
                         }
                     }
-                },
-                new Response.ErrorListener() {
+                }, new Response.ErrorListener() {
+
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        System.out.println("Respuesta del servidor con error: " + error.toString());
+
                     }
-                }
-        );
-        requestQueue.add(jsonArrayRequest);
-        return colectivosActivos;
+                });
+
+        requestQueue.add(jsonObjectRequest);
+        return colectivos;
     }
 
+
+
+
+//    JSONObject colectivo = response.getJSONObject(i);
+//    String id = colectivo.getString("id");
+//    String patente = colectivo.getString("patente");
+//    String unidad = colectivo.getString("unidad");
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public NetworkInfo isNetAvailable() {
-//        ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-//        NetworkInfo actNetInfo = connectivityManager.getActiveNetworkInfo();
-//        return (actNetInfo != null && actNetInfo.isConnected());
 
         ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-//        ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         //for airplane mode, networkinfo is null
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
 
         return activeNetwork;
-//        if (null != activeNetwork) {
-//
-//            switch (activeNetwork.getType()){
-//                case ConnectivityManager.TYPE_WIFI:
-//                    Toast.makeText(mContext,"wifi encenidido", Toast.LENGTH_SHORT).show();
-//                    tvNetwork.setVisibility(View.GONE);
-//                    break;
-//                case ConnectivityManager.TYPE_MOBILE:Toast.makeText(getApplicationContext(),"mobile encenidido", Toast.LENGTH_SHORT).show();
-//                    tvNetwork.setVisibility(View.GONE);
-//                    break;
-//            }
-//        }else {
-//            tvNetwork.setVisibility(View.VISIBLE);
-//            Toast.makeText(getApplicationContext(),"internet apagado", Toast.LENGTH_SHORT).show();
-//        }
-
-
-
-    }
-
-//    @Override
-//    public boolean isOnlineNet() {
-//        Process p = null;
-//        try {
-//            p = Runtime.getRuntime().exec("ping -c 1 www.google.es");
-//            int val = p.waitFor();
-//            boolean reachable = (val == 0);
-//            return reachable;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return false;
-//    }
-
+   }
 
     public List<Coordenada> consultaTrayectoASimular(String denom) {
         listaCoordenadasTrayecto = new ArrayList<Coordenada>();
@@ -277,7 +270,6 @@ public class MainModel implements MainInterface.Model {
 
 
     public void obtenerUbicacion() {
-//        final String[] strUbicacion = new String[1];
 
         LocationManager locationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
 
