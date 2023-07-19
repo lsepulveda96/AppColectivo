@@ -1,4 +1,4 @@
-package com.stcu.appcolectivo;
+package com.stcu.appcolectivo.ui;
 
 import android.Manifest;
 import android.app.Activity;
@@ -18,7 +18,6 @@ import android.widget.Toast;
 import com.gpmess.example.volley.app.R;
 import com.stcu.appcolectivo.interfaces.TrayectoARecorrerInterface;
 import com.stcu.appcolectivo.presenter.TrayectoARecorrerPresenter;
-import com.stcu.appcolectivo.ui.Coordenada;
 
 import java.util.Date;
 import java.util.List;

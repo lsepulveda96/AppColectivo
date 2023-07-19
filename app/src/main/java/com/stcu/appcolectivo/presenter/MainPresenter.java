@@ -5,6 +5,8 @@ import android.content.Context;
 import android.net.NetworkInfo;
 
 import com.stcu.appcolectivo.interfaces.MainInterface;
+import com.stcu.appcolectivo.model.Colectivo;
+import com.stcu.appcolectivo.model.Linea;
 import com.stcu.appcolectivo.model.MainModel;
 import com.stcu.appcolectivo.ui.Coordenada;
 
@@ -31,15 +33,26 @@ public class MainPresenter implements MainInterface.Presenter {
         }
     }
 
+//    @Override
+//    public List<String> consultaLineasActivas() {
+//        List<String> lineasActivas = model.consultaLineasActivas();
+//        return lineasActivas;
+//    }
+
     @Override
-    public List<String> consultaLineasActivas() {
-        List<String> lineasActivas = model.consultaLineasActivas();
+    public List<Linea> consultaLineasActivas() {
+        List<Linea> lineasActivas = model.consultaLineasActivas();
         return lineasActivas;
     }
 
+//    @Override
+//    public List<String> consultaColectivosActivos() {
+//        List<String> colectivosActivos = model.consultaColectivosActivos();
+//        return colectivosActivos;
+//    }
     @Override
-    public List<String> consultaColectivosActivos() {
-        List<String> colectivosActivos = model.consultaColectivosActivos();
+    public List<Colectivo> consultaColectivosActivos() {
+        List<Colectivo> colectivosActivos = model.consultaColectivosActivos();
         return colectivosActivos;
     }
 

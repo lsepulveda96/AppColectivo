@@ -10,9 +10,6 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 
@@ -22,10 +19,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.stcu.appcolectivo.MainActivity;
+import com.stcu.appcolectivo.ui.MainActivity;
 import com.stcu.appcolectivo.interfaces.MainInterface;
 import com.stcu.appcolectivo.ui.Coordenada;
 
@@ -37,9 +33,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class MainModel implements MainInterface.Model {
 //    public static String ipv4 = "http://stcu.mdn.unp.edu.ar:50002/stcu_app/";
@@ -67,14 +60,63 @@ public class MainModel implements MainInterface.Model {
         requestQueue = Volley.newRequestQueue(mContext);
     }
 
+    // metodo que andaba bien, que responde string denominacion
+//    public List<String> consultaLineasActivas() {
+//
+//        requestQueue = Volley.newRequestQueue(mContext);
+//
+//        String url = ipv4+"lineas/activas";
+//
+//        List<String> lineasDisponibles = new ArrayList<>();
+//
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+//                (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
+//
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        try {
+//
+//                            JSONArray ja = response.getJSONArray("data"); // get the JSONArray
+//
+//                            for(int i=0;i<ja.length();i++){
+//                                JSONObject linea = ja.getJSONObject(i);
+//                                String denominacion = linea.getString("denominacion");
+//                                lineasDisponibles.add(denominacion);
+//                            }
+//
+////                            presenter.showLineasDisponibles(lineasDisponibles);
+//                            System.out.println("Respuesta del servidor ok: " + lineasDisponibles.get(0));
+//
+//
+//                        } catch (JSONException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                    }
+//                }, new Response.ErrorListener() {
+//
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        System.out.println("Respuesta del servidor con error: " + error.toString());
+//
+//                    }
+//                });
+//
+//        requestQueue.add(jsonObjectRequest);
+//
+//        return lineasDisponibles;
+//    }
 
-    public List<String> consultaLineasActivas() {
+
+
+
+    public List<Linea> consultaLineasActivas() {
 
         requestQueue = Volley.newRequestQueue(mContext);
 
         String url = ipv4+"lineas/activas";
 
-        List<String> lineasDisponibles = new ArrayList<>();
+        //List<String> lineasDisponibles = new ArrayList<>();
+        List<Linea> lineasDisponibles = new ArrayList<>();
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
@@ -88,7 +130,9 @@ public class MainModel implements MainInterface.Model {
                             for(int i=0;i<ja.length();i++){
                                 JSONObject linea = ja.getJSONObject(i);
                                 String denominacion = linea.getString("denominacion");
-                                lineasDisponibles.add(denominacion);
+                                String descripcion = linea.getString("descripcion");
+                                boolean enServicio = linea.getBoolean("enServicio");
+                                lineasDisponibles.add(new Linea(denominacion,descripcion,enServicio));
                             }
 
 //                            presenter.showLineasDisponibles(lineasDisponibles);
@@ -109,8 +153,12 @@ public class MainModel implements MainInterface.Model {
                 });
 
         requestQueue.add(jsonObjectRequest);
+
         return lineasDisponibles;
     }
+
+
+
 
     //metodo que anda bien
 //    public List<String> consultaLineasActivas() {
@@ -151,13 +199,78 @@ public class MainModel implements MainInterface.Model {
 //        return lineasActivas;
 //    }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // el metodo de antes que devuevle string unidad
+//    @Override
+//    public List<String> consultaColectivosActivos() {
+//        requestQueue = Volley.newRequestQueue(mContext);
+//
+//        String url = ipv4+"colectivos";
+//
+//        List<String> colectivos = new ArrayList<>();
+//
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+//                (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
+//
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        try {
+//
+//                            JSONArray ja = response.getJSONArray("data"); // get the JSONArray
+//
+//                            for(int i=0;i<ja.length();i++){
+//                                JSONObject colectivo = ja.getJSONObject(i);
+//                                String id = colectivo.getString("id");
+//                                String patente = colectivo.getString("patente");
+//                                String unidad = colectivo.getString("unidad");
+//                                colectivos.add(unidad);
+//                            }
+//
+////                            presenter.showLineasDisponibles(lineasDisponibles);
+//
+//                            System.out.println("Respuesta del servidor ok: " + colectivos.get(0));
+//
+//                        } catch (JSONException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                    }
+//                }, new Response.ErrorListener() {
+//
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        System.out.println("Respuesta del servidor con error: " + error.toString());
+//
+//                    }
+//                });
+//
+//        requestQueue.add(jsonObjectRequest);
+//        return colectivos;
+//    }
+
+
     @Override
-    public List<String> consultaColectivosActivos() {
+    public List<Colectivo> consultaColectivosActivos() {
         requestQueue = Volley.newRequestQueue(mContext);
 
         String url = ipv4+"colectivos";
 
-        List<String> colectivos = new ArrayList<>();
+        List<Colectivo> colectivos = new ArrayList<>();
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
@@ -173,7 +286,8 @@ public class MainModel implements MainInterface.Model {
                                 String id = colectivo.getString("id");
                                 String patente = colectivo.getString("patente");
                                 String unidad = colectivo.getString("unidad");
-                                colectivos.add(unidad);
+                                String marca = colectivo.getString("marca");
+                                colectivos.add(new Colectivo(patente,unidad,marca));
                             }
 
 //                            presenter.showLineasDisponibles(lineasDisponibles);
@@ -196,17 +310,6 @@ public class MainModel implements MainInterface.Model {
         requestQueue.add(jsonObjectRequest);
         return colectivos;
     }
-
-
-
-
-//    JSONObject colectivo = response.getJSONObject(i);
-//    String id = colectivo.getString("id");
-//    String patente = colectivo.getString("patente");
-//    String unidad = colectivo.getString("unidad");
-//
-
-
 
 
 

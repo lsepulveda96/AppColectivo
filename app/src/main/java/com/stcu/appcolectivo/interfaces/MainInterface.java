@@ -2,6 +2,8 @@ package com.stcu.appcolectivo.interfaces;
 
 import android.net.NetworkInfo;
 
+import com.stcu.appcolectivo.model.Colectivo;
+import com.stcu.appcolectivo.model.Linea;
 import com.stcu.appcolectivo.ui.Coordenada;
 
 import java.util.List;
@@ -30,11 +32,12 @@ public interface MainInterface {
     interface Presenter {
         void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, Long fechaUbicacionI);
 
-        List<String> consultaLineasActivas();
+//        List<String> consultaLineasActivas();
+List<Linea> consultaLineasActivas();
 
-        List<String> consultaColectivosActivos();
+//        List<String> consultaColectivosActivos();
+        List<Colectivo> consultaColectivosActivos();
 
-//        boolean isOnlineNet();
 
         NetworkInfo isNetAvailable();
 
@@ -69,9 +72,11 @@ public interface MainInterface {
     interface Model {
         void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, Long fechaUbicacionI);
 
-        List<String> consultaLineasActivas();
+        //List<String> consultaLineasActivas();
+        List<Linea> consultaLineasActivas();
 
-        List<String> consultaColectivosActivos();
+//        List<String> consultaColectivosActivos();
+        List<Colectivo> consultaColectivosActivos();
 
         NetworkInfo isNetAvailable();
 

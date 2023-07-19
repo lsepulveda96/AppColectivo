@@ -31,18 +31,18 @@
         </activity>
 
         <activity
-            android:name="com.stcu.appcolectivo.MainActivity"
+            android:name="com.stcu.appcolectivo.ui.MainActivity"
             android:label="@string/title_activity_main"
             android:screenOrientation="portrait">
         </activity>
 
         <activity
-            android:name="com.stcu.appcolectivo.ColectivoEnServicioActivity"
+            android:name="com.stcu.appcolectivo.ui.ColectivoEnServicioActivity"
             android:label="@string/title_activity_colectivo_en_servicio">
         </activity>
 
         <activity
-            android:name="com.stcu.appcolectivo.SimulacionRecorridoActivity"
+            android:name="com.stcu.appcolectivo.ui.SimulacionRecorridoActivity"
             android:label="@string/title_activity_simulacion_recorrido">
         </activity>
 
@@ -51,7 +51,7 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <receiver android:name="com.stcu.appcolectivo.MainActivity" />
+        <receiver android:name="com.stcu.appcolectivo.ui.MainActivity" />
 
     </application>
 

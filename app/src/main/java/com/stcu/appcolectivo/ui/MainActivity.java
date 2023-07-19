@@ -1,4 +1,4 @@
-package com.stcu.appcolectivo;
+package com.stcu.appcolectivo.ui;
 
 
 import android.app.Activity;
@@ -28,8 +28,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.gpmess.example.volley.app.R;
 import com.stcu.appcolectivo.interfaces.MainInterface;
+import com.stcu.appcolectivo.model.Colectivo;
+import com.stcu.appcolectivo.model.Linea;
 import com.stcu.appcolectivo.presenter.MainPresenter;
-import com.stcu.appcolectivo.ui.Coordenada;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -43,6 +44,10 @@ public class MainActivity extends Activity implements MainInterface.View {
     public static final int WifiData = 1;
 
     private MainInterface.Presenter presenter;
+
+    List<Colectivo> colectivosDisponibles;
+    List<Linea> lineasDisponibles;
+
 
     Button btnGPS;
     TextView tvUbicacion, tvNetwork;
@@ -132,7 +137,7 @@ public class MainActivity extends Activity implements MainInterface.View {
         btnGPS = (Button) findViewById(R.id.button);
 
 //        btnCargarListas = (Button) findViewById(R.id.carga_button);
-        btnIniciarServicio = (Button) findViewById(R.id.guarda_button);
+        btnIniciarServicio = (Button) findViewById(R.id.btnIniciarServicio);
         finServicio = (Button) findViewById(R.id.fin_button);
         finServicio.setEnabled(false);
         btnIniciarServicio.setEnabled(false); // para que no pueda seleccionar una lista vacia
@@ -144,42 +149,56 @@ public class MainActivity extends Activity implements MainInterface.View {
         tvColectivoSeleccionado = (TextView) findViewById(R.id.tvColectivoSeleccionado);
         tvNetwork = (TextView)findViewById(R.id.tv_network);
 
-        //ver si esto anda- sino probar otro getExtra.
-        HashSet<String> hashSetLineas = new HashSet<String>();
-//        hashSetLineas = getIntent().getExtras().getParcelable("hsLineas");
-
-        HashSet<String> hashSetColectivos = new HashSet<String>();
-
-//        hashSetColectivos = getIntent().getExtras().getParcelable("hsColectivos");
+//        colectivosDisponibles = new ArrayList<>();
+//        lineasDisponibles = new ArrayList<>();
 
 
-//ver si esto anda!!
-        Bundle bundle = getIntent().getExtras().getBundle("hsLineas");
-        if (bundle != null) {
-            for (String key : bundle.keySet()) {
-                hashSetLineas.add((String) bundle.get(key));
-            //Log.e(TAG, key + " : " + (bundle.get(key) != null ? bundle.get(key) : "NULL"));
-            }
-        }
+        colectivosDisponibles = getIntent().getParcelableArrayListExtra("listaColectivos");
+        lineasDisponibles = getIntent().getParcelableArrayListExtra("listaLineas");
 
-        Bundle bundle2 = getIntent().getExtras().getBundle("hsColectivos");
-        if (bundle2 != null) {
-            for (String key : bundle2.keySet()) {
-                hashSetColectivos.add((String) bundle2.get(key));
-                //Log.e(TAG, key + " : " + (bundle.get(key) != null ? bundle.get(key) : "NULL"));
-            }
-        }
+//        ArrayList<String> colectivosDisponibles = getIntent().getExtras().getStringArrayList("listaColectivos");
+//
+//        ArrayList<String> lineasDisponibles = getIntent().getStringArrayListExtra("listaLineas");
+
+        System.out.println("El tamano de la lista de lineas desde el servidor --------------------- " +lineasDisponibles.size());
+
+        System.out.println("El tamano de la lista de colectivos desde el servidor --------------------- " +colectivosDisponibles.size());
+
+
+
+
+
+////         esto no anda.
+//        Bundle bundle = getIntent().getExtras().getBundle("hsLineas");
+//        if (bundle != null) {
+//            for (String key : bundle.keySet()) {
+//                hashSetLineas.add((String) bundle.get(key));
+//            //Log.e(TAG, key + " : " + (bundle.get(key) != null ? bundle.get(key) : "NULL"));
+//            }
+//        }
+//
+//        Bundle bundle2 = getIntent().getExtras().getBundle("hsColectivos");
+//        if (bundle2 != null) {
+//            for (String key : bundle2.keySet()) {
+//                hashSetColectivos.add((String) bundle2.get(key));
+//                //Log.e(TAG, key + " : " + (bundle.get(key) != null ? bundle.get(key) : "NULL"));
+//            }
+//        }
 
         adapterSeleccionLinea.clear();
-        for(String opcion: hashSetLineas){
-            adapterSeleccionLinea.add(opcion);
+        for(Linea opcion: lineasDisponibles){
+            adapterSeleccionLinea.add(opcion.getDenominacion());
         }
         adapterSeleccionColectivo.clear();
-        for(String opcion2: hashSetColectivos){
-            adapterSeleccionColectivo.add(opcion2);
+
+        for(Colectivo opcion2: colectivosDisponibles){
+            adapterSeleccionColectivo.add(opcion2.getUnidad());
         }
+        adapterSeleccionLinea.setDropDownViewResource(R.layout.textview_spinner_selected);
+        adapterSeleccionColectivo.setDropDownViewResource(R.layout.textview_spinner_selected);
         itemSeleccionLinea.setAdapter(adapterSeleccionLinea);
         itemSeleccionColectivo.setAdapter(adapterSeleccionColectivo);
+
 
         // si los dos estan vacios
         if(adapterSeleccionLinea.isEmpty() || adapterSeleccionColectivo.isEmpty()){
@@ -198,8 +217,11 @@ public class MainActivity extends Activity implements MainInterface.View {
 
 //            new Task1().execute();
             //esto anda bien!! si no llega a andar lo del asyntask probar esto.
-            final List<String> opcionesLineas = presenter.consultaLineasActivas();
-            final List<String> opcionesColectivos = presenter.consultaColectivosActivos();
+//            final List<String> opcionesLineas = presenter.consultaLineasActivas();
+//            final List<String> opcionesColectivos = presenter.consultaColectivosActivos();
+
+            final List<Linea> opcionesLineas = presenter.consultaLineasActivas();
+            final List<Colectivo> opcionesColectivos = presenter.consultaColectivosActivos();
 
 
             dialog2 = new ProgressDialog( this );
@@ -211,18 +233,33 @@ public class MainActivity extends Activity implements MainInterface.View {
                 public void run() {
                     swipe.setRefreshing(false);
                     dialog2.cancel();
-                    Set<String> hs = new HashSet<String>();
-                    hs.addAll(opcionesLineas);
-                    Set<String> hs2 = new HashSet<String>();
-                    hs2.addAll(opcionesColectivos);
+//                    Set<String> hs = new HashSet<String>();
+//                    hs.addAll(opcionesLineas);
+//                    Set<String> hs2 = new HashSet<String>();
+//                    hs2.addAll(opcionesColectivos);
+//                    adapterSeleccionLinea.clear();
+//                    for(String opcion: hs){
+//                        adapterSeleccionLinea.add(opcion);
+//                    }
+//                    adapterSeleccionColectivo.clear();
+//                    for(String opcion2: hs2){
+//                        adapterSeleccionColectivo.add(opcion2);
+//                    }
+
+//                    Set<String> hs = new HashSet<String>();
+//                    hs.addAll(opcionesLineas);
+//                    Set<String> hs2 = new HashSet<String>();
+//                    hs2.addAll(opcionesColectivos);
                     adapterSeleccionLinea.clear();
-                    for(String opcion: hs){
-                        adapterSeleccionLinea.add(opcion);
+                    for(Linea opcion: opcionesLineas){
+                        adapterSeleccionLinea.add(opcion.getDenominacion());
                     }
                     adapterSeleccionColectivo.clear();
-                    for(String opcion2: hs2){
-                        adapterSeleccionColectivo.add(opcion2);
+                    for(Colectivo opcion2: opcionesColectivos){
+                        adapterSeleccionColectivo.add(opcion2.getUnidad());
                     }
+
+
                     itemSeleccionLinea.setAdapter(adapterSeleccionLinea);
                     adapterSeleccionLinea.setDropDownViewResource(R.layout.textview_spinner_selected);
                     itemSeleccionColectivo.setAdapter(adapterSeleccionColectivo);
@@ -635,8 +672,15 @@ public class MainActivity extends Activity implements MainInterface.View {
                 //aca tiene que haber algo para saber si la resp http esta ok o no
                 //que tambien devuelva una booleana con status 200?
                 //tendria que devolver un array, en pos 2 que este la respuesta
-                final List<String> opcionesLineas = presenter.consultaLineasActivas();
-                final List<String> opcionesColectivos = presenter.consultaColectivosActivos();
+
+//                final List<String> opcionesLineas = presenter.consultaLineasActivas();
+//                final List<String> opcionesColectivos = presenter.consultaColectivosActivos();
+
+                final List<Linea> opcionesLineas = presenter.consultaLineasActivas();
+                final List<Colectivo> opcionesColectivos = presenter.consultaColectivosActivos();
+
+
+
 //                final Handler ha
 //                ndler2 = new Handler();
 //                final Runnable r2 = new Runnable(){
@@ -648,23 +692,35 @@ public class MainActivity extends Activity implements MainInterface.View {
 //                    throw new RuntimeException(e);
 //                }
 
-                Set<String> hs = new HashSet<String>();
-                        hs.addAll(opcionesLineas);
-                        Set<String> hs2 = new HashSet<String>();
-                        hs2.addAll(opcionesColectivos);
+//                Set<String> hs = new HashSet<String>();
+//                        hs.addAll(opcionesLineas);
+//                        Set<String> hs2 = new HashSet<String>();
+//                        hs2.addAll(opcionesColectivos);
 
 
                         MainActivity.this.runOnUiThread(new Runnable() {
                     public void run() {
+//                        adapterSeleccionLinea.clear();
+//                        adapterSeleccionColectivo.clear();
+//                        for(String opcion: hs){
+//                            adapterSeleccionLinea.add(opcion);
+//                        }
+//
+//                        for(String opcion2: hs2){
+//                            adapterSeleccionColectivo.add(opcion2);
+//                        }
+
                         adapterSeleccionLinea.clear();
                         adapterSeleccionColectivo.clear();
-                        for(String opcion: hs){
-                            adapterSeleccionLinea.add(opcion);
+                        for(Linea opcion: opcionesLineas){
+                            adapterSeleccionLinea.add(opcion.getDenominacion());
                         }
 
-                        for(String opcion2: hs2){
-                            adapterSeleccionColectivo.add(opcion2);
+                        for(Colectivo opcion2: opcionesColectivos){
+                            adapterSeleccionColectivo.add(opcion2.getUnidad());
                         }
+
+
                         itemSeleccionLinea.setAdapter(adapterSeleccionLinea);
                         adapterSeleccionLinea.setDropDownViewResource(R.layout.textview_spinner_selected);
                         itemSeleccionColectivo.setAdapter(adapterSeleccionColectivo);

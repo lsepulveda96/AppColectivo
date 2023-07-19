@@ -4,12 +4,12 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/main_gradient_color"
-    tools:context="com.stcu.appcolectivo.MainActivity">
+    tools:context="com.stcu.appcolectivo.ui.MainActivity">
 
     <!--borrar-->
     <fragment
         android:id="@+id/main_fragment"
-        android:name="com.stcu.appcolectivo.MainFragment"
+        android:name="com.stcu.appcolectivo.ui.MainFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
@@ -108,7 +108,7 @@
 
 
     <Button
-        android:id="@+id/guarda_button"
+        android:id="@+id/btnIniciarServicio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/spinnerSelColectivo"
@@ -124,7 +124,7 @@
         android:id="@+id/fin_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/guarda_button"
+        android:layout_below="@+id/btnIniciarServicio"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"

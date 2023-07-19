@@ -1,4 +1,4 @@
-package com.stcu.appcolectivo;
+package com.stcu.appcolectivo.ui;
 
 import android.content.Intent;
 import android.os.Bundle;

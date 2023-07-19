@@ -3,12 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/main_gradient_color"
-    tools:context="com.stcu.appcolectivo.SimulacionRecorridoActivity">
+    tools:context="com.stcu.appcolectivo.ui.SimulacionRecorridoActivity">
 
 
     <fragment
         android:id="@+id/main_fragment"
-        android:name="com.stcu.appcolectivo.MainFragment"
+        android:name="com.stcu.appcolectivo.ui.MainFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
