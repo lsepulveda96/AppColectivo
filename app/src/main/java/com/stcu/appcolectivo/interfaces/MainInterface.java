@@ -4,6 +4,7 @@ import android.net.NetworkInfo;
 
 import com.stcu.appcolectivo.model.Colectivo;
 import com.stcu.appcolectivo.model.Linea;
+import com.stcu.appcolectivo.model.Recorrido;
 import com.stcu.appcolectivo.ui.Coordenada;
 
 import java.util.List;
@@ -33,11 +34,12 @@ public interface MainInterface {
         void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, Long fechaUbicacionI);
 
 //        List<String> consultaLineasActivas();
-List<Linea> consultaLineasActivas();
+        List<Linea> consultaLineasActivas();
 
 //        List<String> consultaColectivosActivos();
         List<Colectivo> consultaColectivosActivos();
 
+        List<Recorrido> consultaRecorridoActivos(String denomLinea);
 
         NetworkInfo isNetAvailable();
 
@@ -64,6 +66,8 @@ List<Linea> consultaLineasActivas();
 
         void showResponseError(String error);
 
+
+
 //        void showListadoLineas(List<String> listadoLineas);
 //
 //        void showListadoColectivos(List<String> listadoColectivos);
@@ -78,6 +82,8 @@ List<Linea> consultaLineasActivas();
 //        List<String> consultaColectivosActivos();
         List<Colectivo> consultaColectivosActivos();
 
+        List<Recorrido> consultaRecorridosActivos(String denomLinea);
+
         NetworkInfo isNetAvailable();
 
 //        boolean isOnlineNet();
@@ -89,5 +95,8 @@ List<Linea> consultaLineasActivas();
         void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String latitud, String longitud);
 
         void makeRequestPostFin(String seleccionLin, String seleccionCol, String lat, String lng);
+
+
+
     }
 }

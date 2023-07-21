@@ -84,6 +84,18 @@
         android:textSize="16sp" />
 
 
+    <TextView
+        android:id="@+id/tvSeleccionRecorrido"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spinnerSelColectivo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:fontFamily="@font/alata"
+        android:text="Seleccionar recorrido:"
+        android:textAllCaps="false"
+        android:textSize="16sp" />
+
     <Spinner
         android:id="@+id/spinnerSelColectivo"
         android:layout_width="match_parent"
@@ -96,6 +108,16 @@
         android:background="@drawable/spinner_selector" />
 
 
+    <Spinner
+        android:id="@+id/spinnerSelRecorrido"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_below="@+id/tvSeleccionRecorrido"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/spinner_selector"
+        android:spinnerMode="dialog" />
 
     <TextView
         android:id="@+id/tvLineaSeleccionada"
@@ -111,8 +133,8 @@
         android:id="@+id/btnIniciarServicio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/spinnerSelColectivo"
-        android:layout_marginTop="220dp"
+        android:layout_below="@+id/spinnerSelRecorrido"
+        android:layout_marginTop="100dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:background="@drawable/btn_follow_style"

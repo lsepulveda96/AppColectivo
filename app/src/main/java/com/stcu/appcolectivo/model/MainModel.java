@@ -45,6 +45,7 @@ public class MainModel implements MainInterface.Model {
     List<String> listadoColectivos = new ArrayList<String>();
     List<Coordenada> listaParadas;
     private List<Coordenada> listaCoordenadasTrayecto;
+    private List<Recorrido> listaRecorridosActivos;
     Coordenada parada;
     Coordenada coord;
 
@@ -602,4 +603,52 @@ public class MainModel implements MainInterface.Model {
         requestQueue.add(postRequest);
 //        addToQueue(postRequest);
     }
+
+
+
+
+    public List<Recorrido> consultaRecorridosActivos(String denomLinea) {
+        listaRecorridosActivos = new ArrayList<Recorrido>();
+        String url = ipv4 + "recorridosActivos/" + denomLinea;
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+
+                            JSONArray ja = response.getJSONArray("data"); // get the JSONArray
+
+                            for(int i=0;i<ja.length();i++){
+                                JSONObject recorridoActivo = ja.getJSONObject(i);
+                                long id = Long.parseLong(recorridoActivo.getString("id"));
+                                String denominacion = recorridoActivo.getString("denominacion");
+                                boolean activo = Boolean.parseBoolean(recorridoActivo.getString("activo"));
+
+                                listaRecorridosActivos.add(new Recorrido(id,denominacion,activo));
+                            }
+
+//                            presenter.showLineasDisponibles(lineasDisponibles);
+
+                            System.out.println("Respuesta del servidor ok: " + listaRecorridosActivos.get(0));
+
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        System.out.println("Respuesta del servidor con error: " + error.toString());
+
+                    }
+                });
+        requestQueue.add(jsonObjectRequest);
+        return listaRecorridosActivos;
+    }
+
+
+
 }

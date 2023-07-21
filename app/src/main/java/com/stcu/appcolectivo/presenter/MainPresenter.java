@@ -8,6 +8,7 @@ import com.stcu.appcolectivo.interfaces.MainInterface;
 import com.stcu.appcolectivo.model.Colectivo;
 import com.stcu.appcolectivo.model.Linea;
 import com.stcu.appcolectivo.model.MainModel;
+import com.stcu.appcolectivo.model.Recorrido;
 import com.stcu.appcolectivo.ui.Coordenada;
 
 import java.util.ArrayList;
@@ -55,6 +56,13 @@ public class MainPresenter implements MainInterface.Presenter {
         List<Colectivo> colectivosActivos = model.consultaColectivosActivos();
         return colectivosActivos;
     }
+
+    @Override
+    public List<Recorrido> consultaRecorridoActivos(String denomLinea) {
+        List<Recorrido> recorridosActivos = model.consultaRecorridosActivos(denomLinea);
+        return recorridosActivos;
+    }
+
 
     public NetworkInfo isNetAvailable() {
         return model.isNetAvailable();

@@ -30,6 +30,7 @@ import com.gpmess.example.volley.app.R;
 import com.stcu.appcolectivo.interfaces.MainInterface;
 import com.stcu.appcolectivo.model.Colectivo;
 import com.stcu.appcolectivo.model.Linea;
+import com.stcu.appcolectivo.model.Recorrido;
 import com.stcu.appcolectivo.presenter.MainPresenter;
 
 import java.util.ArrayList;
@@ -49,16 +50,14 @@ public class MainActivity extends Activity implements MainInterface.View {
     List<Linea> lineasDisponibles;
 
 
+
     Button btnGPS;
     TextView tvUbicacion, tvNetwork;
-//    TexView tvAccess;
     private String myLat, myLng;
-    private Spinner itemSeleccionLinea, itemSeleccionColectivo;
+    private Spinner itemSeleccionLinea, itemSeleccionColectivo, itemSeleccionRecorrido;
     private Button btnIniciarServicio;
-
-//    private Button btnCargarListas;
     Button finServicio;
-    ArrayAdapter<String> adapterSeleccionLinea, adapterSeleccionColectivo;
+    ArrayAdapter<String> adapterSeleccionLinea, adapterSeleccionColectivo, adapterSeleccionRecorrido;
     private TextView tvColectivoSeleccionado, tvLineaSeleccionada;
     Long fechaUbicacionI;
     List<Coordenada> coordenadasSim;
@@ -96,25 +95,6 @@ public class MainActivity extends Activity implements MainInterface.View {
             Toast.makeText(getApplicationContext(),"internet apagado", Toast.LENGTH_SHORT).show();
         }
 
-//        ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-//        //for airplane mode, networkinfo is null
-//        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-//        if (null != activeNetwork) {
-//
-//            switch (activeNetwork.getType()){
-//                case ConnectivityManager.TYPE_WIFI:Toast.makeText(getApplicationContext(),"wifi encenidido", Toast.LENGTH_SHORT).show();
-//                    tvNetwork.setVisibility(View.GONE);
-//                    break;
-//                case ConnectivityManager.TYPE_MOBILE:Toast.makeText(getApplicationContext(),"mobile encenidido", Toast.LENGTH_SHORT).show();
-//                    tvNetwork.setVisibility(View.GONE);
-//                    break;
-//            }
-//        }else {
-//            tvNetwork.setVisibility(View.VISIBLE);
-//            Toast.makeText(getApplicationContext(),"internet apagado", Toast.LENGTH_SHORT).show();
-//        }
-    //
-
     }
 
     @Override
@@ -135,55 +115,23 @@ public class MainActivity extends Activity implements MainInterface.View {
         setLat("0");
         tvUbicacion = (TextView) findViewById(R.id.tvUbicacion);
         btnGPS = (Button) findViewById(R.id.button);
-
-//        btnCargarListas = (Button) findViewById(R.id.carga_button);
         btnIniciarServicio = (Button) findViewById(R.id.btnIniciarServicio);
         finServicio = (Button) findViewById(R.id.fin_button);
         finServicio.setEnabled(false);
         btnIniciarServicio.setEnabled(false); // para que no pueda seleccionar una lista vacia
         adapterSeleccionLinea = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
         adapterSeleccionColectivo = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
+        adapterSeleccionRecorrido = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
         itemSeleccionLinea = (Spinner) findViewById(R.id.spinnerSelLinea);
         itemSeleccionColectivo = (Spinner) findViewById(R.id.spinnerSelColectivo);
+        itemSeleccionRecorrido = (Spinner) findViewById(R.id.spinnerSelRecorrido);
         tvLineaSeleccionada = (TextView) findViewById(R.id.tvLineaSeleccionada);
         tvColectivoSeleccionado = (TextView) findViewById(R.id.tvColectivoSeleccionado);
         tvNetwork = (TextView)findViewById(R.id.tv_network);
 
-//        colectivosDisponibles = new ArrayList<>();
-//        lineasDisponibles = new ArrayList<>();
-
-
         colectivosDisponibles = getIntent().getParcelableArrayListExtra("listaColectivos");
         lineasDisponibles = getIntent().getParcelableArrayListExtra("listaLineas");
 
-//        ArrayList<String> colectivosDisponibles = getIntent().getExtras().getStringArrayList("listaColectivos");
-//
-//        ArrayList<String> lineasDisponibles = getIntent().getStringArrayListExtra("listaLineas");
-
-        System.out.println("El tamano de la lista de lineas desde el servidor --------------------- " +lineasDisponibles.size());
-
-        System.out.println("El tamano de la lista de colectivos desde el servidor --------------------- " +colectivosDisponibles.size());
-
-
-
-
-
-////         esto no anda.
-//        Bundle bundle = getIntent().getExtras().getBundle("hsLineas");
-//        if (bundle != null) {
-//            for (String key : bundle.keySet()) {
-//                hashSetLineas.add((String) bundle.get(key));
-//            //Log.e(TAG, key + " : " + (bundle.get(key) != null ? bundle.get(key) : "NULL"));
-//            }
-//        }
-//
-//        Bundle bundle2 = getIntent().getExtras().getBundle("hsColectivos");
-//        if (bundle2 != null) {
-//            for (String key : bundle2.keySet()) {
-//                hashSetColectivos.add((String) bundle2.get(key));
-//                //Log.e(TAG, key + " : " + (bundle.get(key) != null ? bundle.get(key) : "NULL"));
-//            }
-//        }
 
         adapterSeleccionLinea.clear();
         for(Linea opcion: lineasDisponibles){
@@ -198,7 +146,7 @@ public class MainActivity extends Activity implements MainInterface.View {
         adapterSeleccionColectivo.setDropDownViewResource(R.layout.textview_spinner_selected);
         itemSeleccionLinea.setAdapter(adapterSeleccionLinea);
         itemSeleccionColectivo.setAdapter(adapterSeleccionColectivo);
-
+        itemSeleccionRecorrido.setAdapter(adapterSeleccionRecorrido);
 
         // si los dos estan vacios
         if(adapterSeleccionLinea.isEmpty() || adapterSeleccionColectivo.isEmpty()){
@@ -216,9 +164,6 @@ public class MainActivity extends Activity implements MainInterface.View {
         swipe.setOnRefreshListener(() -> {
 
 //            new Task1().execute();
-            //esto anda bien!! si no llega a andar lo del asyntask probar esto.
-//            final List<String> opcionesLineas = presenter.consultaLineasActivas();
-//            final List<String> opcionesColectivos = presenter.consultaColectivosActivos();
 
             final List<Linea> opcionesLineas = presenter.consultaLineasActivas();
             final List<Colectivo> opcionesColectivos = presenter.consultaColectivosActivos();
@@ -233,23 +178,7 @@ public class MainActivity extends Activity implements MainInterface.View {
                 public void run() {
                     swipe.setRefreshing(false);
                     dialog2.cancel();
-//                    Set<String> hs = new HashSet<String>();
-//                    hs.addAll(opcionesLineas);
-//                    Set<String> hs2 = new HashSet<String>();
-//                    hs2.addAll(opcionesColectivos);
-//                    adapterSeleccionLinea.clear();
-//                    for(String opcion: hs){
-//                        adapterSeleccionLinea.add(opcion);
-//                    }
-//                    adapterSeleccionColectivo.clear();
-//                    for(String opcion2: hs2){
-//                        adapterSeleccionColectivo.add(opcion2);
-//                    }
 
-//                    Set<String> hs = new HashSet<String>();
-//                    hs.addAll(opcionesLineas);
-//                    Set<String> hs2 = new HashSet<String>();
-//                    hs2.addAll(opcionesColectivos);
                     adapterSeleccionLinea.clear();
                     for(Linea opcion: opcionesLineas){
                         adapterSeleccionLinea.add(opcion.getDenominacion());
@@ -275,7 +204,35 @@ public class MainActivity extends Activity implements MainInterface.View {
                 }
             };
             handler2.postDelayed(r2,4000);
+            // aca deberia llamar a los recorridos de la linea
+
         });
+
+        final List<Recorrido> opcionesRecorridos = presenter.consultaRecorridoActivos(itemSeleccionLinea.getSelectedItem().toString());
+
+        final Handler handler3 = new Handler();
+        final Runnable r3 = new Runnable(){
+            public void run() {
+
+
+                adapterSeleccionRecorrido.clear();
+
+
+                System.out.println("el tamannno de opcionesRecorridos ----" + opcionesRecorridos.size());
+                System.out.println("lo que trae el item selected del servidor linea ---- " + itemSeleccionLinea.getSelectedItem().toString());
+
+
+                for(Recorrido opcionRecorrido: opcionesRecorridos){
+                    adapterSeleccionRecorrido.add(opcionRecorrido.getDenominacion());
+
+                    System.out.println("lo que trae el servidor de los recorridos ---- " + opcionRecorrido.getDenominacion());
+
+                }
+                itemSeleccionRecorrido.setAdapter(adapterSeleccionRecorrido);
+                adapterSeleccionRecorrido.setDropDownViewResource(R.layout.textview_spinner_selected);
+            }
+        };
+        handler3.postDelayed(r3,2000);
     }
 
 
@@ -300,10 +257,12 @@ public class MainActivity extends Activity implements MainInterface.View {
         final String seleccionLin2 = itemSeleccionLinea.getSelectedItem().toString();
         final String seleccionCol2 = itemSeleccionColectivo.getSelectedItem().toString();
 
-        //TODO 4to refactoring, ojo con lo que devuelve!! donde lo uso? lista de trayecto a simular!
         coordenadasSim = new ArrayList<Coordenada>();
-//        coordenadasSim = fragment.consultaTrayectoASimular( seleccionLin2 );
-        coordenadasSim = presenter.consultaTrayectoASimular( seleccionLin2);
+
+
+
+        // TODO aca tengo que traer el nombre del recorrido que ya selecciono
+        coordenadasSim = presenter.consultaTrayectoASimular(seleccionLin2);
 
         dialog1 = new ProgressDialog( this );
         dialog1.setMessage( "Cargando recorrido a simular" );
@@ -655,105 +614,75 @@ public class MainActivity extends Activity implements MainInterface.View {
 //        }
 //        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 //    }
-        class Task1 extends AsyncTask<Void,Void,Boolean> {
 
-            @Override
-            protected void onPreExecute() {
-//                super.onPreExecute();
-//                dialog2 = new ProgressDialog( MainActivity.this );
-//                dialog2.setMessage( "Cargando listado de lineas y colectivos" );
-//                dialog2.show();
-
-            }
-
-            @Override
-            protected Boolean doInBackground(Void... voids) {
-
-                //aca tiene que haber algo para saber si la resp http esta ok o no
-                //que tambien devuelva una booleana con status 200?
-                //tendria que devolver un array, en pos 2 que este la respuesta
-
-//                final List<String> opcionesLineas = presenter.consultaLineasActivas();
-//                final List<String> opcionesColectivos = presenter.consultaColectivosActivos();
-
-                final List<Linea> opcionesLineas = presenter.consultaLineasActivas();
-                final List<Colectivo> opcionesColectivos = presenter.consultaColectivosActivos();
-
-
-
-//                final Handler ha
-//                ndler2 = new Handler();
-//                final Runnable r2 = new Runnable(){
+    //probarlo, pero todavia no lo uso
+//        class Task1 extends AsyncTask<Void,Void,Boolean> {
+//
+//            @Override
+//            protected void onPreExecute() {
+////                super.onPreExecute();
+////                dialog2 = new ProgressDialog( MainActivity.this );
+////                dialog2.setMessage( "Cargando listado de lineas y colectivos" );
+////                dialog2.show();
+//
+//            }
+//
+//            @Override
+//            protected Boolean doInBackground(Void... voids) {
+//
+//                //aca tiene que haber algo para saber si la resp http esta ok o no
+//                //que tambien devuelva una booleana con status 200?
+//                //tendria que devolver un array, en pos 2 que este la respuesta
+//
+//                final List<Linea> opcionesLineas = presenter.consultaLineasActivas();
+//                final List<Colectivo> opcionesColectivos = presenter.consultaColectivosActivos();
+//
+//                        MainActivity.this.runOnUiThread(new Runnable() {
 //                    public void run() {
-
-//                try {
-//                    Thread.sleep(5000);
-//                } catch (InterruptedException e) {
-//                    throw new RuntimeException(e);
-//                }
-
-//                Set<String> hs = new HashSet<String>();
-//                        hs.addAll(opcionesLineas);
-//                        Set<String> hs2 = new HashSet<String>();
-//                        hs2.addAll(opcionesColectivos);
-
-
-                        MainActivity.this.runOnUiThread(new Runnable() {
-                    public void run() {
+//
 //                        adapterSeleccionLinea.clear();
 //                        adapterSeleccionColectivo.clear();
-//                        for(String opcion: hs){
-//                            adapterSeleccionLinea.add(opcion);
+//                        for(Linea opcion: opcionesLineas){
+//                            adapterSeleccionLinea.add(opcion.getDenominacion());
 //                        }
 //
-//                        for(String opcion2: hs2){
-//                            adapterSeleccionColectivo.add(opcion2);
+//                        for(Colectivo opcion2: opcionesColectivos){
+//                            adapterSeleccionColectivo.add(opcion2.getUnidad());
 //                        }
-
-                        adapterSeleccionLinea.clear();
-                        adapterSeleccionColectivo.clear();
-                        for(Linea opcion: opcionesLineas){
-                            adapterSeleccionLinea.add(opcion.getDenominacion());
-                        }
-
-                        for(Colectivo opcion2: opcionesColectivos){
-                            adapterSeleccionColectivo.add(opcion2.getUnidad());
-                        }
-
-
-                        itemSeleccionLinea.setAdapter(adapterSeleccionLinea);
-                        adapterSeleccionLinea.setDropDownViewResource(R.layout.textview_spinner_selected);
-                        itemSeleccionColectivo.setAdapter(adapterSeleccionColectivo);
-                        adapterSeleccionColectivo.setDropDownViewResource(R.layout.textview_spinner_selected);
-                    }
-                });
-
-
-                        // si los dos estan vacios
-                        if(adapterSeleccionLinea.isEmpty() || adapterSeleccionColectivo.isEmpty()){
-                            MainActivity.this.runOnUiThread(new Runnable() {
-                                public void run() {
-                                    Toast.makeText(getApplicationContext(), "No se pudo cargar el listado de lineas y colectivos", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                            return false;
-                        }else {
-                            btnIniciarServicio.setEnabled( true ); // para que pueda guardar la eleccion
-                            finServicio.setEnabled( true );
-                            return true;
-                        }
+//
+//                        itemSeleccionLinea.setAdapter(adapterSeleccionLinea);
+//                        adapterSeleccionLinea.setDropDownViewResource(R.layout.textview_spinner_selected);
+//                        itemSeleccionColectivo.setAdapter(adapterSeleccionColectivo);
+//                        adapterSeleccionColectivo.setDropDownViewResource(R.layout.textview_spinner_selected);
 //                    }
-//                };
-//                handler2.postDelayed(r2,4000);
-//                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Boolean s) {
-                swipe.setRefreshing(false);
-//                dialog2.cancel();
-            }
-        }
+//                });
+//
+//
+//                        // si los dos estan vacios
+//                        if(adapterSeleccionLinea.isEmpty() || adapterSeleccionColectivo.isEmpty()){
+//                            MainActivity.this.runOnUiThread(new Runnable() {
+//                                public void run() {
+//                                    Toast.makeText(getApplicationContext(), "No se pudo cargar el listado de lineas y colectivos", Toast.LENGTH_SHORT).show();
+//                                }
+//                            });
+//                            return false;
+//                        }else {
+//                            btnIniciarServicio.setEnabled( true ); // para que pueda guardar la eleccion
+//                            finServicio.setEnabled( true );
+//                            return true;
+//                        }
+////                    }
+////                };
+////                handler2.postDelayed(r2,4000);
+////                return null;
+//            }
+//
+//            @Override
+//            protected void onPostExecute(Boolean s) {
+//                swipe.setRefreshing(false);
+////                dialog2.cancel();
+//            }
+//        }
 
 
 
