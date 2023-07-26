@@ -1,29 +1,12 @@
 package com.stcu.appcolectivo.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.gpmess.example.volley.app.R;
-import com.stcu.appcolectivo.ui.BaseVolleyFragment;
-import com.stcu.appcolectivo.ui.Coordenada;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.stcu.appcolectivo.util.BaseVolleyFragment;
 
 public class MainFragment extends BaseVolleyFragment {
 

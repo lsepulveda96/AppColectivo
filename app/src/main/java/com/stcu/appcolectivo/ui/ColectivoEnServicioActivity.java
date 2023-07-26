@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.gpmess.example.volley.app.R;
 import com.stcu.appcolectivo.interfaces.TrayectoARecorrerInterface;
+import com.stcu.appcolectivo.model.Coordenada;
 import com.stcu.appcolectivo.presenter.TrayectoARecorrerPresenter;
 
 import java.util.Date;

@@ -5,7 +5,7 @@ import android.net.NetworkInfo;
 import com.stcu.appcolectivo.model.Colectivo;
 import com.stcu.appcolectivo.model.Linea;
 import com.stcu.appcolectivo.model.Recorrido;
-import com.stcu.appcolectivo.ui.Coordenada;
+import com.stcu.appcolectivo.model.Coordenada;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public interface MainInterface {
 
 //        void showResponseInicioServicioError(String error);
 
-        void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String latInicial, String lngInicial);
+        void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial);
 
 //        void showResponsePostSimulacionError(String error);
 
@@ -43,7 +43,7 @@ public interface MainInterface {
 
         NetworkInfo isNetAvailable();
 
-        List<Coordenada> consultaTrayectoASimular(String seleccionLin2);
+        List<Coordenada> consultaTrayectoASimular(String seleccionLin2, String seleccionRec2);
 
         //para mostar ubicacion pedida anteriormente
         void showUbicacion(String strLatitud, String strLongitud);
@@ -54,9 +54,9 @@ public interface MainInterface {
 
 //        void showResponseInicioServicioError(String error);
 
-        void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String latitud, String longitud);
+        void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String seleccionRec2, String latitud, String longitud);
 
-        void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String latInicial, String lngInicial);
+        void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial);
 
 //        void showResponsePostSimulacionError(String toString);
 
@@ -88,11 +88,11 @@ public interface MainInterface {
 
 //        boolean isOnlineNet();
 
-        List<Coordenada> consultaTrayectoASimular(String seleccionLin2);
+        List<Coordenada> consultaTrayectoASimular(String seleccionLin2, String seleccionRec2);
 
         void obtenerUbicacion();
 
-        void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String latitud, String longitud);
+        void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String seleccionRec2, String latitud, String longitud);
 
         void makeRequestPostFin(String seleccionLin, String seleccionCol, String lat, String lng);
 

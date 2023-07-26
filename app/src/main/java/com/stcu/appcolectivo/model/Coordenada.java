@@ -1,4 +1,4 @@
-package com.stcu.appcolectivo.ui;
+package com.stcu.appcolectivo.model;
 
 public class Coordenada {
 

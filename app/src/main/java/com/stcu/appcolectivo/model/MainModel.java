@@ -17,13 +17,11 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.stcu.appcolectivo.ui.MainActivity;
 import com.stcu.appcolectivo.interfaces.MainInterface;
-import com.stcu.appcolectivo.ui.Coordenada;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -288,7 +286,7 @@ public class MainModel implements MainInterface.Model {
                                 String patente = colectivo.getString("patente");
                                 String unidad = colectivo.getString("unidad");
                                 String marca = colectivo.getString("marca");
-                                colectivos.add(new Colectivo(patente,unidad,marca));
+                                colectivos.add(new Colectivo(unidad,patente,marca));
                             }
 
 //                            presenter.showLineasDisponibles(lineasDisponibles);
@@ -313,17 +311,6 @@ public class MainModel implements MainInterface.Model {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
     public NetworkInfo isNetAvailable() {
 
         ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -333,11 +320,17 @@ public class MainModel implements MainInterface.Model {
         return activeNetwork;
    }
 
-    public List<Coordenada> consultaTrayectoASimular(String denom) {
+    /**
+     * Metodo que recupera la lista de coordenadas a utilizar para simular el trayecto seleccionado
+     * @param denom denominacion de la linea seleccionada
+     * @param seleccionRec2 seleccion de uno de los recorridos activos de esa linea seleccionada
+     * @return lista de coordenadas del trayecto seleccionado
+     */
+    public List<Coordenada> consultaTrayectoASimular(String denom, String seleccionRec2) {
         listaCoordenadasTrayecto = new ArrayList<Coordenada>();
-        String url = ipv4 + "rest/lineaColectivos/trayectos/" + denom;
+        String url = ipv4 + "trayectos/" + denom +"/"+ seleccionRec2;
 
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
+       /* JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
                 Request.Method.GET,
                 url,
                 (String) null,
@@ -364,19 +357,60 @@ public class MainModel implements MainInterface.Model {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
+                        System.out.println("Error respuesta del servidor: " + error.toString());
                     }
                 }
-        );
-        requestQueue.add(jsonArrayRequest);
+        );*/
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+
+                            JSONArray paradas = response.getJSONArray("data"); // get the JSONArray
+
+                            for (int i = 0; i < paradas.length(); i++) {
+                                JSONObject parada = paradas.getJSONObject(i);
+
+                                JSONObject coordLng = new JSONObject(parada.getString("parada")).getJSONObject("coordenada");
+                                String longitud = coordLng.getString("lng");
+
+                                JSONObject coordLat = new JSONObject(parada.getString("parada")).getJSONObject("coordenada");
+                                String latitud = coordLat.getString("lat");
+
+                                String direccion= new JSONObject(parada.getString("parada")).getString("direccion");
+
+                                // esto quizas se deba llamar Parada, o paradaRecorrido en vez de coordenada
+                                coord = new Coordenada();
+                                coord.setLatitud(Double.parseDouble(latitud));
+                                coord.setLongitud(Double.parseDouble(longitud));
+                                coord.setDireccion(direccion);
+                                listaCoordenadasTrayecto.add(coord);
+                            }
+
+//                            System.out.println("Respuesta del servidor ok: " + colectivos.get(0));
+
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        System.out.println("Respuesta del servidor con error: " + error.toString());
+
+                    }
+                });
+
+        requestQueue.add(jsonObjectRequest);
         return listaCoordenadasTrayecto;
     }
-
 
     public void obtenerUbicacion() {
 
         LocationManager locationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
-
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -395,8 +429,6 @@ public class MainModel implements MainInterface.Model {
             public void onProviderDisabled(String provider) {
             }
         };
-
-
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -494,9 +526,20 @@ public class MainModel implements MainInterface.Model {
 //        addToQueue(postRequest);
     }
 
-    public void makeRequestPostSimulacion(final String seleccionLin, final String seleccionCol, final String latInicial, final String lngInicial) {
+    // todo esto trabajando en este para simulacion recorrido
+    /**
+     * Metodo utilizado para inicializar la simulacion del recorrido
+     *
+     * @param seleccionLin
+     * @param seleccionCol
+     * @param seleccionRec
+     * @param latInicial
+     * @param lngInicial
+     */
+    public void makeRequestPostSimulacion(final String seleccionLin, final String seleccionCol, final String seleccionRec, final String latInicial, final String lngInicial) {
 
-        final String url = ipv4+"rest/lineaColectivos/inicio"; // uni
+        //antiguo
+       /* final String url = ipv4+"inicio"; // uni
         final Long fechaUbicacion = System.currentTimeMillis();
         StringRequest postRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>()
@@ -504,36 +547,14 @@ public class MainModel implements MainInterface.Model {
                     @Override
                     public void onResponse(String response) {
                         response = response.replaceAll ("\"","");
-                        presenter.showResponsePostSimulacionOk(response,seleccionLin,seleccionCol,latInicial, lngInicial);
-
-//                        Toast toast1 =
-//                                Toast.makeText(getActivity(),
-//                                        response, Toast.LENGTH_LONG);
-//                        toast1.show();
-//
-//                        if(response.equals("Servicio iniciado")) {
-//                            //TODO tiene que ir al model a hacer request y volver al main activity para que llame a simulacion
-//                            Intent ma2 = new Intent(getActivity(), SimulacionRecorridoActivity.class);
-//                            ma2.putExtra("linea", seleccionLin);
-//                            ma2.putExtra("colectivo", seleccionCol);
-//                            ma2.putExtra("latitud", latInicial);
-//                            ma2.putExtra("longitud", lngInicial);
-//                            ma2.putExtra("fechaUbicacion", String.valueOf(System.currentTimeMillis()));
-//                            getActivity().startActivity(ma2);
-//                        }
+                        presenter.showResponsePostSimulacionOk(response,seleccionLin,seleccionCol,seleccionRec,latInicial, lngInicial);
                     }
                 },
                 new Response.ErrorListener()
                 {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
                         presenter.showResponseError("No se pudo iniciar el servicio");
-//                        presenter.showResponsePostSimulacionError(error.toString());
-//                        Toast toast1 = Toast.makeText(getActivity(),"No se pudo iniciar el servicio", Toast.LENGTH_SHORT);
-//                        toast1.show();
-//                        Toast.makeText( getActivity(),"Vuelva a intentarlo",Toast.LENGTH_SHORT ).show();
-
                     }
                 }
         ) {
@@ -544,6 +565,7 @@ public class MainModel implements MainInterface.Model {
 
                 params.put("linea",seleccionLin);
                 params.put("colectivo", seleccionCol);
+                params.put("recorrido", seleccionRec);
                 params.put("latitud", latInicial);
                 params.put("longitud", lngInicial);
                 params.put("fechaUbicacion", String.valueOf(fechaUbicacion));
@@ -551,9 +573,84 @@ public class MainModel implements MainInterface.Model {
                 return params;
             }
         };
-        requestQueue.add(postRequest);
-//        addToQueue(postRequest);
+        requestQueue.add(postRequest);*/
+
+        final String url = ipv4+"inicio"; // uni
+        final long fechaUbicacion = System.currentTimeMillis();
+        Map<String, String> params = new HashMap();
+        params.put("linea",seleccionLin);
+        params.put("colectivo", seleccionCol);
+        params.put("recorrido", seleccionRec);
+        params.put("latitud", latInicial);
+        params.put("longitud", lngInicial);
+        params.put("fechaUbicacion", String.valueOf(fechaUbicacion));
+
+        JSONObject parameters = new JSONObject(params);
+
+//        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, url, parameters,new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        //response = response.replaceAll ("\"","");
+                        presenter.showResponsePostSimulacionOk(response.toString(),seleccionLin,seleccionCol,seleccionRec,latInicial, lngInicial);
+                    }
+                },  new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        presenter.showResponseError("No se pudo iniciar el servicio");
+                    }
+
+    });
+
+
+//                new Response.Listener<String>()
+//                {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        response = response.replaceAll ("\"","");
+//                        presenter.showResponsePostSimulacionOk(response,seleccionLin,seleccionCol,seleccionRec,latInicial, lngInicial);
+//                    }
+//                },
+//                new Response.ErrorListener()
+//                {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        presenter.showResponseError("No se pudo iniciar el servicio");
+//                    }
+//                }
+//        ) {
+//            @Override
+//            protected Map<String, String> getParams()
+//            {
+//                Map<String, String>  params = new HashMap<String, String>();
+//
+//                params.put("linea",seleccionLin);
+//                params.put("colectivo", seleccionCol);
+//                params.put("recorrido", seleccionRec);
+//                params.put("latitud", latInicial);
+//                params.put("longitud", lngInicial);
+//                params.put("fechaUbicacion", String.valueOf(fechaUbicacion));
+//
+//                return params;
+//            }
+//        };
+        requestQueue.add(jsonRequest);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     public void makeRequestPostFin(final String seleccionLin, final String seleccionCol, final String lat, final String lng) {

@@ -9,7 +9,7 @@ import com.stcu.appcolectivo.model.Colectivo;
 import com.stcu.appcolectivo.model.Linea;
 import com.stcu.appcolectivo.model.MainModel;
 import com.stcu.appcolectivo.model.Recorrido;
-import com.stcu.appcolectivo.ui.Coordenada;
+import com.stcu.appcolectivo.model.Coordenada;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,10 +69,10 @@ public class MainPresenter implements MainInterface.Presenter {
     }
 
     @Override
-    public List<Coordenada> consultaTrayectoASimular(String seleccionLin2) {
+    public List<Coordenada> consultaTrayectoASimular(String seleccionLin2, String seleccionRec2) {
         List<Coordenada> coordenadasSim = new ArrayList<Coordenada>();
         if(view != null){
-            coordenadasSim = model.consultaTrayectoASimular(seleccionLin2);
+            coordenadasSim = model.consultaTrayectoASimular(seleccionLin2, seleccionRec2);
         }
         return coordenadasSim;
     }
@@ -106,16 +106,16 @@ public class MainPresenter implements MainInterface.Presenter {
 //    }
 
     @Override
-    public void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String latitud, String longitud) {
+    public void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String seleccionRec2, String latitud, String longitud) {
         if(view != null){
-            model.makeRequestPostSimulacion(seleccionLin2, seleccionCol2, latitud, longitud);
+            model.makeRequestPostSimulacion(seleccionLin2, seleccionCol2, seleccionRec2, latitud, longitud);
         }
     }
 
     @Override
-    public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String latInicial, String lngInicial) {
+    public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial) {
         if(view!=null){
-            view.showResponsePostSimulacionOk( response,  seleccionLin,  seleccionCol,  latInicial,  lngInicial);
+            view.showResponsePostSimulacionOk( response,  seleccionLin,  seleccionCol,  seleccionRec, latInicial,  lngInicial);
         }
     }
 

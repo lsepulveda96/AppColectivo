@@ -2,7 +2,6 @@ package com.stcu.appcolectivo.model;
 
 import android.app.Activity;
 import android.content.Context;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -12,7 +11,6 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.stcu.appcolectivo.interfaces.TrayectoARecorrerInterface;
-import com.stcu.appcolectivo.ui.Coordenada;
 
 import org.json.JSONArray;
 import org.json.JSONException;

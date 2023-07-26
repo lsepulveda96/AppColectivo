@@ -1,13 +1,10 @@
-package com.stcu.appcolectivo.ui;
+package com.stcu.appcolectivo.util;
 
 import android.content.Context;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
-/**
- * Created by Santi on 26/05/2014.
- */
 public class VolleyS {
     private static VolleyS mVolleyS = null;
     //Este objeto es la cola que usará la aplicación

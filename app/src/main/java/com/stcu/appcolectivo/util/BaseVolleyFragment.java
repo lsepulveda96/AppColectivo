@@ -1,4 +1,4 @@
-package com.stcu.appcolectivo.ui;
+package com.stcu.appcolectivo.util;
 
 import android.app.Fragment;
 import android.os.Bundle;

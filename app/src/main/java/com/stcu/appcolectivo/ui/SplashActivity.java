@@ -9,7 +9,6 @@ import android.os.Parcelable;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.android.volley.toolbox.BasicNetwork;
 import com.gpmess.example.volley.app.R;
 import com.stcu.appcolectivo.interfaces.MainInterface;
 import com.stcu.appcolectivo.model.Colectivo;
@@ -17,13 +16,7 @@ import com.stcu.appcolectivo.model.Linea;
 import com.stcu.appcolectivo.presenter.MainPresenter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class SplashActivity extends Activity implements MainInterface.View  {
 
@@ -106,7 +99,7 @@ public class SplashActivity extends Activity implements MainInterface.View  {
     }
 
     @Override
-    public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String latInicial, String lngInicial) {
+    public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial) {
 
     }
 

@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -29,14 +28,16 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.gpmess.example.volley.app.R;
 import com.stcu.appcolectivo.interfaces.MainInterface;
 import com.stcu.appcolectivo.model.Colectivo;
+import com.stcu.appcolectivo.model.Coordenada;
 import com.stcu.appcolectivo.model.Linea;
 import com.stcu.appcolectivo.model.Recorrido;
 import com.stcu.appcolectivo.presenter.MainPresenter;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 public class MainActivity extends Activity implements MainInterface.View {
@@ -232,7 +233,7 @@ public class MainActivity extends Activity implements MainInterface.View {
                 adapterSeleccionRecorrido.setDropDownViewResource(R.layout.textview_spinner_selected);
             }
         };
-        handler3.postDelayed(r3,2000);
+        handler3.postDelayed(r3,4000);
     }
 
 
@@ -256,13 +257,15 @@ public class MainActivity extends Activity implements MainInterface.View {
 
         final String seleccionLin2 = itemSeleccionLinea.getSelectedItem().toString();
         final String seleccionCol2 = itemSeleccionColectivo.getSelectedItem().toString();
+        final String seleccionRec2 = itemSeleccionRecorrido.getSelectedItem().toString();
 
         coordenadasSim = new ArrayList<Coordenada>();
 
 
 
         // TODO aca tengo que traer el nombre del recorrido que ya selecciono
-        coordenadasSim = presenter.consultaTrayectoASimular(seleccionLin2);
+            // ahora tambien le pasa el recorrido que selecciona para buscar su id en la bd y linkear
+        coordenadasSim = presenter.consultaTrayectoASimular(seleccionLin2, seleccionRec2);
 
         dialog1 = new ProgressDialog( this );
         dialog1.setMessage( "Cargando recorrido a simular" );
@@ -276,12 +279,10 @@ public class MainActivity extends Activity implements MainInterface.View {
 
                     Toast.makeText( getApplicationContext() ,"Iniciando simulacion..", Toast.LENGTH_SHORT ).show();
                     Coordenada coordInicial = coordenadasSim.get( 0 );
-                    // inicia simulacion
-                    //TODO mover a model
-                    //quede aca, hacer todo este viaje al model
-                    //despues el viaje del model a aca, y cambiar de activity al de simulacion
-//                    fragment.makeRequestPostSimulacion( seleccionLin2, seleccionCol2, String.valueOf( coordInicial.getLatitud() ), String.valueOf( coordInicial.getLongitud() ) );
-                    presenter.makeRequestPostSimulacion( seleccionLin2, seleccionCol2, String.valueOf( coordInicial.getLatitud() ), String.valueOf( coordInicial.getLongitud() ) );
+
+                    //aca quizas le deba pasar tambien la denom del trayecto
+                    //todo esto trabajando en este para simulacion recorrido
+                    presenter.makeRequestPostSimulacion( seleccionLin2, seleccionCol2, seleccionRec2, String.valueOf( coordInicial.getLatitud() ), String.valueOf( coordInicial.getLongitud() ) );
                     //aca tiene que venir la respuesta con "servicio iniciado" llamada desde el model presenter
                     //cambiar de activity a simulacionRecorrido
                 } else {
@@ -296,70 +297,11 @@ public class MainActivity extends Activity implements MainInterface.View {
     }
 
 
-    //Boton cargar, para actualizar la lista de colectivos y lineas
-    //esto se deberia hacer automaticamente cuando entra a la app! - Echo.
-    //reemplazado por deslizar hacia abajo
-//    public void Cargar(View view) {
-////        MainFragment fragment = (MainFragment) getFragmentManager().findFragmentById(R.id.main_fragment) ;
-//
-//        //TODO segundo refactoring
-////        fragment.consultaLineasActivas();
-//
-//        //TODO tercer refactoring
-//        //fragment.consultaColectivosActivos();
-//
-//
-////        final List<String> opcionesLineas = fragment.getListadoLineas();
-////        final List<String> opcionesLineas = getListadoLineas();
-////        final List<String> opcionesColectivos = fragment.getListadoColectivos();
-////        final List<String> opcionesColectivos = getListadoColectivos();
-//
-//        final List<String> opcionesLineas = presenter.consultaLineasActivas();
-//        final List<String> opcionesColectivos = presenter.consultaColectivosActivos();
-//
-//
-//        dialog2 = new ProgressDialog( this );
-//        dialog2.setMessage( "Cargando listado de lineas y colectivos" );
-//        dialog2.show();
-//
-//        final Handler handler2 = new Handler();
-//        final Runnable r2 = new Runnable(){
-//            public void run() {
-//                dialog2.cancel();
-//                Set<String> hs = new HashSet<String>();
-//                hs.addAll(opcionesLineas);
-//                Set<String> hs2 = new HashSet<String>();
-//                hs2.addAll(opcionesColectivos);
-//                adapter.clear();
-//                for(String opcion: hs){
-//                    adapter.add(opcion);
-//                }
-//                adapter2.clear();
-//                for(String opcion2: hs2){
-//                    adapter2.add(opcion2);
-//                }
-//                itemSeleccionLinea.setAdapter(adapter);
-//                itemSeleccionColectivo.setAdapter(adapter2);
-//
-//                // si los dos estan vacios
-//                if(adapter.isEmpty() || adapter2.isEmpty()){
-//                    Toast.makeText( getApplicationContext() ,"No se pudo cargar el listado de lineas y colectivos", Toast.LENGTH_SHORT ).show();
-//                }else {
-//                    btnIniciarServicio.setEnabled( true ); // para que pueda guardar la eleccion
-//                    finServicio.setEnabled( true );
-//                }
-//            }
-//        };
-//        handler2.postDelayed(r2,4000);
-//
-//    } // fin boton
-
 
     //boton iniciar servicio
     public void iniciarServicio(View view) {
 
         // TODO 5to refactoring
-//        obtenerUbicacion();
         presenter.obtenerUbicacion();
 
 //        tvUbicacion.setText(location.getLatitude() + "" + location.getLongitude());
@@ -393,7 +335,7 @@ public class MainActivity extends Activity implements MainInterface.View {
                 }
             }
         };
-        handler.postDelayed(r,2500);
+        handler.postDelayed(r,4500);
 
     } // fin boton
 
@@ -418,8 +360,6 @@ public class MainActivity extends Activity implements MainInterface.View {
             String seleccionCol = itemSeleccionColectivo.getSelectedItem().toString();
             tvLineaSeleccionada.setText("Linea: " + seleccionLin);
             tvColectivoSeleccionado.setText("Colectivo: " + seleccionCol);
-//            MainFragment fragment = (MainFragment) getFragmentManager().findFragmentById(R.id.main_fragment);
-//            fragment.makeRequestPostFin(seleccionLin, seleccionCol, getLat(), getLng());
             presenter.makeRequestPostFin(seleccionLin, seleccionCol, getLat(), getLng());
         }
             }
@@ -470,25 +410,46 @@ public class MainActivity extends Activity implements MainInterface.View {
         }
     }
 
+
+    // todo esto trabajando en este para simulacion recorrido
     @Override
-    public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String latInicial, String lngInicial) {
-//        Toast toast1 =
-//                Toast.makeText(getActivity(),
-//                        response, Toast.LENGTH_LONG);
-//        toast1.show();
-
-        Toast.makeText( getApplicationContext() ,response, Toast.LENGTH_LONG ).show();
-
+    public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial) {
+       //antiguo
+        /* Toast.makeText( getApplicationContext() ,response, Toast.LENGTH_LONG ).show();
         if(response.equals("Servicio iniciado")) {
             //TODO tiene que ir al model a hacer request y volver al main activity para que llame a simulacion
             Intent ma2 = new Intent(getApplicationContext(), SimulacionRecorridoActivity.class);
             ma2.putExtra("linea", seleccionLin);
             ma2.putExtra("colectivo", seleccionCol);
+            ma2.putExtra("recorrido", seleccionRec);
             ma2.putExtra("latitud", latInicial);
             ma2.putExtra("longitud", lngInicial);
             ma2.putExtra("fechaUbicacion", String.valueOf(System.currentTimeMillis()));
             getApplicationContext().startActivity(ma2);
+        }*/
+        try {
+            JSONObject obj = new JSONObject(response);
+            String respuesta = obj.getString("mensaje");
+
+            Toast.makeText( MainActivity.this, respuesta, Toast.LENGTH_LONG ).show();
+            if(respuesta.equals("Servicio iniciado")) {
+                //TODO tiene que ir al model a hacer request y volver al main activity para que llame a simulacion
+                Intent ma2 = new Intent(MainActivity.this, SimulacionRecorridoActivity.class);
+                ma2.putExtra("linea", seleccionLin);
+                ma2.putExtra("colectivo", seleccionCol);
+                ma2.putExtra("recorrido", seleccionRec);
+                ma2.putExtra("latitud", latInicial);
+                ma2.putExtra("longitud", lngInicial);
+                ma2.putExtra("fechaUbicacion", String.valueOf(System.currentTimeMillis()));
+                this.startActivity(ma2);
+            }
+
+        } catch (JSONException e) {
+            System.out.println("respuesta con error al intentar cargar la simulacion del recorrido" + e.toString());
+            throw new RuntimeException(e);
         }
+
+
     }
 
 
@@ -521,99 +482,6 @@ public class MainActivity extends Activity implements MainInterface.View {
     public void setFechaUbicacionI(Long fechaUbicacionI) {
         this.fechaUbicacionI = fechaUbicacionI;
     }
-
-//    @Override
-//    public void showListadoLineas(List<String> listadoLineas) {
-//        this.listadoLineas = listadoLineas;
-//
-//    }
-//
-//    @Override
-//    public void showListadoColectivos(List<String> listadoColectivos) {
-//        this.listadoColectivos = listadoColectivos;
-//    }
-
-//    public List<String> getListadoLineas() {
-//        return this.listadoLineas;
-//    }
-
-//    public List<String> getListadoColectivos() {
-//        return this.listadoColectivos;
-//    }
-    //    //TODO estos metodos son iguales!! refactoring
-//    @Override
-//    public void showResponseInicioServicioError(String error) {
-//        //parametro error por si quiero mostrar la respuesta que devuelve volley
-////        Toast toast1 = Toast.makeText(getActivity(),"No se pudo iniciar el servicio", Toast.LENGTH_SHORT);
-////        toast1.show();
-//        Toast.makeText( getApplicationContext(),"No se pudo iniciar el servicio",Toast.LENGTH_SHORT ).show();
-//        Toast.makeText( getApplicationContext(),"Vuelva a intentarlo",Toast.LENGTH_SHORT ).show();
-//    }
-//    @Override
-//    public void showResponsePostSimulacionError(String error) {
-//        Toast.makeText( getApplicationContext(),"No se pudo iniciar el servicio",Toast.LENGTH_SHORT ).show();
-//        Toast.makeText( getApplicationContext(),"Vuelva a intentarlo",Toast.LENGTH_SHORT ).show();
-//    }
-
-    //    // red habilitada
-//    public boolean isNetDisponible(){
-//        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-//        NetworkInfo actNetInfo = connectivityManager.getActiveNetworkInfo();
-//        return (actNetInfo != null && actNetInfo.isConnected());
-//    }
-
-//    // si hay acceso a internet
-//    public Boolean isOnlineNet(){
-//
-//        Process p = null;
-//        try {
-//            p = Runtime.getRuntime().exec("ping -c 1 www.google.es");
-//            int val = p.waitFor();
-//            boolean reachable = (val == 0);
-//            return reachable;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return false;
-//    }
-
-
-//    public void obtenerUbicacion() {
-//        LocationManager locationManager = (LocationManager) MainActivity.this.getSystemService(Context.LOCATION_SERVICE);
-//
-//        LocationListener locationListener = new LocationListener() {
-//            @Override
-//            public void onLocationChanged(Location location) {
-//                tvUbicacion.setText(location.getLatitude() + "" + location.getLongitude());
-//                setLat(String.valueOf(location.getLatitude()));
-//                setLng(String.valueOf(location.getLongitude()));
-//            }
-//
-//            @Override
-//            public void onStatusChanged(String provider, int status, Bundle extras) {
-//            }
-//
-//            @Override
-//            public void onProviderEnabled(String provider) {
-//            }
-//
-//            @Override
-//            public void onProviderDisabled(String provider) {
-//            }
-//        };
-//
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            return;
-//        }
-//        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-//    }
 
     //probarlo, pero todavia no lo uso
 //        class Task1 extends AsyncTask<Void,Void,Boolean> {
@@ -732,7 +600,6 @@ public class MainActivity extends Activity implements MainInterface.View {
         protected void onPostExecute(Boolean result) {
 
         }*/
-
 
 }
 

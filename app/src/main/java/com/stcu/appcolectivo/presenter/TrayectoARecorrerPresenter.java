@@ -5,7 +5,7 @@ import android.content.Context;
 
 import com.stcu.appcolectivo.interfaces.TrayectoARecorrerInterface;
 import com.stcu.appcolectivo.model.TrayectoARecorrerModel;
-import com.stcu.appcolectivo.ui.Coordenada;
+import com.stcu.appcolectivo.model.Coordenada;
 
 import java.util.List;
 
