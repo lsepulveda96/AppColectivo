@@ -10,8 +10,10 @@ public class Linea implements Parcelable {
     String denominacion;
     String descripcion;
     boolean enServicio;
+    Long idLinea;
 
-    public Linea(String denominacion, String descripcion, boolean enServicio) {
+    public Linea(Long idLinea, String denominacion, String descripcion, boolean enServicio) {
+        this.idLinea = idLinea;
         this.denominacion = denominacion;
         this.descripcion = descripcion;
         this.enServicio = enServicio;
@@ -20,6 +22,7 @@ public class Linea implements Parcelable {
     public Linea(){}
 
     protected Linea(Parcel in) {
+        idLinea = in.readLong();
         denominacion = in.readString();
         descripcion = in.readString();
         enServicio = in.readByte() != 0;
@@ -61,6 +64,14 @@ public class Linea implements Parcelable {
         this.enServicio = enServicio;
     }
 
+    public Long getIdLinea() {
+        return idLinea;
+    }
+
+    public void setIdLinea(Long idLinea) {
+        this.idLinea = idLinea;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -68,6 +79,7 @@ public class Linea implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel parcel, int i) {
+        parcel.writeLong(idLinea);
         parcel.writeString(denominacion);
         parcel.writeString(descripcion);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

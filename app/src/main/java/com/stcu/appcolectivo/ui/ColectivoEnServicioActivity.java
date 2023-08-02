@@ -8,6 +8,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -31,7 +32,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
     public static int tiempoMaxDetenido = 17;
 
     private TextView tvLinea, tvColectivo, tvLatitud, tvLongitud, tvUbicacion, tvEstado;
-    private String linea, colectivo, latitud, longitud, fechaUbicacionInicialS, myLat, myLng, latAntigua, lngAntigua;
+    private String linea, colectivo, recorrido, latitud, longitud, fechaUbicacionInicialS, myLat, myLng, latAntigua, lngAntigua;
     private Long fechaUbicacionAntigua, fechaUbicacionInicial, fechaUbicacionActual;
     private Button finServicio;
     Double latActual, lngActual, distancia = 0.0;
@@ -56,6 +57,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
 
         linea = getIntent().getExtras().getString("linea");
         colectivo = getIntent().getExtras().getString("colectivo");
+        recorrido = getIntent().getExtras().getString("recorrido");
         latitud = getIntent().getExtras().getString("latitud");
         longitud = getIntent().getExtras().getString("longitud");
         fechaUbicacionInicialS = getIntent().getExtras().getString("fechaUbicacion");
@@ -76,14 +78,14 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
         latActual = Double.parseDouble(latitud);
         lngActual = Double.parseDouble(longitud);
 
-        paradasRecorrido = presenter.consultaParadasRecorrido(linea);
-        detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo);
+        paradasRecorrido = presenter.consultaParadasRecorrido(linea, recorrido);
+        detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo, recorrido);
 //        TODO por si es parada final
         final Handler handler = new Handler();
         final Runnable r = new Runnable() {
             public void run() {
                 // para indicar que esta en la parada inicial
-                detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo);
+                detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo, recorrido);
                 time time = new time();
                 time.execute();
             }
@@ -101,7 +103,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
         //resetea el contDesvio
         contDesvio = 0;
 
-        presenter.makeRequestPostFin(linea, colectivo, latitud, longitud);
+        presenter.makeRequestPostFin(linea, colectivo, recorrido);
         bandera = false;
         if (notActiva) {
             presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
@@ -109,7 +111,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
         notActiva = false; // resetea la bandera
 
         //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
-        presenter.makeRequestPostFinDesvio(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual));
+        presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
 
         Toast toast1 =
                 Toast.makeText(this,
@@ -124,7 +126,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
     public void finServicioSimple() {
         //resetea el contDesvio
         contDesvio = 0;
-        presenter.makeRequestPostFin(linea, colectivo, latitud, longitud);
+        presenter.makeRequestPostFin(linea, colectivo, recorrido);
         bandera = false;
         if (notActiva) {
             presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
@@ -132,7 +134,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
         notActiva = false; // resetea la bandera
 
         //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
-        presenter.makeRequestPostFinDesvio(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual));
+        presenter.makeRequestPostFinDesvio(linea, colectivo,recorrido);
 
         Toast toast1 =
                 Toast.makeText(this,
@@ -178,8 +180,8 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                 //que envie la consulta de desvio la primera vez
                 if (contDesvio < 1) {
                     // si la primera vez esta parado y esta en una parada tambien detecta la parada
-                    detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo);
-                    presenter.makeRequestPostEnvioDesvio(linea, colectivo, latActual, lngActual);
+                    detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo, recorrido);
+                    presenter.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
                     Toast.makeText(ColectivoEnServicioActivity.this, "Detectando desvio..", Toast.LENGTH_SHORT).show();
                     contDesvio++;
                 }
@@ -207,7 +209,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
 
                     if (contVerifParada < 1) {
                         //si esta parado la primera vez detecta la parada
-                        detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo);
+                        detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo, recorrido);
                         //por si es parada final
                         contVerifParada++;
                     }
@@ -240,12 +242,12 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                     //por si es parada final
 
 //                   vuelve a verificar si esta desviado
-                    boolean esFin = detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo);
+                    boolean esFin = detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo, recorrido);
                     // vuelve a verificar si esta desviado
                     if (esFin) {
                         finish();
                     } else {
-                        presenter.makeRequestPostEnvioDesvio(linea, colectivo, latActual, lngActual);
+                        presenter.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
                         Toast.makeText(ColectivoEnServicioActivity.this, "Detectando desvio..", Toast.LENGTH_SHORT).show();
 
                         Toast.makeText(ColectivoEnServicioActivity.this, "enviando ubicacion..", Toast.LENGTH_SHORT).show();
@@ -314,22 +316,24 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
 //            // for ActivityCompat#requestPermissions for more details.
 //            return;
 //        }
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    Activity#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for Activity#requestPermissions for more details.
-            return;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    Activity#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for Activity#requestPermissions for more details.
+                return;
+            }
         }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
     }
 
 
 
-        public boolean detectarParada(List<Coordenada> listitaParadas, Double latActual, Double lngActual, String denom, String unidad) {
+        public boolean detectarParada(List<Coordenada> listitaParadas, Double latActual, Double lngActual, String denom, String unidad, String denomRecorrido) {
             boolean esFin = false;
             MainFragment fragment = (MainFragment) getFragmentManager().findFragmentById(R.id.main_fragment); // tener esta como global
             for(Coordenada parada: listitaParadas){
@@ -339,14 +343,14 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                         esFin = true;
                         Toast.makeText( this, "Colectivo en parada final", Toast.LENGTH_SHORT ).show();
 //                        fragment.makeRequestPostColeEnParada( parada.getCodigo(), denom, unidad ); // a rest lineaColectivo
-                        presenter.makeRequestPostColeEnParada( parada.getCodigo(), denom, unidad ); // a rest lineaColectivo
+                        presenter.makeRequestPostColeEnParada( parada.getCodigo(), denom, unidad, denomRecorrido); // a rest lineaColectivo
                         finServicioSimple();
                         finish();
                     }else {
                         // es porque esta en o cerca de una parada de esa linea que esta en servicio
                         Toast.makeText( this, "Colectivo en parada", Toast.LENGTH_SHORT ).show();
 //                        fragment.makeRequestPostColeEnParada( parada.getCodigo(), denom, unidad ); // a rest lineaColectivo
-                        presenter.makeRequestPostColeEnParada( parada.getCodigo(), denom, unidad ); // a rest lineaColectivo
+                        presenter.makeRequestPostColeEnParada( parada.getCodigo(), denom, unidad, denomRecorrido ); // a rest lineaColectivo
                     }
                 }
             }

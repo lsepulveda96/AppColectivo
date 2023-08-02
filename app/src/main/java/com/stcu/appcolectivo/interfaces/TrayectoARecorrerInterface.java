@@ -22,9 +22,10 @@ public interface TrayectoARecorrerInterface {
     }
 
     interface Presenter {
-        List<Coordenada> consultaParadasRecorrido(String linea);
+        List<Coordenada> consultaParadasRecorrido(String linea, String recorrido);
 
-        void makeRequestPostFin(String linea, String colectivo, String latitud, String longitud);
+//        void makeRequestPostFin(String linea, String colectivo, String latitud, String longitud);
+        void makeRequestPostFin(String linea, String colectivo, String recorrido);
 //
 //        void showResponsePostFinOk(String response);
 //
@@ -34,7 +35,7 @@ public interface TrayectoARecorrerInterface {
 //
 //        void showResponsePostFinInformeError(String error);
 //
-        void makeRequestPostFinDesvio(String linea, String colectivo, String latitud, String longitud, String fechaUbicacionActual);
+        void makeRequestPostFinDesvio(String linea, String colectivo, String recorrido);
 //
 //        void showResponsePostFinDesvioError(String toString);
 
@@ -46,9 +47,9 @@ public interface TrayectoARecorrerInterface {
 
         void makeRequestPostActInforme(String linea, String colectivo, String lat, String lng, String fechaUbicacionStr, String difTotalStr);
 
-        void makeRequestPostEnvioDesvio(String linea, String colectivo, Double latActual, Double lngActual);
+        void makeRequestPostEnvioDesvio(String linea, String colectivo, String recorrido, Double latActual, Double lngActual);
 
-        void makeRequestPostColeEnParada(int codigo, String denom, String unidad);
+        void makeRequestPostColeEnParada(int codigo, String denomLinea, String unidad, String denomRecorrido);
 
 //        void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, Long fechaUbicacionI);
 //
@@ -58,13 +59,14 @@ public interface TrayectoARecorrerInterface {
     }
 
     interface Model {
-        List<Coordenada> consultaParadasRecorrido(String linea);
+        List<Coordenada> consultaParadasRecorrido(String linea, String recorrido);
 
-        void makeRequestPostFin(String linea, String colectivo, String latitud, String longitud);
+//        void makeRequestPostFin(String linea, String colectivo, String latitud, String longitud);
+        void makeRequestPostFin(String linea, String colectivo, String recorrido);
 
         void makeRequestPostFinInforme(String linea, String colectivo, String latActual, String lngActual, String fechaUbicacionActual, String difTotal);
 
-        void makeRequestPostFinDesvio(String linea, String colectivo, String latitud, String longitud, String fechaUbicacionActual);
+        void makeRequestPostFinDesvio(String linea, String colectivo, String recorrido);
 
         void makeRequestPostEnvio(String linea, String colectivo, String lat, String lng);
 
@@ -72,9 +74,9 @@ public interface TrayectoARecorrerInterface {
 
         void makeRequestPostActInforme(String linea, String colectivo, String lat, String lng, String fechaUbicacionStr, String difTotalStr);
 
-        void makeRequestPostEnvioDesvio(String linea, String colectivo, Double latActual, Double lngActual);
+        void makeRequestPostEnvioDesvio(String linea, String colectivo, String recorrido, Double latActual, Double lngActual);
 
-        void makeRequestPostColeEnParada(int codigo, String denom, String unidad);
+        void makeRequestPostColeEnParada(int codigo, String denomLinea, String unidad, String denomRecorrido);
 //        void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, Long fechaUbicacionI);
 //
 //        List<String> consultaLineasActivas();

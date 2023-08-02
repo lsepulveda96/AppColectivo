@@ -23,8 +23,8 @@ public class TrayectoARecorrerPresenter implements TrayectoARecorrerInterface.Pr
     }
 
     @Override
-    public List<Coordenada> consultaParadasRecorrido(String linea) {
-        List<Coordenada> paradasRecorrido = model.consultaParadasRecorrido(linea);
+    public List<Coordenada> consultaParadasRecorrido(String linea, String recorrido) {
+        List<Coordenada> paradasRecorrido = model.consultaParadasRecorrido(linea,recorrido);
         return paradasRecorrido;
     }
 
@@ -57,23 +57,24 @@ public class TrayectoARecorrerPresenter implements TrayectoARecorrerInterface.Pr
     }
 
     @Override
-    public void makeRequestPostEnvioDesvio(String linea, String colectivo, Double latActual, Double lngActual) {
+    public void makeRequestPostEnvioDesvio(String linea, String colectivo, String recorrido, Double latActual, Double lngActual) {
         if(view != null){
-            model.makeRequestPostEnvioDesvio(linea, colectivo, latActual, lngActual);
+            model.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
         }
     }
 
     @Override
-    public void makeRequestPostColeEnParada(int codigo, String denom, String unidad) {
+    public void makeRequestPostColeEnParada(int codigo, String denomLinea, String unidad, String denomRecorrido) {
         if(view != null){
-            model.makeRequestPostColeEnParada(codigo, denom, unidad);
+            model.makeRequestPostColeEnParada(codigo, denomLinea, unidad, denomRecorrido);
         }
     }
 
     @Override
-    public void makeRequestPostFin(String linea, String colectivo, String latitud, String longitud) {
+    public void makeRequestPostFin(String linea, String colectivo, String recorrido) {
         if(view != null){
-            model.makeRequestPostFin(linea, colectivo, latitud, longitud);
+//            model.makeRequestPostFin(linea, colectivo, latitud, longitud);
+            model.makeRequestPostFin(linea, colectivo, recorrido);
         }
     }
 
@@ -106,9 +107,9 @@ public class TrayectoARecorrerPresenter implements TrayectoARecorrerInterface.Pr
 //    }
 
     @Override
-    public void makeRequestPostFinDesvio(String linea, String colectivo, String latitud, String longitud, String fechaUbicacionActual) {
+    public void makeRequestPostFinDesvio(String linea, String colectivo, String recorrido) {
         if(view != null){
-            model.makeRequestPostFinDesvio(linea, colectivo, latitud, longitud, fechaUbicacionActual);
+            model.makeRequestPostFinDesvio(linea, colectivo, recorrido);
         }
     }
 

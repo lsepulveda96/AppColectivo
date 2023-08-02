@@ -215,19 +215,9 @@ public class MainActivity extends Activity implements MainInterface.View {
         final Runnable r3 = new Runnable(){
             public void run() {
 
-
                 adapterSeleccionRecorrido.clear();
-
-
-                System.out.println("el tamannno de opcionesRecorridos ----" + opcionesRecorridos.size());
-                System.out.println("lo que trae el item selected del servidor linea ---- " + itemSeleccionLinea.getSelectedItem().toString());
-
-
                 for(Recorrido opcionRecorrido: opcionesRecorridos){
                     adapterSeleccionRecorrido.add(opcionRecorrido.getDenominacion());
-
-                    System.out.println("lo que trae el servidor de los recorridos ---- " + opcionRecorrido.getDenominacion());
-
                 }
                 itemSeleccionRecorrido.setAdapter(adapterSeleccionRecorrido);
                 adapterSeleccionRecorrido.setDropDownViewResource(R.layout.textview_spinner_selected);
@@ -280,8 +270,6 @@ public class MainActivity extends Activity implements MainInterface.View {
                     Toast.makeText( getApplicationContext() ,"Iniciando simulacion..", Toast.LENGTH_SHORT ).show();
                     Coordenada coordInicial = coordenadasSim.get( 0 );
 
-                    //aca quizas le deba pasar tambien la denom del trayecto
-                    //todo esto trabajando en este para simulacion recorrido
                     presenter.makeRequestPostSimulacion( seleccionLin2, seleccionCol2, seleccionRec2, String.valueOf( coordInicial.getLatitud() ), String.valueOf( coordInicial.getLongitud() ) );
                     //aca tiene que venir la respuesta con "servicio iniciado" llamada desde el model presenter
                     //cambiar de activity a simulacionRecorrido

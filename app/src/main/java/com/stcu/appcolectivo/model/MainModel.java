@@ -131,7 +131,8 @@ public class MainModel implements MainInterface.Model {
                                 String denominacion = linea.getString("denominacion");
                                 String descripcion = linea.getString("descripcion");
                                 boolean enServicio = linea.getBoolean("enServicio");
-                                lineasDisponibles.add(new Linea(denominacion,descripcion,enServicio));
+                                Long idLinea = Long.parseLong(linea.getString("id"));
+                                lineasDisponibles.add(new Linea(idLinea, denominacion,descripcion,enServicio));
                             }
 
 //                            presenter.showLineasDisponibles(lineasDisponibles);
@@ -282,11 +283,11 @@ public class MainModel implements MainInterface.Model {
 
                             for(int i=0;i<ja.length();i++){
                                 JSONObject colectivo = ja.getJSONObject(i);
-                                String id = colectivo.getString("id");
+                                Long idColectivo = Long.parseLong(colectivo.getString("id"));
                                 String patente = colectivo.getString("patente");
                                 String unidad = colectivo.getString("unidad");
                                 String marca = colectivo.getString("marca");
-                                colectivos.add(new Colectivo(unidad,patente,marca));
+                                colectivos.add(new Colectivo(idColectivo,unidad,patente,marca));
                             }
 
 //                            presenter.showLineasDisponibles(lineasDisponibles);
@@ -538,43 +539,6 @@ public class MainModel implements MainInterface.Model {
      */
     public void makeRequestPostSimulacion(final String seleccionLin, final String seleccionCol, final String seleccionRec, final String latInicial, final String lngInicial) {
 
-        //antiguo
-       /* final String url = ipv4+"inicio"; // uni
-        final Long fechaUbicacion = System.currentTimeMillis();
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response) {
-                        response = response.replaceAll ("\"","");
-                        presenter.showResponsePostSimulacionOk(response,seleccionLin,seleccionCol,seleccionRec,latInicial, lngInicial);
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        presenter.showResponseError("No se pudo iniciar el servicio");
-                    }
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams()
-            {
-                Map<String, String>  params = new HashMap<String, String>();
-
-                params.put("linea",seleccionLin);
-                params.put("colectivo", seleccionCol);
-                params.put("recorrido", seleccionRec);
-                params.put("latitud", latInicial);
-                params.put("longitud", lngInicial);
-                params.put("fechaUbicacion", String.valueOf(fechaUbicacion));
-
-                return params;
-            }
-        };
-        requestQueue.add(postRequest);*/
-
         final String url = ipv4+"inicio"; // uni
         final long fechaUbicacion = System.currentTimeMillis();
         Map<String, String> params = new HashMap();
@@ -587,11 +551,9 @@ public class MainModel implements MainInterface.Model {
 
         JSONObject parameters = new JSONObject(params);
 
-//        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, url, parameters,new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        //response = response.replaceAll ("\"","");
                         presenter.showResponsePostSimulacionOk(response.toString(),seleccionLin,seleccionCol,seleccionRec,latInicial, lngInicial);
                     }
                 },  new Response.ErrorListener()
@@ -600,57 +562,9 @@ public class MainModel implements MainInterface.Model {
                     public void onErrorResponse(VolleyError error) {
                         presenter.showResponseError("No se pudo iniciar el servicio");
                     }
-
     });
-
-
-//                new Response.Listener<String>()
-//                {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        response = response.replaceAll ("\"","");
-//                        presenter.showResponsePostSimulacionOk(response,seleccionLin,seleccionCol,seleccionRec,latInicial, lngInicial);
-//                    }
-//                },
-//                new Response.ErrorListener()
-//                {
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        presenter.showResponseError("No se pudo iniciar el servicio");
-//                    }
-//                }
-//        ) {
-//            @Override
-//            protected Map<String, String> getParams()
-//            {
-//                Map<String, String>  params = new HashMap<String, String>();
-//
-//                params.put("linea",seleccionLin);
-//                params.put("colectivo", seleccionCol);
-//                params.put("recorrido", seleccionRec);
-//                params.put("latitud", latInicial);
-//                params.put("longitud", lngInicial);
-//                params.put("fechaUbicacion", String.valueOf(fechaUbicacion));
-//
-//                return params;
-//            }
-//        };
         requestQueue.add(jsonRequest);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     public void makeRequestPostFin(final String seleccionLin, final String seleccionCol, final String lat, final String lng) {
@@ -719,11 +633,11 @@ public class MainModel implements MainInterface.Model {
 
                             for(int i=0;i<ja.length();i++){
                                 JSONObject recorridoActivo = ja.getJSONObject(i);
-                                long id = Long.parseLong(recorridoActivo.getString("id"));
+                                Long idRecorrido = Long.parseLong(recorridoActivo.getString("id"));
                                 String denominacion = recorridoActivo.getString("denominacion");
                                 boolean activo = Boolean.parseBoolean(recorridoActivo.getString("activo"));
 
-                                listaRecorridosActivos.add(new Recorrido(id,denominacion,activo));
+                                listaRecorridosActivos.add(new Recorrido(idRecorrido,denominacion,activo));
                             }
 
 //                            presenter.showLineasDisponibles(lineasDisponibles);

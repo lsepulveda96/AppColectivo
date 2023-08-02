@@ -7,12 +7,14 @@ import androidx.annotation.NonNull;
 
 public class Colectivo implements Parcelable {
 
+    Long idColectivo;
     String unidad;
     String patente;
     String marca;
 
 
-    public Colectivo(String unidad, String patente, String marca) {
+    public Colectivo(Long idColectivo, String unidad, String patente, String marca) {
+        this.idColectivo = idColectivo;
         this.unidad = unidad;
         this.patente = patente;
         this.marca = marca;
@@ -21,6 +23,7 @@ public class Colectivo implements Parcelable {
     public Colectivo(){}
 
     protected Colectivo(Parcel in) {
+        idColectivo = in.readLong();
         unidad = in.readString();
         patente = in.readString();
         marca = in.readString();
@@ -69,6 +72,7 @@ public class Colectivo implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel parcel, int i) {
+        parcel.writeLong(idColectivo);
         parcel.writeString(unidad);
         parcel.writeString(patente);
         parcel.writeString(marca);

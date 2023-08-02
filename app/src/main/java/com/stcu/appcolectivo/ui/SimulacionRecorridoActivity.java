@@ -22,38 +22,20 @@ import java.util.List;
 public class SimulacionRecorridoActivity extends Activity implements TrayectoARecorrerInterface.View{
 
     //TODO esta clase si deberia tener una aparte para model, ir haciendo refactoring de los metodos
-    Boolean bandera = true;
-    Boolean notActiva = false;
+    Boolean bandera = true, notActiva = false;
     public static double distanciaOffSetMov = 20.0;
     public static int tiempoMaxDetenido = 17;
 
-    private TextView tvLinea;
-    private TextView tvColectivo;
-    private TextView tvLatitud;
-    private TextView tvLongitud;
-    private String linea;
-    private String colectivo;
-    private String latitud;
-    private String longitud;
-    private Long fechaUbicacionAntigua;
-    private Long fechaUbicacionInicial;
-    private String fechaUbicacionInicialS;
-    private Button finServicio;
-    private TextView tvUbicacion;
+    private TextView tvLinea ,tvColectivo, tvLatitud, tvLongitud, tvUbicacion;
     TextView tvEstado;
-    private String myLat;
-    private String myLng;
-    private String latAntigua;
-    private String lngAntigua;
-    Double latActual;
-    Double lngActual;
-    Double distancia = 0.0;
-    private Long fechaUbicacionActual;
+    private String linea, colectivo, recorrido, latitud, longitud, fechaUbicacionInicialS, myLat, myLng, latAntigua, lngAntigua;
+    private Long fechaUbicacionAntigua, fechaUbicacionInicial, fechaUbicacionActual;
+    private Button finServicio;
+    Double latActual, lngActual, distancia = 0.0;
     int difTotal = 0;
-    private int contDesvio = 0;
-    private int contVerifParada = 0;
-    List<Coordenada> paradasRecorrido;
-    List<Coordenada> coordenadasSim;
+    private int contDesvio = 0, contVerifParada = 0;
+
+    List<Coordenada> paradasRecorrido, coordenadasSim;
     // la empiezo en 0 para que se sume siempre (tambien la primera vez)
     private int contCoorSim = 0;
 
@@ -75,6 +57,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
         linea = getIntent().getExtras().getString("linea");
         colectivo = getIntent().getExtras().getString("colectivo");
+        recorrido = getIntent().getExtras().getString("recorrido");
         latitud = getIntent().getExtras().getString("latitud");
         longitud = getIntent().getExtras().getString("longitud");
         fechaUbicacionInicialS = getIntent().getExtras().getString("fechaUbicacion");
@@ -95,18 +78,20 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         latActual = Double.parseDouble(latitud);
         lngActual = Double.parseDouble(longitud);
 
-        paradasRecorrido = presenter.consultaParadasRecorrido(linea);
+        paradasRecorrido = presenter.consultaParadasRecorrido(linea,recorrido);
+        coordenadasSim = paradasRecorrido;
 
         final Handler handler = new Handler();
         final Runnable r = new Runnable() {
             public void run() {
+
                 // para indicar que esta en la parada inicial
-                setParadaInicio(paradasRecorrido.get(0),linea,colectivo);
+                setParadaInicio(paradasRecorrido.get(0),linea,colectivo,recorrido);
                 time time = new time();
                 time.execute();
             }
         };
-        handler.postDelayed(r,3000);
+        handler.postDelayed(r,4000);
 
     }
 
@@ -116,43 +101,59 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         //resetea el contDesvio
         contDesvio = 0;
 
-        presenter.makeRequestPostFin(linea,colectivo,latitud,longitud);
-        bandera = false;
-        if(notActiva) {
-            presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
-        }
-        notActiva = false; // resetea la bandera
-
         //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
-        presenter.makeRequestPostFinDesvio(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual));
+        presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
 
-        Toast toast1 =
-                Toast.makeText(this,
-                        "Servicio finalizado", Toast.LENGTH_SHORT);
-        toast1.show();
-        finish();
+//        presenter.makeRequestPostFin(linea,colectivo,latitud,longitud);
+        presenter.makeRequestPostFin(linea,colectivo,recorrido);
+
+        final Handler handler = new Handler();
+        final Runnable r = new Runnable() {
+            public void run() {
+                bandera = false;
+                if(notActiva) {
+                    presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
+                }
+                notActiva = false; // resetea la bandera
+                Toast.makeText( getApplicationContext(), "Servicio finalizado", Toast.LENGTH_SHORT ).show();
+                finish();
+            }
+        };
+        handler.postDelayed( r, 2000 );
+
+
     }
 
     public void finServicioSimple() {
         //resetea el contDesvio
         contDesvio = 0;
-        presenter.makeRequestPostFin(linea,colectivo,latitud,longitud);
-
-        bandera = false;
-        if(notActiva) {
-            presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
-        }
-        notActiva = false; // resetea la bandera
 
         //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
         // TODO Arreglar
-        presenter.makeRequestPostFinDesvio(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual));
+        presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
 
-        Toast toast1 =
-                Toast.makeText(this,
-                        "Servicio finalizado", Toast.LENGTH_SHORT);
-        toast1.show();
-        finish();
+
+
+        presenter.makeRequestPostFin(linea,colectivo,recorrido);
+
+
+        final Handler handler = new Handler();
+        final Runnable r = new Runnable() {
+            public void run() {
+                bandera = false;
+                if(notActiva) {
+                    presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
+                }
+                notActiva = false; // resetea la bandera
+
+
+                Toast.makeText( getApplicationContext(), "Servicio finalizado", Toast.LENGTH_SHORT ).show();
+                finish();
+            }
+        };
+        handler.postDelayed( r, 2000 );
+
+
     }
 
     public void hilo(){
@@ -178,6 +179,8 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
             return true;
         }
 
+
+        // todo trabajar en este metodo
         @Override
         protected void onPostExecute(Boolean aBoolean){
             if(bandera){
@@ -197,13 +200,11 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                 lngActual = getLngActual();
                 fechaUbicacionActual = getFechaUbicacion(); // la que recive de la ubicacion actual
 
-                MainFragment fragment = (MainFragment) getFragmentManager().findFragmentById(R.id.main_fragment); // tener esta como global
-
                 //que envie la consulta de desvio la primera vez
                 if(contDesvio < 1) {
                     // si la primera vez esta parado y esta en una parada tambien detecta la parada
-                    detectarParada(paradasRecorrido,latActual,lngActual,linea,colectivo);
-                    presenter.makeRequestPostEnvioDesvio(linea, colectivo, latActual, lngActual);
+                    detectarParada(paradasRecorrido,latActual,lngActual,linea,colectivo,recorrido);
+                    presenter.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
                     Toast.makeText(SimulacionRecorridoActivity.this, "Detectando desvio..", Toast.LENGTH_SHORT).show();
                     contDesvio++;
                 }
@@ -232,7 +233,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
                     if(contVerifParada < 1){
                         //si esta parado la primera vez detecta la parada
-                        detectarParada(paradasRecorrido,latActual,lngActual,linea,colectivo);
+                        detectarParada(paradasRecorrido,latActual,lngActual,linea,colectivo,recorrido);
                         //por si es parada final
                         //detectarParadaFinal(getParadaFinal(),latActual,lngActual);
                         contVerifParada++;
@@ -243,12 +244,10 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
                         // si el colectivo todavia sigue parado, actualiza la notificacion
                         if(notActiva == true){
-//                            fragment.makeRequestPostActInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
                             presenter.makeRequestPostActInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
                             Toast.makeText(SimulacionRecorridoActivity.this, "unidad detenida, actualizando informe..", Toast.LENGTH_SHORT).show();
                         }else{
                             // sino es la primera vez que el colectivo se para y crea la nueva notificacion y setea bandera en true
-//                            fragment.makeRequestPostEnvioInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
                             presenter.makeRequestPostEnvioInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
                             Toast.makeText(SimulacionRecorridoActivity.this, "unidad detenida, enviando informe..", Toast.LENGTH_SHORT).show();
                             notActiva = true;
@@ -258,7 +257,6 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                 }else{
                     // si el colectivo estaba parado, y empezo a circular, actualiza la notificacion(con el tiempo final) y cambia la bandera a false
                     if(notActiva == true) {
-//                        fragment.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
                         presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
                         notActiva = false; // resetea la bandera
                     }
@@ -266,15 +264,13 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                     // contador en 0 para que cuando se vuelve a parar la primera vez verifique si es parada
                     contVerifParada = 0;
 
-                    boolean esFin = detectarParada(paradasRecorrido,latActual,lngActual,linea,colectivo);
+                    boolean esFin = detectarParada(paradasRecorrido,latActual,lngActual,linea,colectivo,recorrido);
                     // vuelve a verificar si esta desviado
                     if(esFin) {
                         finish();
                     }else {
-//                        fragment.makeRequestPostEnvioDesvio( linea, colectivo, latActual, lngActual );
-                        presenter.makeRequestPostEnvioDesvio(linea, colectivo, latActual, lngActual);
+                        presenter.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
                         Toast.makeText( SimulacionRecorridoActivity.this, "Enviando ubicacion..", Toast.LENGTH_SHORT ).show();
-//                        fragment.makeRequestPostEnvio( linea, colectivo, getLat(), getLng() );
                         presenter.makeRequestPostEnvio(linea, colectivo, getLat(), getLng());
 
                         difTotal = 0; // resetea la suma
@@ -352,24 +348,22 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         this.fechaUbicacionActual = fechaUbicacion;
     }
 
-    public boolean detectarParada(List<Coordenada> listitaParadas, Double latActual, Double lngActual, String denom, String unidad) {
+    public boolean detectarParada(List<Coordenada> listitaParadas, Double latActual, Double lngActual, String denomLinea, String unidad, String denomRecorrido ) {
         boolean esFin = false;
-        MainFragment fragment = (MainFragment) getFragmentManager().findFragmentById(R.id.main_fragment); // tener esta como global
         for(Coordenada parada: listitaParadas){
             double distancia = calcularDistancia(latActual,lngActual,parada.getLatitud(),parada.getLongitud());
             if (distancia < 20.0) {
                 if(getParadaFinal().getCodigo() == parada.getCodigo()){
                     esFin = true;
                     Toast.makeText( SimulacionRecorridoActivity.this, "Colectivo en parada final", Toast.LENGTH_SHORT ).show();
-//                    fragment.makeRequestPostColeEnParada( parada.getCodigo(), denom, unidad ); // a rest lineaColectivo
-                    presenter.makeRequestPostColeEnParada( parada.getCodigo(), denom, unidad);
+                    presenter.makeRequestPostColeEnParada( parada.getCodigo(), denomLinea, unidad,denomRecorrido);
                     finServicioSimple();
                     finish();
                 }else {
                     // es porque esta en o cerca de una parada de esa linea que esta en servicio
                     Toast.makeText( SimulacionRecorridoActivity.this, "Colectivo en parada", Toast.LENGTH_SHORT ).show();
 //                    fragment.makeRequestPostColeEnParada( parada.getCodigo(), denom, unidad ); // a rest lineaColectivo
-                    presenter.makeRequestPostColeEnParada( parada.getCodigo(), denom, unidad);
+                    presenter.makeRequestPostColeEnParada( parada.getCodigo(), denomLinea, unidad, denomRecorrido);
                 }
             }
         }
@@ -377,11 +371,11 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
     }
 
 
-    public void setParadaInicio(Coordenada coordenada, String linea, String colectivo) {
+    public void setParadaInicio(Coordenada coordenada, String linea, String colectivo, String denomRecorrido) {
         MainFragment fragment = (MainFragment) getFragmentManager().findFragmentById(R.id.main_fragment);
         Toast.makeText( SimulacionRecorridoActivity.this, "Colectivo en parada inicio", Toast.LENGTH_SHORT ).show();
 //        fragment.makeRequestPostColeEnParada( coordenada.getCodigo(), linea, colectivo ); // a rest lineaColectivo
-        presenter.makeRequestPostColeEnParada(coordenada.getCodigo(), linea, colectivo);
+        presenter.makeRequestPostColeEnParada(coordenada.getCodigo(), linea, colectivo, denomRecorrido);
     }
 
     // Si hay que cambiar la parada final, se hace aca
