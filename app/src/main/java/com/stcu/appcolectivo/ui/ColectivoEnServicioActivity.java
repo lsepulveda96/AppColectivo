@@ -251,7 +251,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                         Toast.makeText(ColectivoEnServicioActivity.this, "Detectando desvio..", Toast.LENGTH_SHORT).show();
 
                         Toast.makeText(ColectivoEnServicioActivity.this, "enviando ubicacion..", Toast.LENGTH_SHORT).show();
-                        presenter.makeRequestPostEnvio(linea, colectivo, getLat(), getLng());
+                        presenter.makeRequestPostEnvio(linea, colectivo, recorrido, getLat(), getLng());
 
                         difTotal = 0; // resetea la suma
                         tvEstado.setText("Unidad en circulacion");

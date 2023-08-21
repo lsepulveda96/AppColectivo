@@ -48,12 +48,6 @@ public class SplashActivity extends Activity implements MainInterface.View  {
 //                final List<String> opcionesLineas = presenter.consultaLineasActivas();
 //                final List<String> opcionesColectivos = presenter.consultaColectivosActivos();
 
-
-
-
-                System.out.println("lo que trae la lista del coelctivo del servidor tamanioooooo: " + listaColectivos.size());
-                System.out.println("lo que trae la lista del linea del servidor tamanioooooo: " + listaLineas.size());
-
                 for (Colectivo colectivo: listaColectivos ) {
                     System.out.println("lo que trae la lista del coelctivo del servidor: " + colectivo.getUnidad());
                 }

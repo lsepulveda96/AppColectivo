@@ -41,7 +41,7 @@ public interface TrayectoARecorrerInterface {
 
         void showResponse(String response);
 
-        void makeRequestPostEnvio(String linea, String colectivo, String lat, String lng);
+        void makeRequestPostEnvio(String linea, String colectivo, String recorrido, String lat, String lng);
 
         void makeRequestPostEnvioInforme(String linea, String colectivo, String valueOf, String valueOf1, String valueOf2, String s);
 
@@ -68,7 +68,7 @@ public interface TrayectoARecorrerInterface {
 
         void makeRequestPostFinDesvio(String linea, String colectivo, String recorrido);
 
-        void makeRequestPostEnvio(String linea, String colectivo, String lat, String lng);
+        void makeRequestPostEnvio(String linea, String colectivo, String recorrido, String lat, String lng);
 
         void makeRequestPostEnvioInforme(String linea, String colectivo, String lat, String lng, String fechaUbicacionStr, String difTotalStr);
 

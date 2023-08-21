@@ -36,9 +36,9 @@ public class TrayectoARecorrerPresenter implements TrayectoARecorrerInterface.Pr
     }
 
     @Override
-    public void makeRequestPostEnvio(String linea, String colectivo, String lat, String lng) {
+    public void makeRequestPostEnvio(String linea, String colectivo, String recorrido, String lat, String lng) {
         if(view != null){
-            model.makeRequestPostEnvio(linea, colectivo, lat, lng);
+            model.makeRequestPostEnvio(linea, colectivo, recorrido, lat, lng);
         }
     }
 

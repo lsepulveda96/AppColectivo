@@ -25,7 +25,7 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
 //    public static String ipv4 = "http://stcu.mdn.unp.edu.ar:50002/stcu_app/";
 
     // ip local casa
-    public static String ipv4 = "http://192.168.0.103:50000/v1/mobile/";
+    public static String ipv4 = "http://192.168.0.106:50000/v1/mobile/";
     Activity mActivity;
     Context mContext;
     RequestQueue requestQueue;
@@ -189,8 +189,8 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
 
 
 
-    public void makeRequestPostEnvio(final String seleccionLin, final String seleccionCol, final String latitud, final String longitud) {
-        final String url = ipv4+"rest/lineaColectivos/enviarUbicacion";
+    public void makeRequestPostEnvio(final String seleccionLin, final String seleccionCol, String seleccionRec, final String latitud, final String longitud) {
+       /* final String url = ipv4+"rest/lineaColectivos/enviarUbicacion";
         final long fechaUbicacion = System.currentTimeMillis();
         StringRequest postRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>()
@@ -226,6 +226,34 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
             }
         };
         requestQueue.add(postRequest);
+
+*/
+        final String url = ipv4+"enviarUbicacion";
+
+        Map<String, String> params = new HashMap();
+        params.put("linea",seleccionLin);
+        params.put("colectivo", seleccionCol);
+        params.put("recorrido", seleccionRec);
+        params.put("latitud", latitud);
+        params.put("longitud", longitud);
+
+        JSONObject parameters = new JSONObject(params);
+
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, url, parameters,new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+            }
+        },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        presenter.showResponse("No se pudo enviar la ubicacion");
+                    }
+                });
+
+        requestQueue.add(jsonRequest);
     }
 
     @Override
