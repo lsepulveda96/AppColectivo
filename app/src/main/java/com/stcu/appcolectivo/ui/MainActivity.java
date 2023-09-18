@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -160,6 +161,41 @@ public class MainActivity extends Activity implements MainInterface.View {
         }
 
 
+        // ante un cambio en la linea, llama nuevamente a sus recorrido correspondientes
+        itemSeleccionLinea.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+//                System.out.println("el item cambio");
+//                Toast.makeText(MainActivity.this, "el item linea cambio", Toast.LENGTH_SHORT).show();
+
+                final List<Recorrido> opcionesRecorridos = presenter.consultaRecorridoActivos(itemSeleccionLinea.getSelectedItem().toString());
+
+                final Handler handler3 = new Handler();
+                final Runnable r3 = new Runnable(){
+                    public void run() {
+
+
+                        adapterSeleccionRecorrido.clear();
+                        for(Recorrido opcionRecorrido: opcionesRecorridos){
+                            adapterSeleccionRecorrido.add(opcionRecorrido.getDenominacion());
+                        }
+                        itemSeleccionRecorrido.setAdapter(adapterSeleccionRecorrido);
+                        adapterSeleccionRecorrido.setDropDownViewResource(R.layout.textview_spinner_selected);
+                    }
+                };
+                handler3.postDelayed(r3,3000);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                // escribir codigo..
+            }
+        });
+
+
+
+
+
         //desplaza para abajo para actualizar, reemplaza boton actualizar
         swipe = (SwipeRefreshLayout) findViewById(R.id.swipe);
         swipe.setOnRefreshListener(() -> {
@@ -223,7 +259,7 @@ public class MainActivity extends Activity implements MainInterface.View {
                 adapterSeleccionRecorrido.setDropDownViewResource(R.layout.textview_spinner_selected);
             }
         };
-        handler3.postDelayed(r3,4000);
+        handler3.postDelayed(r3,3000);
     }
 
 

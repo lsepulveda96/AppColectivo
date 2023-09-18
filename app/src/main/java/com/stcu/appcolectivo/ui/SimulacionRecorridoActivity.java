@@ -21,7 +21,6 @@ import java.util.List;
 
 public class SimulacionRecorridoActivity extends Activity implements TrayectoARecorrerInterface.View{
 
-    //TODO esta clase si deberia tener una aparte para model, ir haciendo refactoring de los metodos
     Boolean enTransito = true, notificacionActiva = false;
     public static double distanciaOffSetMov = 20.0;
     public static int tiempoMaxDetenido = 17;
@@ -414,7 +413,6 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
     // Si hay que cambiar la parada final, se hace aca
     public Coordenada getParadaFinal() {
         Coordenada paradaFinal = paradasRecorrido.get(paradasRecorrido.size()-1);
-        System.out.println( "++++++++++++++++++ la parada final:" + paradasRecorrido.get(paradasRecorrido.size()-1).getDireccion() );
         return paradaFinal;
     }
 
