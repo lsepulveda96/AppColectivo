@@ -7,7 +7,11 @@ import com.stcu.appcolectivo.model.Linea;
 import com.stcu.appcolectivo.model.Recorrido;
 import com.stcu.appcolectivo.model.Coordenada;
 
+import org.json.JSONObject;
+
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 public interface MainInterface {
     interface View {
@@ -34,10 +38,10 @@ public interface MainInterface {
         void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, Long fechaUbicacionI);
 
 //        List<String> consultaLineasActivas();
-        List<Linea> consultaLineasActivas();
+        List<Linea> consultaLineasActivas() throws ExecutionException, InterruptedException, TimeoutException;
 
 //        List<String> consultaColectivosActivos();
-        List<Colectivo> consultaColectivosActivos();
+        List<Colectivo> consultaColectivosActivos() throws ExecutionException, InterruptedException, TimeoutException;
 
         List<Recorrido> consultaRecorridoActivos(String denomLinea);
 
@@ -66,8 +70,6 @@ public interface MainInterface {
 
         void showResponseError(String error);
 
-
-
 //        void showListadoLineas(List<String> listadoLineas);
 //
 //        void showListadoColectivos(List<String> listadoColectivos);
@@ -77,10 +79,10 @@ public interface MainInterface {
         void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, Long fechaUbicacionI);
 
         //List<String> consultaLineasActivas();
-        List<Linea> consultaLineasActivas();
+        List<Linea> consultaLineasActivas() throws ExecutionException, InterruptedException, TimeoutException;
 
 //        List<String> consultaColectivosActivos();
-        List<Colectivo> consultaColectivosActivos();
+        List<Colectivo> consultaColectivosActivos() throws ExecutionException, InterruptedException, TimeoutException;
 
         List<Recorrido> consultaRecorridosActivos(String denomLinea);
 
@@ -95,8 +97,6 @@ public interface MainInterface {
         void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String seleccionRec2, String latitud, String longitud);
 
         void makeRequestPostFin(String seleccionLin, String seleccionCol, String lat, String lng);
-
-
 
     }
 }

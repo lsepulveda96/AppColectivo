@@ -39,6 +39,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 
 public class MainActivity extends Activity implements MainInterface.View {
@@ -202,8 +204,26 @@ public class MainActivity extends Activity implements MainInterface.View {
 
 //            new Task1().execute();
 
-            final List<Linea> opcionesLineas = presenter.consultaLineasActivas();
-            final List<Colectivo> opcionesColectivos = presenter.consultaColectivosActivos();
+            final List<Linea> opcionesLineas;
+            try {
+                opcionesLineas = presenter.consultaLineasActivas();
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } catch (TimeoutException e) {
+                throw new RuntimeException(e);
+            }
+            final List<Colectivo> opcionesColectivos;
+            try {
+                opcionesColectivos = presenter.consultaColectivosActivos();
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } catch (TimeoutException e) {
+                throw new RuntimeException(e);
+            }
 
 
             dialog2 = new ProgressDialog( this );

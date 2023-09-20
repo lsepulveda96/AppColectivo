@@ -1,5 +1,7 @@
 package com.stcu.appcolectivo.model;
 
+import static android.content.ContentValues.TAG;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -10,6 +12,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 
@@ -18,6 +21,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.stcu.appcolectivo.ui.MainActivity;
@@ -31,6 +35,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class MainModel implements MainInterface.Model {
 //    public static String ipv4 = "http://stcu.mdn.unp.edu.ar:50002/stcu_app/";
@@ -59,57 +66,10 @@ public class MainModel implements MainInterface.Model {
         requestQueue = Volley.newRequestQueue(mContext);
     }
 
-    // metodo que andaba bien, que responde string denominacion
-//    public List<String> consultaLineasActivas() {
-//
-//        requestQueue = Volley.newRequestQueue(mContext);
-//
-//        String url = ipv4+"lineas/activas";
-//
-//        List<String> lineasDisponibles = new ArrayList<>();
-//
-//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-//                (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
-//
-//                    @Override
-//                    public void onResponse(JSONObject response) {
-//                        try {
-//
-//                            JSONArray ja = response.getJSONArray("data"); // get the JSONArray
-//
-//                            for(int i=0;i<ja.length();i++){
-//                                JSONObject linea = ja.getJSONObject(i);
-//                                String denominacion = linea.getString("denominacion");
-//                                lineasDisponibles.add(denominacion);
-//                            }
-//
-////                            presenter.showLineasDisponibles(lineasDisponibles);
-//                            System.out.println("Respuesta del servidor ok: " + lineasDisponibles.get(0));
-//
-//
-//                        } catch (JSONException e) {
-//                            throw new RuntimeException(e);
-//                        }
-//                    }
-//                }, new Response.ErrorListener() {
-//
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        System.out.println("Respuesta del servidor con error: " + error.toString());
-//
-//                    }
-//                });
-//
-//        requestQueue.add(jsonObjectRequest);
-//
-//        return lineasDisponibles;
-//    }
-
-
-
-
+    //metodo que anda bien consultaLineasActivas
+    /*
     public List<Linea> consultaLineasActivas() {
-
+        System.out.println("entra dentro de consulta lineas");
         requestQueue = Volley.newRequestQueue(mContext);
 
         String url = ipv4+"lineas/activas";
@@ -139,6 +99,7 @@ public class MainModel implements MainInterface.Model {
                             System.out.println("Respuesta del servidor ok: " + lineasDisponibles.get(0));
 
 
+
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
@@ -156,116 +117,12 @@ public class MainModel implements MainInterface.Model {
 
         return lineasDisponibles;
     }
+     */
 
-
-
-
-    //metodo que anda bien
-//    public List<String> consultaLineasActivas() {
-//        List<String> lineasActivas = new ArrayList<>();
-//
-//        String url = ipv4 + "rest/lineas/activas"; // ip uni
-//
-//        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
-//                Request.Method.GET,
-//                url,
-//                (String) null,
-//                new Response.Listener<JSONArray>() {
-//                    @Override
-//                    public void onResponse(JSONArray response) {
-//                        try {
-//                            for (int i = 0; i < response.length(); i++) {
-//                                JSONObject linea = response.getJSONObject(i);
-//                                String id = linea.getString("id");
-//                                String denominacion = linea.getString("denominacion");
-//                                String enServicio = linea.getString("enServicio");
-//
-//                                listadoLineas.add(denominacion);
-////                                presenter.showListadoLineas(listadoLineas);
-//
-//                            }
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                },
-//                new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                    }
-//                }
-//        );
-//        requestQueue.add(jsonArrayRequest);
-//        return lineasActivas;
-//    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // el metodo de antes que devuevle string unidad
-//    @Override
-//    public List<String> consultaColectivosActivos() {
-//        requestQueue = Volley.newRequestQueue(mContext);
-//
-//        String url = ipv4+"colectivos";
-//
-//        List<String> colectivos = new ArrayList<>();
-//
-//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-//                (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
-//
-//                    @Override
-//                    public void onResponse(JSONObject response) {
-//                        try {
-//
-//                            JSONArray ja = response.getJSONArray("data"); // get the JSONArray
-//
-//                            for(int i=0;i<ja.length();i++){
-//                                JSONObject colectivo = ja.getJSONObject(i);
-//                                String id = colectivo.getString("id");
-//                                String patente = colectivo.getString("patente");
-//                                String unidad = colectivo.getString("unidad");
-//                                colectivos.add(unidad);
-//                            }
-//
-////                            presenter.showLineasDisponibles(lineasDisponibles);
-//
-//                            System.out.println("Respuesta del servidor ok: " + colectivos.get(0));
-//
-//                        } catch (JSONException e) {
-//                            throw new RuntimeException(e);
-//                        }
-//                    }
-//                }, new Response.ErrorListener() {
-//
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        System.out.println("Respuesta del servidor con error: " + error.toString());
-//
-//                    }
-//                });
-//
-//        requestQueue.add(jsonObjectRequest);
-//        return colectivos;
-//    }
-
-
-    @Override
+    //metodo que anda bien consultaColectivosActivos
+    /*    @Override
     public List<Colectivo> consultaColectivosActivos() {
+        System.out.println("entra dentro de consulta colectivos");
         requestQueue = Volley.newRequestQueue(mContext);
 
         String url = ipv4+"colectivos";
@@ -278,6 +135,7 @@ public class MainModel implements MainInterface.Model {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+
 
                             JSONArray ja = response.getJSONArray("data"); // get the JSONArray
 
@@ -294,9 +152,12 @@ public class MainModel implements MainInterface.Model {
 
                             System.out.println("Respuesta del servidor ok: " + colectivos.get(0));
 
+
+
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
+
                     }
                 }, new Response.ErrorListener() {
 
@@ -309,7 +170,90 @@ public class MainModel implements MainInterface.Model {
 
         requestQueue.add(jsonObjectRequest);
         return colectivos;
+    }*/
+
+
+    //metodo para probar asyncTask
+    @Override
+    public List<Linea> consultaLineasActivas() throws ExecutionException, InterruptedException, TimeoutException {
+        System.out.println("entra dentro de consulta lineas");
+        requestQueue = Volley.newRequestQueue(mContext);
+
+        String url = ipv4+"lineas/activas";
+
+        List<Linea> lineasDisponibles = new ArrayList<>();
+        RequestFuture<JSONObject> future = RequestFuture.newFuture();
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, future, future);
+
+        requestQueue.add(jsonObjectRequest);
+
+        JSONObject resp = future.get(5,TimeUnit.SECONDS);
+
+        try {
+
+            JSONArray ja = resp.getJSONArray("data"); // get the JSONArray
+
+            for(int i=0;i<ja.length();i++){
+                JSONObject linea = ja.getJSONObject(i);
+                String denominacion = linea.getString("denominacion");
+                String descripcion = linea.getString("descripcion");
+                boolean enServicio = linea.getBoolean("enServicio");
+                Long idLinea = Long.parseLong(linea.getString("id"));
+                lineasDisponibles.add(new Linea(idLinea, denominacion,descripcion,enServicio));
+            }
+            System.out.println("Respuesta del servidor ok: " + lineasDisponibles.get(0));
+
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        return lineasDisponibles;
     }
+
+
+
+    //metodo para probar asyncTask
+    @Override
+    public List<Colectivo> consultaColectivosActivos() throws ExecutionException, InterruptedException, TimeoutException {
+        System.out.println("entra dentro de consulta colectivos");
+        requestQueue = Volley.newRequestQueue(mContext);
+
+        String url = ipv4+"colectivos";
+
+        List<Colectivo> colectivosDisponibles = new ArrayList<>();
+
+
+        RequestFuture<JSONObject> future = RequestFuture.newFuture();
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, future, future);
+
+        requestQueue.add(jsonObjectRequest);
+
+        JSONObject resp = future.get(5,TimeUnit.SECONDS);
+        try {
+            JSONArray ja = resp.getJSONArray("data"); // get the JSONArray
+            for(int i=0;i<ja.length();i++){
+                JSONObject colectivo = ja.getJSONObject(i);
+                Long idColectivo = Long.parseLong(colectivo.getString("id"));
+                String patente = colectivo.getString("patente");
+                String unidad = colectivo.getString("unidad");
+                String marca = colectivo.getString("marca");
+                colectivosDisponibles.add(new Colectivo(idColectivo,unidad,patente,marca));
+            }
+            System.out.println("Respuesta del servidor ok: " + colectivosDisponibles.get(0));
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        return colectivosDisponibles;
+    }
+
+
+
 
 
     public NetworkInfo isNetAvailable() {
@@ -617,7 +561,6 @@ public class MainModel implements MainInterface.Model {
 
 
 
-
     public List<Recorrido> consultaRecorridosActivos(String denomLinea) {
         listaRecorridosActivos = new ArrayList<Recorrido>();
         String url = ipv4 + "recorridosActivos/" + denomLinea;
@@ -659,7 +602,5 @@ public class MainModel implements MainInterface.Model {
         requestQueue.add(jsonObjectRequest);
         return listaRecorridosActivos;
     }
-
-
 
 }

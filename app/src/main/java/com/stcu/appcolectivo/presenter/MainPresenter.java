@@ -11,8 +11,12 @@ import com.stcu.appcolectivo.model.MainModel;
 import com.stcu.appcolectivo.model.Recorrido;
 import com.stcu.appcolectivo.model.Coordenada;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 
 public class MainPresenter implements MainInterface.Presenter {
@@ -41,7 +45,7 @@ public class MainPresenter implements MainInterface.Presenter {
 //    }
 
     @Override
-    public List<Linea> consultaLineasActivas() {
+    public List<Linea> consultaLineasActivas() throws ExecutionException, InterruptedException, TimeoutException {
         List<Linea> lineasActivas = model.consultaLineasActivas();
         return lineasActivas;
     }
@@ -52,7 +56,7 @@ public class MainPresenter implements MainInterface.Presenter {
 //        return colectivosActivos;
 //    }
     @Override
-    public List<Colectivo> consultaColectivosActivos() {
+    public List<Colectivo> consultaColectivosActivos() throws ExecutionException, InterruptedException, TimeoutException {
         List<Colectivo> colectivosActivos = model.consultaColectivosActivos();
         return colectivosActivos;
     }
@@ -146,6 +150,12 @@ public class MainPresenter implements MainInterface.Presenter {
             view.showResponseError(error);
         }
     }
+
+
+
+
+
+
 
 //    @Override
 //    public void showListadoLineas(List<String> listadoLineas) {
