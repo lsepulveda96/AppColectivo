@@ -62,7 +62,7 @@ public class MainPresenter implements MainInterface.Presenter {
     }
 
     @Override
-    public List<Recorrido> consultaRecorridoActivos(String denomLinea) {
+    public List<Recorrido> consultaRecorridoActivos(String denomLinea) throws ExecutionException, InterruptedException, TimeoutException {
         List<Recorrido> recorridosActivos = model.consultaRecorridosActivos(denomLinea);
         return recorridosActivos;
     }

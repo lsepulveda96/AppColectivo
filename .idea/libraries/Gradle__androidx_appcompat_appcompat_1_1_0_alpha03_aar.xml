@@ -5,8 +5,8 @@
     </ANNOTATIONS>
     <CLASSES>
       <root url="jar://$APPLICATION_HOME_DIR$/jre/caches/transforms-3/a6828b3df1c7060c8fa035e92838380f/transformed/appcompat-1.1.0-alpha03/jars/classes.jar!/" />
-      <root url="file://$APPLICATION_HOME_DIR$/jre/caches/transforms-3/a6828b3df1c7060c8fa035e92838380f/transformed/appcompat-1.1.0-alpha03/AndroidManifest.xml" />
       <root url="file://$APPLICATION_HOME_DIR$/jre/caches/transforms-3/a6828b3df1c7060c8fa035e92838380f/transformed/appcompat-1.1.0-alpha03/res" />
+      <root url="file://$APPLICATION_HOME_DIR$/jre/caches/transforms-3/a6828b3df1c7060c8fa035e92838380f/transformed/appcompat-1.1.0-alpha03/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

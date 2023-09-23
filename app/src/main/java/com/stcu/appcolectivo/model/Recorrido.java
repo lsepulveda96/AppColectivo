@@ -1,6 +1,11 @@
 package com.stcu.appcolectivo.model;
 
-public class Recorrido {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
+public class Recorrido implements Parcelable {
 
     private long id;
     private String denominacion;
@@ -13,6 +18,24 @@ public class Recorrido {
         this.denominacion = denominacion;
         this.activo = activo;
     }
+
+    protected Recorrido(Parcel in) {
+        id = in.readLong();
+        denominacion = in.readString();
+        activo = in.readByte() != 0;
+    }
+
+    public static final Creator<Recorrido> CREATOR = new Creator<Recorrido>() {
+        @Override
+        public Recorrido createFromParcel(Parcel in) {
+            return new Recorrido(in);
+        }
+
+        @Override
+        public Recorrido[] newArray(int size) {
+            return new Recorrido[size];
+        }
+    };
 
     public long getId() {
         return id;
@@ -36,5 +59,17 @@ public class Recorrido {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel parcel, int i) {
+        parcel.writeLong(id);
+        parcel.writeString(denominacion);
+        parcel.writeByte((byte) (activo ? 1 : 0));
     }
 }

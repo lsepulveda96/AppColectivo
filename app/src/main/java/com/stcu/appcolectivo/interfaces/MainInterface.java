@@ -43,7 +43,7 @@ public interface MainInterface {
 //        List<String> consultaColectivosActivos();
         List<Colectivo> consultaColectivosActivos() throws ExecutionException, InterruptedException, TimeoutException;
 
-        List<Recorrido> consultaRecorridoActivos(String denomLinea);
+        List<Recorrido> consultaRecorridoActivos(String denomLinea) throws ExecutionException, InterruptedException, TimeoutException;
 
         NetworkInfo isNetAvailable();
 
@@ -84,7 +84,7 @@ public interface MainInterface {
 //        List<String> consultaColectivosActivos();
         List<Colectivo> consultaColectivosActivos() throws ExecutionException, InterruptedException, TimeoutException;
 
-        List<Recorrido> consultaRecorridosActivos(String denomLinea);
+        List<Recorrido> consultaRecorridosActivos(String denomLinea) throws ExecutionException, InterruptedException, TimeoutException;
 
         NetworkInfo isNetAvailable();
 
