@@ -11,6 +11,7 @@ import com.stcu.appcolectivo.model.MainModel;
 import com.stcu.appcolectivo.model.Recorrido;
 import com.stcu.appcolectivo.model.Coordenada;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public class MainPresenter implements MainInterface.Presenter {
     }
 
     @Override
-    public List<Coordenada> consultaTrayectoASimular(String seleccionLin2, String seleccionRec2) {
+    public List<Coordenada> consultaTrayectoASimular(String seleccionLin2, String seleccionRec2) throws JSONException, ExecutionException, InterruptedException, TimeoutException {
         List<Coordenada> coordenadasSim = new ArrayList<Coordenada>();
         if(view != null){
             coordenadasSim = model.consultaTrayectoASimular(seleccionLin2, seleccionRec2);

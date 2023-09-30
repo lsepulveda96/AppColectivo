@@ -7,7 +7,11 @@ import com.stcu.appcolectivo.interfaces.TrayectoARecorrerInterface;
 import com.stcu.appcolectivo.model.TrayectoARecorrerModel;
 import com.stcu.appcolectivo.model.Coordenada;
 
+import org.json.JSONException;
+
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 
 public class TrayectoARecorrerPresenter implements TrayectoARecorrerInterface.Presenter {
@@ -23,7 +27,7 @@ public class TrayectoARecorrerPresenter implements TrayectoARecorrerInterface.Pr
     }
 
     @Override
-    public List<Coordenada> consultaParadasRecorrido(String linea, String recorrido) {
+    public List<Coordenada> consultaParadasRecorrido(String linea, String recorrido) throws JSONException, ExecutionException, InterruptedException, TimeoutException {
         List<Coordenada> paradasRecorrido = model.consultaParadasRecorrido(linea,recorrido);
         return paradasRecorrido;
     }
@@ -36,7 +40,7 @@ public class TrayectoARecorrerPresenter implements TrayectoARecorrerInterface.Pr
     }
 
     @Override
-    public void makeRequestPostEnvio(String linea, String colectivo, String recorrido, String lat, String lng) {
+    public void makeRequestPostEnvio(String linea, String colectivo, String recorrido, String lat, String lng) throws ExecutionException, InterruptedException, TimeoutException {
         if(view != null){
             model.makeRequestPostEnvio(linea, colectivo, recorrido, lat, lng);
         }
@@ -57,21 +61,21 @@ public class TrayectoARecorrerPresenter implements TrayectoARecorrerInterface.Pr
     }
 
     @Override
-    public void makeRequestPostEnvioDesvio(String linea, String colectivo, String recorrido, Double latActual, Double lngActual) {
+    public void makeRequestPostEnvioDesvio(String linea, String colectivo, String recorrido, Double latActual, Double lngActual) throws ExecutionException, InterruptedException, TimeoutException {
         if(view != null){
             model.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
         }
     }
 
     @Override
-    public void makeRequestPostColeEnParada(int codigo, String denomLinea, String unidad, String denomRecorrido) {
+    public void makeRequestPostColeEnParada(int codigo, String denomLinea, String unidad, String denomRecorrido) throws ExecutionException, InterruptedException, TimeoutException {
         if(view != null){
             model.makeRequestPostColeEnParada(codigo, denomLinea, unidad, denomRecorrido);
         }
     }
 
     @Override
-    public void makeRequestPostFin(String linea, String colectivo, String recorrido) {
+    public void makeRequestPostFin(String linea, String colectivo, String recorrido) throws ExecutionException, InterruptedException, TimeoutException {
         if(view != null){
 //            model.makeRequestPostFin(linea, colectivo, latitud, longitud);
             model.makeRequestPostFin(linea, colectivo, recorrido);
@@ -107,7 +111,7 @@ public class TrayectoARecorrerPresenter implements TrayectoARecorrerInterface.Pr
 //    }
 
     @Override
-    public void makeRequestPostFinDesvio(String linea, String colectivo, String recorrido) {
+    public void makeRequestPostFinDesvio(String linea, String colectivo, String recorrido) throws ExecutionException, InterruptedException, TimeoutException {
         if(view != null){
             model.makeRequestPostFinDesvio(linea, colectivo, recorrido);
         }

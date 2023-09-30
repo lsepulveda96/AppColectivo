@@ -21,8 +21,12 @@ import com.stcu.appcolectivo.interfaces.TrayectoARecorrerInterface;
 import com.stcu.appcolectivo.model.Coordenada;
 import com.stcu.appcolectivo.presenter.TrayectoARecorrerPresenter;
 
+import org.json.JSONException;
+
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 
 public class ColectivoEnServicioActivity extends Activity implements TrayectoARecorrerInterface.View {
@@ -78,14 +82,40 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
         latActual = Double.parseDouble(latitud);
         lngActual = Double.parseDouble(longitud);
 
-        paradasRecorrido = presenter.consultaParadasRecorrido(linea, recorrido);
-        detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo, recorrido);
+        try {
+            paradasRecorrido = presenter.consultaParadasRecorrido(linea, recorrido);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (TimeoutException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo, recorrido);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (TimeoutException e) {
+            throw new RuntimeException(e);
+        }
 //        TODO por si es parada final
         final Handler handler = new Handler();
         final Runnable r = new Runnable() {
             public void run() {
                 // para indicar que esta en la parada inicial
-                detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo, recorrido);
+                try {
+                    detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo, recorrido);
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (TimeoutException e) {
+                    throw new RuntimeException(e);
+                }
                 time time = new time();
                 time.execute();
             }
@@ -99,7 +129,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
      *
      * @param  view    boton fin servicio
      */
-    public void finServicio(View view) {
+    public void finServicio(View view) throws ExecutionException, InterruptedException, TimeoutException {
         //resetea el contDesvio
         contDesvio = 0;
 
@@ -123,7 +153,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
     /**
      * Finaliza el servicio por haber llegado a la parada final del recorrido
      */
-    public void finServicioSimple() {
+    public void finServicioSimple() throws ExecutionException, InterruptedException, TimeoutException {
         //resetea el contDesvio
         contDesvio = 0;
         presenter.makeRequestPostFin(linea, colectivo, recorrido);
@@ -180,8 +210,24 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                 //que envie la consulta de desvio la primera vez
                 if (contDesvio < 1) {
                     // si la primera vez esta parado y esta en una parada tambien detecta la parada
-                    detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo, recorrido);
-                    presenter.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
+                    try {
+                        detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo, recorrido);
+                    } catch (ExecutionException e) {
+                        throw new RuntimeException(e);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    } catch (TimeoutException e) {
+                        throw new RuntimeException(e);
+                    }
+                    try {
+                        presenter.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
+                    } catch (ExecutionException e) {
+                        throw new RuntimeException(e);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    } catch (TimeoutException e) {
+                        throw new RuntimeException(e);
+                    }
                     Toast.makeText(ColectivoEnServicioActivity.this, "Detectando desvio..", Toast.LENGTH_SHORT).show();
                     contDesvio++;
                 }
@@ -209,7 +255,15 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
 
                     if (contVerifParada < 1) {
                         //si esta parado la primera vez detecta la parada
-                        detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo, recorrido);
+                        try {
+                            detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo, recorrido);
+                        } catch (ExecutionException e) {
+                            throw new RuntimeException(e);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        } catch (TimeoutException e) {
+                            throw new RuntimeException(e);
+                        }
                         //por si es parada final
                         contVerifParada++;
                     }
@@ -242,16 +296,41 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                     //por si es parada final
 
 //                   vuelve a verificar si esta desviado
-                    boolean esFin = detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo, recorrido);
+                    boolean esFin = false;
+                    try {
+                        esFin = detectarParada(paradasRecorrido, latActual, lngActual, linea, colectivo, recorrido);
+                    } catch (ExecutionException e) {
+                        throw new RuntimeException(e);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    } catch (TimeoutException e) {
+                        throw new RuntimeException(e);
+                    }
                     // vuelve a verificar si esta desviado
                     if (esFin) {
                         finish();
                     } else {
-                        presenter.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
+                        try {
+                            presenter.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
+                        } catch (ExecutionException e) {
+                            throw new RuntimeException(e);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        } catch (TimeoutException e) {
+                            throw new RuntimeException(e);
+                        }
                         Toast.makeText(ColectivoEnServicioActivity.this, "Detectando desvio..", Toast.LENGTH_SHORT).show();
 
                         Toast.makeText(ColectivoEnServicioActivity.this, "enviando ubicacion..", Toast.LENGTH_SHORT).show();
-                        presenter.makeRequestPostEnvio(linea, colectivo, recorrido, getLat(), getLng());
+                        try {
+                            presenter.makeRequestPostEnvio(linea, colectivo, recorrido, getLat(), getLng());
+                        } catch (ExecutionException e) {
+                            throw new RuntimeException(e);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        } catch (TimeoutException e) {
+                            throw new RuntimeException(e);
+                        }
 
                         difTotal = 0; // resetea la suma
                         tvEstado.setText("Unidad en circulacion");
@@ -333,7 +412,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
 
 
 
-        public boolean detectarParada(List<Coordenada> listitaParadas, Double latActual, Double lngActual, String denom, String unidad, String denomRecorrido) {
+        public boolean detectarParada(List<Coordenada> listitaParadas, Double latActual, Double lngActual, String denom, String unidad, String denomRecorrido) throws ExecutionException, InterruptedException, TimeoutException {
             boolean esFin = false;
             MainFragment fragment = (MainFragment) getFragmentManager().findFragmentById(R.id.main_fragment); // tener esta como global
             for(Coordenada parada: listitaParadas){

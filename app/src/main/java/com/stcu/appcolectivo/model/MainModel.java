@@ -1,7 +1,5 @@
 package com.stcu.appcolectivo.model;
 
-import static android.content.ContentValues.TAG;
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -12,7 +10,6 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 
@@ -24,8 +21,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.stcu.appcolectivo.ui.MainActivity;
 import com.stcu.appcolectivo.interfaces.MainInterface;
+import com.stcu.appcolectivo.ui.MainActivity;
 import com.stcu.appcolectivo.util.VolleySingleton;
 
 import org.json.JSONArray;
@@ -178,7 +175,6 @@ public class MainModel implements MainInterface.Model {
     @Override
     public List<Linea> consultaLineasActivas() throws ExecutionException, InterruptedException, TimeoutException {
         System.out.println("entra dentro de consulta lineas");
-//        requestQueue = Volley.newRequestQueue(mContext);
 
         String url = ipv4+"lineas/activas";
 
@@ -190,15 +186,10 @@ public class MainModel implements MainInterface.Model {
 
         VolleySingleton.getmInstance(mActivity.getApplicationContext()).addToRequestQueue((jsonObjectRequest));
 
-//        requestQueue.add(jsonObjectRequest);
-
         JSONObject resp = future.get(5,TimeUnit.SECONDS);
 
-//        System.out.println("la respuesta dentro de lineas: " + resp.toString());
         try {
-
             JSONArray ja = resp.getJSONArray("data"); // get the JSONArray
-
             for(int i=0;i<ja.length();i++){
                 JSONObject linea = ja.getJSONObject(i);
                 String denominacion = linea.getString("denominacion");
@@ -213,7 +204,6 @@ public class MainModel implements MainInterface.Model {
             throw new RuntimeException(e);
         }
 
-
         return lineasDisponibles;
     }
 
@@ -223,7 +213,6 @@ public class MainModel implements MainInterface.Model {
     @Override
     public List<Colectivo> consultaColectivosActivos() throws ExecutionException, InterruptedException, TimeoutException {
         System.out.println("entra dentro de consulta colectivos");
-//        requestQueue = Volley.newRequestQueue(mContext);
 
         String url = ipv4+"colectivos";
 
@@ -236,7 +225,6 @@ public class MainModel implements MainInterface.Model {
                 (Request.Method.GET, url, future, future);
 
         VolleySingleton.getmInstance(mActivity.getApplicationContext()).addToRequestQueue((jsonObjectRequest));
-//        requestQueue.add(jsonObjectRequest);
 
         JSONObject resp = future.get(5,TimeUnit.SECONDS);
         try {
@@ -270,47 +258,17 @@ public class MainModel implements MainInterface.Model {
         return activeNetwork;
    }
 
-    /**
+   // metodo antiguo sin future.get. andando
+/*    *//**
      * Metodo que recupera la lista de coordenadas a utilizar para simular el trayecto seleccionado
      * @param denom denominacion de la linea seleccionada
      * @param seleccionRec2 seleccion de uno de los recorridos activos de esa linea seleccionada
      * @return lista de coordenadas del trayecto seleccionado
-     */
+     *//*
     public List<Coordenada> consultaTrayectoASimular(String denom, String seleccionRec2) {
         listaCoordenadasTrayecto = new ArrayList<Coordenada>();
         String url = ipv4 + "trayectos/" + denom +"/"+ seleccionRec2;
 
-       /* JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
-                Request.Method.GET,
-                url,
-                (String) null,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        try {
-                            //ver donde usa esto!! cuando ande el servidor
-                            for (int i = 0; i < response.length(); i++) {
-                                JSONObject trayecto = response.getJSONObject(i);
-                                String latitud = trayecto.getString("latitud");
-                                String longitud = trayecto.getString("longitud");
-                                coord = new Coordenada();
-                                coord.setLatitud(Double.parseDouble(latitud));
-                                coord.setLongitud(Double.parseDouble(longitud));
-                                listaCoordenadasTrayecto.add(coord);
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        System.out.println("Error respuesta del servidor: " + error.toString());
-                    }
-                }
-        );*/
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
 
@@ -350,13 +308,71 @@ public class MainModel implements MainInterface.Model {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         System.out.println("Respuesta del servidor con error: " + error.toString());
-
                     }
                 });
 
         requestQueue.add(jsonObjectRequest);
         return listaCoordenadasTrayecto;
+    }*/
+
+
+
+
+
+
+    /**
+     * Metodo que recupera la lista de coordenadas a utilizar para simular el trayecto seleccionado
+     * @param denom denominacion de la linea seleccionada
+     * @param seleccionRec2 seleccion de uno de los recorridos activos de esa linea seleccionada
+     * @return lista de coordenadas del trayecto seleccionado
+     */
+    public List<Coordenada> consultaTrayectoASimular(String denom, String seleccionRec2) throws JSONException, ExecutionException, InterruptedException, TimeoutException {
+
+        listaCoordenadasTrayecto = new ArrayList<Coordenada>();
+        String url = ipv4 + "trayectos/" + denom +"/"+ seleccionRec2;
+
+        RequestFuture<JSONObject> future = RequestFuture.newFuture();
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, future, future);
+
+        VolleySingleton.getmInstance(mActivity.getApplicationContext()).addToRequestQueue((jsonObjectRequest));
+
+        JSONObject resp = future.get(5,TimeUnit.SECONDS);
+
+        JSONArray paradas = resp.getJSONArray("data"); // get the JSONArray
+
+        for (int i = 0; i < paradas.length(); i++) {
+            JSONObject parada = paradas.getJSONObject(i);
+
+            JSONObject coordLng = new JSONObject(parada.getString("parada")).getJSONObject("coordenada");
+            String longitud = coordLng.getString("lng");
+
+            JSONObject coordLat = new JSONObject(parada.getString("parada")).getJSONObject("coordenada");
+            String latitud = coordLat.getString("lat");
+
+            String direccion= new JSONObject(parada.getString("parada")).getString("direccion");
+
+            // esto quizas se deba llamar Parada, o paradaRecorrido en vez de coordenada
+            coord = new Coordenada();
+            coord.setLatitud(Double.parseDouble(latitud));
+            coord.setLongitud(Double.parseDouble(longitud));
+            coord.setDireccion(direccion);
+            listaCoordenadasTrayecto.add(coord);
+        }
+
+//      System.out.println("Respuesta del servidor ok: " + colectivos.get(0));
+        return listaCoordenadasTrayecto;
     }
+
+
+
+
+
+
+
+
+
 
     public void obtenerUbicacion() {
 
@@ -410,45 +426,13 @@ public class MainModel implements MainInterface.Model {
 
                         response = response.replaceAll ("\"","");
                         presenter.showResponseInicioServicioOk(response,seleccionLin,seleccionCol,fechaUbicacionI);
-
-
-/*                        Toast toast1 =
-                                Toast.makeText(getActivity(),
-                                        response, Toast.LENGTH_LONG);
-                        toast1.show();
-
-                        if(response.equals("Servicio iniciado")) {
-
-
-                            //pasar devuelta el control al mainActivity para que llame al nuevo activity
-                            //presenter.showResult() o servicioIniciado() o response()
-                            //los parametros ya los tenia del activity del que vino
-                            //
-                            MainActivity activity2 = (MainActivity) getActivity();
-                            String myLat2 = activity2.getLat();
-                            String myLng2 = activity2.getLng();
-
-                            //esto deberia hacerlo en el mainActivity, aca solo llama a la api para iniciar el servicio
-                            Intent ma2 = new Intent(getActivity(), ColectivoEnServicioActivity.class);
-                            ma2.putExtra("linea", seleccionLin);
-                            ma2.putExtra("colectivo", seleccionCol);
-                            ma2.putExtra("latitud", myLat2);
-                            ma2.putExtra("longitud", myLng2);
-
-                            ma2.putExtra("fechaUbicacion", String.valueOf(System.currentTimeMillis()));
-                            getActivity().startActivity(ma2);
-                        }*/
                     }
                 },
                 new Response.ErrorListener()
                 {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-//                        presenter.showResponseInicioServicioError(error.toString());
                         presenter.showResponseError("No se pudo iniciar el servicio");
-//                        Toast toast1 = Toast.makeText(getActivity(),"No se pudo iniciar el servicio", Toast.LENGTH_SHORT);
-//                        toast1.show();
-//                        Toast.makeText( getActivity(),"Vuelva a intentarlo",Toast.LENGTH_SHORT ).show();
                     }
                 }
         ) {

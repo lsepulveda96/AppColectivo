@@ -15,8 +15,12 @@ import com.stcu.appcolectivo.interfaces.TrayectoARecorrerInterface;
 import com.stcu.appcolectivo.model.Coordenada;
 import com.stcu.appcolectivo.presenter.TrayectoARecorrerPresenter;
 
+import org.json.JSONException;
+
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 
 public class SimulacionRecorridoActivity extends Activity implements TrayectoARecorrerInterface.View{
@@ -77,119 +81,104 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         latActual = Double.parseDouble(latitud);
         lngActual = Double.parseDouble(longitud);
 
-        paradasRecorrido = presenter.consultaParadasRecorrido(linea,recorrido);
-        coordenadasSim = paradasRecorrido;
-
-        final Handler handler = new Handler();
-        final Runnable r = new Runnable() {
-            public void run() {
-
-                // para indicar que esta en la parada inicial
-                setParadaInicio(paradasRecorrido.get(0),linea,colectivo,recorrido);
-                System.out.println("la primera parada a recorrer: " + paradasRecorrido.get(0).getDireccion() +", codigo:" + paradasRecorrido.get(0).getCodigo());
-                InicioRecorrido inicioRecorrido = new InicioRecorrido();
-                inicioRecorrido.execute();
-            }
-        };
-        handler.postDelayed(r,4000);
-
-    }
+        //seguir trabajando aca
+        //.
 
 
 
-    public void finServicio(View view) {
-        //resetea el contDesvio
-        contDesvioAlIniciar = 0;
-
-        //nueva, resetea cont coordenada a simular
-        contCoorSim = 0;
-
-        //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
-        presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
-        presenter.makeRequestPostFin(linea,colectivo,recorrido);
-
-        final Handler handler = new Handler();
-        final Runnable r = new Runnable() {
-            public void run() {
-                enTransito = false;
-                if(notificacionActiva) {
-                    presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
-                }
-                notificacionActiva = false; // resetea la bander
-                Toast.makeText( getApplicationContext(), "Servicio finalizado", Toast.LENGTH_SHORT ).show();
-                finish();
-            }
-        };
-        handler.postDelayed( r, 3000 );
-
-    }
-
-    public void finServicioSimple() {
-        //resetea el contador de desvio
-        contDesvioAlIniciar = 0;
-        //nuevo: resetea el cont de coord a simular
-        contCoorSim = 0;
-        //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
-        // TODO Arreglar
-        presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
-        presenter.makeRequestPostFin(linea,colectivo,recorrido);
-
-        final Handler handler = new Handler();
-        final Runnable r = new Runnable() {
-            public void run() {
-                enTransito = false;
-                if(notificacionActiva) {
-                    presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
-                }
-                notificacionActiva = false; // resetea la bander
-                Toast.makeText( getApplicationContext(), "Servicio finalizado", Toast.LENGTH_SHORT ).show();
-//                finish();
-            }
-        };
-        handler.postDelayed( r, 3000 );
+        new InicioRecorridoSim().execute();
 
 
-    }
+//        final Handler handler = new Handler();
+//        final Runnable r = new Runnable() {
+//            public void run() {
+//
+//                // para indicar que esta en la parada inicial
+//                setParadaInicio(paradasRecorrido.get(0),linea,colectivo,recorrido);
+//                System.out.println("la primera parada a recorrer: " + paradasRecorrido.get(0).getDireccion() +", codigo:" + paradasRecorrido.get(0).getCodigo());
+//                InicioRecorrido inicioRecorrido = new InicioRecorrido();
+//                inicioRecorrido.execute();
+//            }
+//        };
+//        handler.postDelayed(r,4000);
 
-    public void hilo(){
+    } // fin onCreate
 
-        try {
-            Thread.sleep(6000); // cuanto tiempo duerme el hilo, esto deberia poder elegirse por el user
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
+
+
+
+
+//    public void hilo(){
+//
+//        try {
+//            Thread.sleep(6000); // cuanto tiempo duerme el hilo, esto deberia poder elegirse por el user
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public void ejecutar(){
-        InicioRecorrido inicioRecorrido = new InicioRecorrido();
+        InicioRecorridoSim inicioRecorrido = new InicioRecorridoSim();
         inicioRecorrido.execute();
     }
 
 
-    public class InicioRecorrido extends AsyncTask<Void,Integer,Boolean> {
+    // cambiar lo del return true
+    public class InicioRecorridoSim extends AsyncTask<Void,Integer,Boolean> {
+
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            hilo();
-            return true;
-        }
+//            hilo();
+            // para indicar que esta en la parada inicial
+            try {
+                paradasRecorrido = presenter.consultaParadasRecorrido(linea,recorrido);
+                coordenadasSim = paradasRecorrido;
+                System.out.println("el resultado de la consulta paradas recorrido");
+//                for (Coordenada coord: paradasRecorrido
+//                ) {
+//                    System.out.println("Parada recorrido- id: " + coord.getCodigo() + ".  direccion: "  + coord.getDireccion());
+//                }
+            }  catch (ExecutionException | InterruptedException | TimeoutException | JSONException e) {
+                System.out.println("Error en consulta paradas recorridos: " + e);
+                throw new RuntimeException(e);
+            }
+
+            try{
+                setParadaInicio(paradasRecorrido.get(0),linea,colectivo,recorrido);
+            }  catch (ExecutionException | InterruptedException | TimeoutException e) {
+                System.out.println("Error en set parada inicio: " + e);
+                throw new RuntimeException(e);
+            }
+            System.out.println("la primera parada a recorrer: " + paradasRecorrido.get(0).getDireccion() +", codigo:" + paradasRecorrido.get(0).getCodigo());
 
 
-        // todo trabajar en este metodo
-        @Override
-        protected void onPostExecute(Boolean aBoolean){
+            for (int i=0;i<paradasRecorrido.size();i++) {
+
+
+
+
             if(enTransito){
 
                 // porque ya es la segunda vez que entra
                 if(contCoorSim < coordenadasSim.size()-1) {
                     contCoorSim++;
                 }else{
-                    finServicioSimple(); // nose si esta bien esto
-                    finish();
+                    try {
+                        finServicioSimple(); // nose si esta bien esto
+                        finish();
+                    } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
 
                 obtenerUbicacion();
-                ejecutar(); // ejecuta el hilo que duerme x segundos
+                try {
+                    Thread.sleep(6000); // para dejar pasar tiempo entre cada parada
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+//                ejecutar(); // ejecuta el hilo que duerme x segundos
 
                 latActual = getLatActual();
                 lngActual = getLngActual();
@@ -199,33 +188,47 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                 //consulta si esta desviado al iniciar el recorrido. por si no esta en parada de inicio
                 if(contDesvioAlIniciar < 1) {
                     // si la primera vez esta parado y esta en una parada tambien detecta la parada
-                    boolean esFin = esParadaFinal(paradasRecorrido,latActual,lngActual,linea,colectivo,recorrido);
+                    boolean esFin;
+                    try {
+                        esFin = esParadaFinal(paradasRecorrido,latActual,lngActual,linea,colectivo,recorrido);
+                        Thread.sleep(3000);
+                        System.out.println("es parada final?: " + esFin);
+                    } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                        throw new RuntimeException(e);
+                    }
 
-                    final Handler handler = new Handler();
-                    final Runnable r = new Runnable(){
-                        public void run(){
-                            if(esFin){
-                                finServicioSimple();
-                                finish();
-                            }
+                    if(esFin){
+                        try {
+                            System.out.println("Entra a fin servicio simple");
+                            finServicioSimple();
+                            finish();
+                        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                            throw new RuntimeException(e);
                         }
-                    };
-                    handler.postDelayed(r,3000);
+                    }
 
-                    presenter.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
-                    Toast.makeText(SimulacionRecorridoActivity.this, "Detectando desvio..", Toast.LENGTH_SHORT).show();
-                    contDesvioAlIniciar++;
-                }
+
+                    try {
+                        presenter.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
+                        System.out.println("Detectando desvio..");
+                        contDesvioAlIniciar++;
+                    } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                        throw new RuntimeException(e);
+                    }
+
+//                    Toast.makeText(SimulacionRecorridoActivity.this, "Detectando desvio..", Toast.LENGTH_SHORT).show();
+
+                } // fin if cont desvio al inciar
 
                 // TODO inicio colectivo detenido
 
-                final Handler handler = new Handler();
-                final Runnable r = new Runnable(){
-                    public void run(){
-                        distancia = calcularDistancia(Double.parseDouble(latAntigua), Double.parseDouble(lngAntigua), latActual, lngActual);
-                    }
-                };
-                handler.postDelayed(r,3500);
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                distancia = calcularDistancia(Double.parseDouble(latAntigua), Double.parseDouble(lngAntigua), latActual, lngActual);
+
 
                 Date fuAntiguaD = new Date(fechaUbicacionAntigua);
                 Date fuActualD = new Date(fechaUbicacionActual);
@@ -234,26 +237,28 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
                 // si esta detenido
                 if(distancia < distanciaOffSetMov ){ // si es menor a 20.0 metros, esta detenido // que luego pueda ser configurable // 20.0
+//                    System.out.println("entra en colectivo detenido");
                     difTotal = difTotal + difSeg; // suma el tiempo total detenido // tambien se puede con cont++ cada 3 intentos envia
                     Toast.makeText(SimulacionRecorridoActivity.this, difTotal+" segundos detenido", Toast.LENGTH_SHORT).show();
                     tvEstado.setText("Unidad detenida");
 
                     if(contVerifParada < 1){
                         //si esta parado la primera vez detecta la parada
-                        boolean esFin = esParadaFinal(paradasRecorrido,latActual,lngActual,linea,colectivo,recorrido);
+                        boolean esFin;
+                        try {
+                            esFin = esParadaFinal(paradasRecorrido,latActual,lngActual,linea,colectivo,recorrido);
 
-                        final Handler handler1 = new Handler();
-                        final Runnable r1 = new Runnable(){
-                            public void run(){
-                                if(esFin){
-                                    finServicioSimple();
-                                    finish();
-                                }
+                            Thread.sleep(3000);
+                            System.out.println("es parada final?: " + esFin);
+                            if(esFin) {
+                                finServicioSimple();
+                                finish();
                             }
-                        };
-                        handler1.postDelayed(r1,3000);
+                        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                            throw new RuntimeException(e);
+                        }
+
                         //por si es parada final
-                        //detectarParadaFinal(getParadaFinal(),latActual,lngActual);
                         contVerifParada++;
                     }
 
@@ -284,37 +289,61 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
                     // contador en 0 para que cuando se vuelve a parar la primera vez verifique si es parada
                     contVerifParada = 0;
+                    try {
+                        // vuelve a verificar si esta desviado
+                        boolean esFin;
+                        esFin = esParadaFinal(paradasRecorrido,latActual,lngActual,linea,colectivo,recorrido);
+                        Thread.sleep(3000);
+                        System.out.println("es parada final?: " + esFin);
+                        if(esFin) {
+//                            System.out.println("llama a fin de servicio simple");
+                            finServicioSimple();
+                            finish();
+                        }else{
+                            System.out.println("no es parada final");
+                            presenter.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
+//                        Toast.makeText( SimulacionRecorridoActivity.this, "Enviando ubicacion..", Toast.LENGTH_SHORT ).show();
+                            System.out.println("enviando ubicacion..");
+                            presenter.makeRequestPostEnvio(linea, colectivo, recorrido, getLat(), getLng());
+                            difTotal = 0; // resetea la suma
+                            System.out.println("unidad en circulacion");
+//                            runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    tvEstado.setText( "Unidad en circulacion" );
+//                                }
+//                            });
 
-                    // vuelve a verificar si esta desviado
-                    boolean esFin = esParadaFinal(paradasRecorrido,latActual,lngActual,linea,colectivo,recorrido);
-
-                    final Handler handler1 = new Handler();
-                    final Runnable r1 = new Runnable(){
-                        public void run(){
-                            if(esFin){
-                                finServicioSimple();
-                                finish();
-                            } else{
-                                presenter.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
-                                Toast.makeText( SimulacionRecorridoActivity.this, "Enviando ubicacion..", Toast.LENGTH_SHORT ).show();
-                                presenter.makeRequestPostEnvio(linea, colectivo, recorrido, getLat(), getLng());
-
-                                difTotal = 0; // resetea la suma
-                                tvEstado.setText( "Unidad en circulacion" );
-                            }
                         }
-                    };
-                    handler1.postDelayed(r1,3000);
+
+                    } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                        throw new RuntimeException(e);
+                    }
+
 
 
                 } // fin else colectivo circulando
 
                 fechaUbicacionAntigua = fechaUbicacionActual;
 //              TODO fin colectivo detenido
-            }
+            } //fin if en transito
+
+            } // fin for
+
+            return true;
+        } // fin doInBackGround
+
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean){
+            System.out.println("recorrido sim terminado");
+            finish();
         }
 
-    }
+    } // fin thread inicio recorrido
+
+
+
 
     private double calcularDistancia(Double latAntigua, Double lngAntigua, Double latActual, Double lngActual) {
         Location locAntigua = new Location("location antigua");
@@ -329,8 +358,6 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
     // ya iniciado el servicio
     public void obtenerUbicacion(){
-        //tvUbicacion.setText(coordenadasSim.get(contCoorSim).getLatitud()+""+coordenadasSim.get(contCoorSim).getLongitud());
-        tvUbicacion.setText(coordenadasSim.get(contCoorSim).getDireccion() + " cod: " + coordenadasSim.get(contCoorSim).getCodigo());
         setLat(String.valueOf(coordenadasSim.get(contCoorSim).getLatitud()));
         setLng(String.valueOf(coordenadasSim.get(contCoorSim).getLongitud()));
         setLatActual(coordenadasSim.get(contCoorSim).getLatitud()); // se pueden sacar por las dos de arriba
@@ -338,6 +365,15 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
         fechaUbicacionActual = System.currentTimeMillis();
         setFechaUbicacion(fechaUbicacionActual);
+//        runOnUiThread(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//
+//                tvUbicacion.setText(coordenadasSim.get(contCoorSim).getDireccion() + " cod: " + coordenadasSim.get(contCoorSim).getCodigo());
+//
+//            }
+//        });
     }
 
     public String getLat(){
@@ -380,21 +416,30 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         this.fechaUbicacionActual = fechaUbicacion;
     }
 
-    public boolean esParadaFinal(List<Coordenada> listaParadasRecorrido, Double latActual, Double lngActual, String denomLinea, String unidad, String denomRecorrido ) {
+    public boolean esParadaFinal(List<Coordenada> listaParadasRecorrido, Double latActual, Double lngActual, String denomLinea, String unidad, String denomRecorrido ) throws ExecutionException, InterruptedException, TimeoutException {
         boolean esFin = false;
+
         for(Coordenada parada: listaParadasRecorrido){
+
+//            System.out.println("Parada actual: " + parada.getCodigo() + " - " + parada.getDireccion());
+//            System.out.println("Parada final: " + getParadaFinal().getCodigo());
+
             double distancia = calcularDistancia(latActual,lngActual,parada.getLatitud(),parada.getLongitud());
+
             if (distancia < 20.0) {
                 if(getParadaFinal().getCodigo() == parada.getCodigo()){
+//                    System.out.println("getParadaFinal es igual a parada getCodigo actual");
                     esFin = true;
-                    Toast.makeText( SimulacionRecorridoActivity.this, "Colectivo en parada final", Toast.LENGTH_SHORT ).show();
+//                    Toast.makeText( SimulacionRecorridoActivity.this, "Colectivo en parada final", Toast.LENGTH_SHORT ).show();
+                    System.out.println("++++ colectivo en parada final");
                     presenter.makeRequestPostColeEnParada( parada.getCodigo(), denomLinea, unidad,denomRecorrido);
-//                    finServicioSimple();
-//                    finish();
+
                 }else{
+//                    System.out.println("getParada actual no era final");
                     // es porque esta en o cerca de una parada de esa linea que esta en servicio
-                    Toast.makeText( SimulacionRecorridoActivity.this, "Colectivo en parada", Toast.LENGTH_SHORT ).show();
-//                    fragment.makeRequestPostColeEnParada( parada.getCodigo(), denom, unidad ); // a rest lineaColectivo
+//                    Toast.makeText( SimulacionRecorridoActivity.this, "Colectivo en parada", Toast.LENGTH_SHORT ).show();
+                    System.out.println("++++ Colectivo en parada");
+
                     presenter.makeRequestPostColeEnParada( parada.getCodigo(), denomLinea, unidad, denomRecorrido);
                 }
             }
@@ -403,10 +448,9 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
     }
 
 
-    public void setParadaInicio(Coordenada coordenada, String linea, String colectivo, String denomRecorrido) {
-        MainFragment fragment = (MainFragment) getFragmentManager().findFragmentById(R.id.main_fragment);
-        Toast.makeText( SimulacionRecorridoActivity.this, "Colectivo en parada inicio", Toast.LENGTH_SHORT ).show();
-//        fragment.makeRequestPostColeEnParada( coordenada.getCodigo(), linea, colectivo ); // a rest lineaColectivo
+    public void setParadaInicio(Coordenada coordenada, String linea, String colectivo, String denomRecorrido) throws ExecutionException, InterruptedException, TimeoutException {
+//        Toast.makeText( SimulacionRecorridoActivity.this, "Colectivo en parada inicio", Toast.LENGTH_SHORT ).show();
+        System.out.println("Colectivo en parada inicio");
         presenter.makeRequestPostColeEnParada(coordenada.getCodigo(), linea, colectivo, denomRecorrido);
     }
 
@@ -416,34 +460,62 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         return paradaFinal;
     }
 
+    public void finServicio(View view) throws ExecutionException, InterruptedException, TimeoutException {
+        //resetea el contDesvio
+        contDesvioAlIniciar = 0;
+
+        //nueva, resetea cont coordenada a simular
+        contCoorSim = 0;
+
+        //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
+        presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
+        presenter.makeRequestPostFin(linea,colectivo,recorrido);
+
+        final Handler handler = new Handler();
+        final Runnable r = new Runnable() {
+            public void run() {
+                enTransito = false;
+                if(notificacionActiva) {
+                    presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
+                }
+                notificacionActiva = false; // resetea la bander
+                Toast.makeText( getApplicationContext(), "Servicio finalizado", Toast.LENGTH_SHORT ).show();
+                finish();
+            }
+        };
+        handler.postDelayed( r, 3000 );
+
+    }
+
+    public void finServicioSimple() throws ExecutionException, InterruptedException, TimeoutException {
+
+        //resetea el contador de desvio
+        contDesvioAlIniciar = 0;
+        //nuevo: resetea el cont de coord a simular
+        contCoorSim = 0;
+        //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
+        // TODO Arreglar
+        presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
+        presenter.makeRequestPostFin(linea,colectivo,recorrido);
+
+        enTransito = false;
+        if(notificacionActiva) {
+            //refactorizarlo
+//            presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
+        }
+        notificacionActiva = false; // resetea la bander
+//        Toast.makeText( getApplicationContext(), "Servicio finalizado", Toast.LENGTH_SHORT ).show();
+        System.out.println("servicio finalizado+++++++++++++++");
+
+    }
+
+
+
     @Override
     public void showResponse(String response) {
         Toast.makeText( getApplicationContext() ,response, Toast.LENGTH_SHORT ).show();
     }
 
-//
-//    @Override
-//    public void showResponsePostFinOk(String response) {
-//        Toast.makeText( getApplicationContext() ,response, Toast.LENGTH_LONG ).show();
-//    }
-//
-//    @Override
-//    public void showResponsePostFinError(String error) {
-//        //parametro error por si quiero usar la respuesta del volley
-//        Toast.makeText( getApplicationContext() ,"No se pudo realizar la operacion", Toast.LENGTH_LONG ).show();
-//        Toast.makeText( getApplicationContext() ,"Vuelva a intentarlo", Toast.LENGTH_LONG ).show();
-//    }
-//
-//    //estos dos metodos son iguales!!! refactor
-//    @Override
-//    public void showResponsePostFinInformeError(String error) {
-//        Toast.makeText( getApplicationContext() ,"No se pudo enviar la notificacion", Toast.LENGTH_LONG ).show();
-//    }
-//
-//    @Override
-//    public void showResponsePostFinDesvioError(String error) {
-//        Toast.makeText( getApplicationContext() ,"No se pudo enviar la notificacion", Toast.LENGTH_LONG ).show();
-//    }
 
 
 }
