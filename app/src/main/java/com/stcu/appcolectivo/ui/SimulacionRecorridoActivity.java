@@ -117,10 +117,6 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 //        }
 //    }
 
-    public void ejecutar(){
-        InicioRecorridoSim inicioRecorrido = new InicioRecorridoSim();
-        inicioRecorrido.execute();
-    }
 
 
     // cambiar lo del return true
@@ -501,7 +497,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         enTransito = false;
         if(notificacionActiva) {
             //refactorizarlo
-//            presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
+            presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
         }
         notificacionActiva = false; // resetea la bander
 //        Toast.makeText( getApplicationContext(), "Servicio finalizado", Toast.LENGTH_SHORT ).show();

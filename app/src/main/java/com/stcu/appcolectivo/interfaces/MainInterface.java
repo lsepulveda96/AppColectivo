@@ -8,7 +8,6 @@ import com.stcu.appcolectivo.model.Recorrido;
 import com.stcu.appcolectivo.model.Coordenada;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -19,7 +18,7 @@ public interface MainInterface {
 
         void showUbicacion(String strLatitud, String strLongitud);
 
-        void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, Long fechaUbicacionI);
+        void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, Long fechaUbicacionI, String lat, String lng);
 
         void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial);
 
@@ -31,7 +30,7 @@ public interface MainInterface {
 
     interface Presenter {
 
-        void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, Long fechaUbicacionI);
+        void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, String seleccionRec, String lat, String lng);
 
         List<Linea> consultaLineasActivas() throws ExecutionException, InterruptedException, TimeoutException;
 
@@ -48,7 +47,7 @@ public interface MainInterface {
 
         void obtenerUbicacion();
 
-        void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, Long fechaUbicacionI);
+        void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, Long fechaUbicacionI, String myLat, String myLng);
 
         void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String seleccionRec2, String latitud, String longitud);
 
@@ -63,7 +62,7 @@ public interface MainInterface {
 
     interface Model {
 
-        void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, Long fechaUbicacionI);
+        void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, String seleccionRec, String lat, String lng);
 
         List<Linea> consultaLineasActivas() throws ExecutionException, InterruptedException, TimeoutException;
 

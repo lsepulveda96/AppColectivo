@@ -1,6 +1,7 @@
 package com.stcu.appcolectivo.ui;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -9,11 +10,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +32,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.gpmess.example.volley.app.R;
@@ -63,6 +72,9 @@ public class MainActivity extends Activity implements MainInterface.View {
     private SwipeRefreshLayout swipe;
 
 
+    Button searchBtn = null;
+    Intent locatorService = null;
+    AlertDialog alertDialog = null;
 
     //necesario para comprobar internet en tiempo real
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -73,17 +85,17 @@ public class MainActivity extends Activity implements MainInterface.View {
     };
 
     //necesario para comprobar internet en tiempo real
-    private void checkStatus(){
+    private void checkStatus() {
         NetworkInfo activeNetwork = presenter.isNetAvailable();
         if (null != activeNetwork) {
 
-            switch (activeNetwork.getType()){
+            switch (activeNetwork.getType()) {
                 case ConnectivityManager.TYPE_WIFI:
                 case ConnectivityManager.TYPE_MOBILE:
                     tvNetwork.setVisibility(View.GONE);
                     break;
             }
-        }else {
+        } else {
             tvNetwork.setVisibility(View.VISIBLE);
         }
 
@@ -94,8 +106,8 @@ public class MainActivity extends Activity implements MainInterface.View {
         super.onCreate(savedInstanceState);
 
         //necesario para comprobar internet en tiempo real
-        IntentFilter intentFilter =new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(mBroadcastReceiver,intentFilter);
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(mBroadcastReceiver, intentFilter);
 
         presenter = new MainPresenter(this, this, this);
 
@@ -122,19 +134,19 @@ public class MainActivity extends Activity implements MainInterface.View {
         // if(listasEstanCargadas) // llamo a lo normal, sino hago un cartel con las op. reintentar. cancelar
         listasEstanCargadas = getIntent().getExtras().getBoolean("listasEstanCargadas");
 
-        if(listasEstanCargadas){
+        if (listasEstanCargadas) {
 
             colectivosDisponibles = getIntent().getParcelableArrayListExtra("listaColectivos");
             lineasDisponibles = getIntent().getParcelableArrayListExtra("listaLineas");
             recorridosDisponibles = getIntent().getParcelableArrayListExtra("listaRecorridos");
 
             adapterSeleccionLinea.clear();
-            for(Linea opcion: lineasDisponibles){
+            for (Linea opcion : lineasDisponibles) {
                 adapterSeleccionLinea.add(opcion.getDenominacion());
             }
             adapterSeleccionColectivo.clear();
 
-            for(Colectivo opcion2: colectivosDisponibles){
+            for (Colectivo opcion2 : colectivosDisponibles) {
                 adapterSeleccionColectivo.add(opcion2.getUnidad());
             }
             adapterSeleccionLinea.setDropDownViewResource(R.layout.textview_spinner_selected);
@@ -144,7 +156,7 @@ public class MainActivity extends Activity implements MainInterface.View {
             itemSeleccionRecorrido.setAdapter(adapterSeleccionRecorrido);
 
             adapterSeleccionRecorrido.clear();
-            for(Recorrido opcionRecorrido: recorridosDisponibles){
+            for (Recorrido opcionRecorrido : recorridosDisponibles) {
                 adapterSeleccionRecorrido.add(opcionRecorrido.getDenominacion());
             }
             itemSeleccionRecorrido.setAdapter(adapterSeleccionRecorrido);
@@ -152,15 +164,15 @@ public class MainActivity extends Activity implements MainInterface.View {
 
 
             // si los dos estan vacios
-            if(adapterSeleccionLinea.isEmpty() || adapterSeleccionColectivo.isEmpty()){
-                Toast.makeText( getApplicationContext() ,"No se pudo cargar el listado de lineas y colectivos", Toast.LENGTH_SHORT ).show();
-            }else {
-                btnIniciarServicio.setEnabled( true ); // para que pueda guardar la eleccion
-                finServicio.setEnabled( true );
+            if (adapterSeleccionLinea.isEmpty() || adapterSeleccionColectivo.isEmpty()) {
+                Toast.makeText(getApplicationContext(), "No se pudo cargar el listado de lineas y colectivos", Toast.LENGTH_SHORT).show();
+            } else {
+                btnIniciarServicio.setEnabled(true); // para que pueda guardar la eleccion
+                finServicio.setEnabled(true);
             }
 
 
-        }else{
+        } else {
             AlertDialog.Builder alertaListasVacias = new AlertDialog.Builder(MainActivity.this);
             alertaListasVacias.setMessage("No es posible cargar listado de colectivos-lineas")
                     .setCancelable(false) // para que no se pueda clickear afuera de el
@@ -169,7 +181,7 @@ public class MainActivity extends Activity implements MainInterface.View {
                         public void onClick(DialogInterface dialogInterface, int i) {
 
                             dialogInterface.cancel();
-                            new ThreadRecargaListaAsyncTask(getApplicationContext(),MainActivity.this).execute();
+                            new ThreadRecargaListaAsyncTask(getApplicationContext(), MainActivity.this).execute();
 
                         }
                     })
@@ -203,12 +215,11 @@ public class MainActivity extends Activity implements MainInterface.View {
         }); // fin Listener cambio de linea
 
 
-
         //desplaza para abajo para actualizar, reemplaza boton actualizar
         swipe = findViewById(R.id.swipe);
         swipe.setOnRefreshListener(() -> {
 
-            new ThreadRecargaListaAsyncTask(this,this).execute();
+            new ThreadRecargaListaAsyncTask(this, this).execute();
 
         }); // fin swipe actualiza listas
 
@@ -228,9 +239,9 @@ public class MainActivity extends Activity implements MainInterface.View {
         int itemId = item.getItemId();
 
         // si uno de los dos es vacio
-        if(adapterSeleccionLinea.isEmpty() || adapterSeleccionColectivo.isEmpty()){
-            Toast.makeText( getApplicationContext() ,"Seleccione linea y colectivo para continuar", Toast.LENGTH_SHORT ).show();
-        }else{
+        if (adapterSeleccionLinea.isEmpty() || adapterSeleccionColectivo.isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Seleccione linea y colectivo para continuar", Toast.LENGTH_SHORT).show();
+        } else {
             new ThreadConsultaTrayectoASimular(this).execute();
         }
         return itemId == R.id.action_settings || super.onOptionsItemSelected(item);
@@ -240,11 +251,13 @@ public class MainActivity extends Activity implements MainInterface.View {
 
 
 
-    //boton iniciar servicio
+/*    //boton iniciar servicio
     public void iniciarServicio(View view) {
 
         // TODO 5to refactoring
         presenter.obtenerUbicacion();
+
+//        new InicioServicio().execute();
 
         dialog3 = new ProgressDialog( this );
         dialog3.setMessage( "Detectando ubicación.." );
@@ -269,9 +282,175 @@ public class MainActivity extends Activity implements MainInterface.View {
                 }
             }
         };
-        handler.postDelayed(r,4500);
+        handler.postDelayed(r,5000);
+
+    } // fin boton iniciar servicio*/
+
+
+    //boton iniciar servicio
+    public void iniciarServicio(View view) {
+
+        Button searchBtn = null;
+        Intent locatorService = null;
+        AlertDialog alertDialog = null;
+
+        if (!startService()) {
+            CreateAlert("Error!", "Service Cannot be started");
+        } else {
+            Toast.makeText(getApplicationContext(), "Service Started",
+                    Toast.LENGTH_LONG).show();
+        }
 
     } // fin boton iniciar servicio
+
+    public boolean stopService() {
+        if (this.locatorService != null) {
+            this.locatorService = null;
+        }
+        return true;
+    }
+
+    public boolean startService() {
+        try {
+            // this.locatorService= new
+            // Intent(FastMainActivity.this,LocatorService.class);
+            // startService(this.locatorService);
+
+            FetchCordinates fetchCordinates = new FetchCordinates();
+            fetchCordinates.execute();
+            return true;
+        } catch (Exception error) {
+            return false;
+        }
+
+    }
+
+    public AlertDialog CreateAlert(String title, String message) {
+        AlertDialog alert = new AlertDialog.Builder(this).create();
+
+        alert.setTitle(title);
+
+        alert.setMessage(message);
+
+        return alert;
+
+    }
+
+    public class FetchCordinates extends AsyncTask<String, Integer, Boolean> {
+        ProgressDialog progDailog = null;
+
+        public double lati = 0.0;
+        public double longi = 0.0;
+
+        public LocationManager mLocationManager;
+        public VeggsterLocationListener mVeggsterLocationListener;
+
+        @Override
+        protected void onPreExecute() {
+//            progDailog.setMessage("Loading...");
+//            progDailog.setIndeterminate(true);
+//            progDailog.setCancelable(true);
+//            progDailog.show();
+        }
+
+        @Override
+        protected void onCancelled(){
+            System.out.println("Cancelled by user!");
+            mLocationManager.removeUpdates(mVeggsterLocationListener);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            Toast.makeText(getApplicationContext(),
+                    "LATITUDE :" + lati + " LONGITUDE :" + longi,
+                    Toast.LENGTH_LONG).show();
+            if(getLat().equals("0")){
+                System.out.println("no se pudo obtener su ubicacion actual");
+            }else{
+                new InicioServicio().execute();
+            }
+        }
+
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            mVeggsterLocationListener = new VeggsterLocationListener();
+            mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+
+                    if (ContextCompat.checkSelfPermission(MainActivity.this,
+                            Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                                Manifest.permission.ACCESS_FINE_LOCATION)){
+                            ActivityCompat.requestPermissions(MainActivity.this,
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                        }else{
+                            ActivityCompat.requestPermissions(MainActivity.this,
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                        }
+                    }
+                    mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mVeggsterLocationListener);
+                }
+            });
+
+//            tratar de hacer esto cuando esta buscando la ubicacion
+//            progDailog.setMessage("Loading...");
+//            progDailog.setIndeterminate(true);
+//            progDailog.setCancelable(true);
+//            progDailog.show();
+
+            while (this.lati == 0.0 | this.longi == 0.0) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println("esperando a la respuesta de la locacion gps");
+            }
+            return null;
+        }
+
+        public class VeggsterLocationListener implements LocationListener {
+
+            @Override
+            public void onLocationChanged(Location location) {
+/*                int lat = (int) location.getLatitude(); // * 1E6);
+                int log = (int) location.getLongitude(); // * 1E6);
+                int acc = (int) (location.getAccuracy());
+                String info = location.getProvider();*/
+                try {
+                    lati = location.getLatitude();
+                    longi = location.getLongitude();
+                    System.out.println("la latitud obtenida: " + lati);
+                    System.out.println("++++++++++++++++++++++++++++++");
+                    System.out.println("la longitud obtenida: " + longi);
+                    setLat(String.valueOf(lati));
+                    setLng(String.valueOf(longi));
+                } catch (Exception e) {
+                    System.out.println("error obteniendo la dir" + e);
+                }
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+                Log.i("OnProviderDisabled", "OnProviderDisabled");
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+                Log.i("onProviderEnabled", "onProviderEnabled");
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status,
+                                        Bundle extras) {
+                Log.i("onStatusChanged", "onStatusChanged");
+            }
+        }
+    }
 
 
     // boton fin servicio
@@ -304,6 +483,7 @@ public class MainActivity extends Activity implements MainInterface.View {
 
     @Override
     public void showUbicacion(String strLatitud, String strLongitud) {
+        System.out.println("entra en show ubicacion" + strLatitud + " --- " +strLongitud );
         tvUbicacion.setText(strLatitud + "" + strLongitud);
         setLat(strLatitud);
         setLng(strLongitud);
@@ -312,19 +492,25 @@ public class MainActivity extends Activity implements MainInterface.View {
 
 
     @Override
-    public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, Long fechaUbicacionI) {
+    public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, Long fechaUbicacionI, String lat, String lng) {
 
-        Toast.makeText( getApplicationContext() ,response, Toast.LENGTH_LONG ).show();
+        try {
+        JSONObject obj = new JSONObject(response);
+        String respuesta = obj.getString("mensaje");
+        if(respuesta.equals("Servicio iniciado")) {
+            Intent intentInicioServicioActivity = new Intent(MainActivity.this, ColectivoEnServicioActivity.class);
+            intentInicioServicioActivity.putExtra("linea", seleccionLin);
+            intentInicioServicioActivity.putExtra("colectivo", seleccionCol);
+            intentInicioServicioActivity.putExtra("latitud", lat);
+            intentInicioServicioActivity.putExtra("longitud", lng);
+            intentInicioServicioActivity.putExtra("fechaUbicacion", String.valueOf(fechaUbicacionI));
+            setFechaUbicacionI(fechaUbicacionI);
+            this.startActivity(intentInicioServicioActivity);
+        }
 
-        if(response.equals("Servicio iniciado")) {
-            //esto deberia hacerlo en el mainActivity, aca solo llama a la api para iniciar el servicio
-            Intent ma2 = new Intent(getApplicationContext(), ColectivoEnServicioActivity.class);
-            ma2.putExtra("linea", seleccionLin);
-            ma2.putExtra("colectivo", seleccionCol);
-            ma2.putExtra("latitud", getLat());
-            ma2.putExtra("longitud", getLng());
-            ma2.putExtra("fechaUbicacion", String.valueOf(fechaUbicacionI));
-            getApplicationContext().startActivity(ma2);
+        } catch (JSONException e) {
+            System.out.println("error al cargar el inicio de servicio" + e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -511,7 +697,7 @@ public class MainActivity extends Activity implements MainInterface.View {
         public void showUbicacion(String strLatitud, String strLongitud) {}
 
         @Override
-        public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, Long fechaUbicacionI) {}
+        public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, Long fechaUbicacionI, String lat, String lng) {}
 
         @Override
         public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial) {}
@@ -620,17 +806,42 @@ public class MainActivity extends Activity implements MainInterface.View {
                 System.out.println("la lista de coordenadas a simular: " + coor.getDireccion());
             }
 
-//            dialog1 = new ProgressDialog( this );
-//            dialog1.setMessage( "Cargando recorrido a simular" );
-//            dialog1.show();
-//            dialog1.cancel();
-
-
-
         } // fin onPostExcecute
 
     } // fin thread trayecto a simular
 
+
+
+
+    public class InicioServicio extends AsyncTask<Void,Integer,Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            // TODO problema aca
+            String seleccionLin = itemSeleccionLinea.getSelectedItem().toString();
+            String seleccionCol = itemSeleccionColectivo.getSelectedItem().toString();
+            String seleccionRec = itemSeleccionRecorrido.getSelectedItem().toString();
+
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+
+                    tvLineaSeleccionada.setText("Linea: " + seleccionLin);
+                    tvColectivoSeleccionado.setText("Colectivo: " + seleccionCol);
+                    // hacer item seleccion recorrido
+                }
+            });
+
+            presenter.enviarInicioServicioAServidor(seleccionLin, seleccionCol, seleccionRec, getLat(), getLng());
+
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            System.out.println("Thread inicio servicio terminado");
+        }
+    }
 
 }
 

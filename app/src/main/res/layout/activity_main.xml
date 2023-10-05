@@ -6,17 +6,6 @@
     android:background="@drawable/main_gradient_color"
     tools:context="com.stcu.appcolectivo.ui.MainActivity">
 
-    <!--borrar-->
-    <fragment
-        android:id="@+id/main_fragment"
-        android:name="com.stcu.appcolectivo.ui.MainFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="21dp"
-        tools:layout="@layout/fragment_main"
-        android:layout_alignParentLeft="true" />
 
 <!--    desliza para actualizar-->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout

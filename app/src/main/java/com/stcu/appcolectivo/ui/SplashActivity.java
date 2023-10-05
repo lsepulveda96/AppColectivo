@@ -5,10 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.Parcelable;
-import android.widget.Toast;
 
 import com.gpmess.example.volley.app.R;
 import com.stcu.appcolectivo.interfaces.MainInterface;
@@ -41,7 +38,7 @@ public class SplashActivity extends Activity implements MainInterface.View  {
     }
 
     @Override
-    public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, Long fechaUbicacionI) {
+    public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, Long fechaUbicacionI, String lat, String lng) {
 
     }
 

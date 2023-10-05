@@ -12,7 +12,6 @@ import com.stcu.appcolectivo.model.Recorrido;
 import com.stcu.appcolectivo.model.Coordenada;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +32,9 @@ public class MainPresenter implements MainInterface.Presenter {
     }
 
     @Override
-    public void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, Long fechaUbicacionI) {
+    public void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, String seleccionRec, String lat, String lng) {
         if(view != null){
-            model.enviarInicioServicioAServidor(seleccionLin, seleccionCol, fechaUbicacionI);
+            model.enviarInicioServicioAServidor(seleccionLin, seleccionCol, seleccionRec, lat, lng);
         }
     }
 
@@ -97,9 +96,9 @@ public class MainPresenter implements MainInterface.Presenter {
     }
 
     @Override
-    public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, Long fechaUbicacionI) {
+    public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, Long fechaUbicacionI, String lat, String lng) {
         if(view!=null){
-            view.showResponseInicioServicioOk(response, seleccionLin, seleccionCol, fechaUbicacionI);
+            view.showResponseInicioServicioOk(response, seleccionLin, seleccionCol, fechaUbicacionI, lat, lng);
         }
     }
 

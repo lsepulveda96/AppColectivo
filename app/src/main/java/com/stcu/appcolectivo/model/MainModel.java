@@ -22,7 +22,6 @@ import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.stcu.appcolectivo.interfaces.MainInterface;
-import com.stcu.appcolectivo.ui.MainActivity;
 import com.stcu.appcolectivo.util.VolleySingleton;
 
 import org.json.JSONArray;
@@ -374,6 +373,44 @@ public class MainModel implements MainInterface.Model {
 
 
 
+ /*   public void obtenerUbicacion() {
+
+        System.out.println("entra en obtenerUbicacion Model");
+
+        if ( Build.VERSION.SDK_INT >= 23 &&
+                ContextCompat.checkSelfPermission( mActivity, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission( mActivity, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return  ;
+        }
+
+        LocationManager locationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
+        LocationListener locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                System.out.println("se pudo obtenr la ubicacion" + location.getLongitude() + " --- " + location.getLongitude());
+                presenter.showUbicacion(String.valueOf(location.getLatitude()), String.valueOf(location.getLongitude()));
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+            }
+        };
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+
+    }*/
+
+
     public void obtenerUbicacion() {
 
         LocationManager locationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
@@ -409,8 +446,11 @@ public class MainModel implements MainInterface.Model {
 
     }
 
-    @Override
-    public void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, Long fechaUbicacionI) {
+    // metodo antiguo
+
+   /*
+   @Override
+   public void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, Long fechaUbicacionI) {
         //llamo al presenter para enviar el resultado devuelta
         //TODO 4 -cuando tiene el dato no se lo envia directo a la vista, pasa devuelta por el presenter
 //        presenter.showResultPresenter(String.valueOf(resultado));
@@ -458,6 +498,38 @@ public class MainModel implements MainInterface.Model {
         };
         requestQueue.add(postRequest);
 //        addToQueue(postRequest);
+    }*/
+
+    @Override
+    public void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, String seleccionRec, String lat, String lng) {
+
+        final String url = ipv4+"inicio"; // uni
+        final long fechaUbicacion = System.currentTimeMillis();
+        Map<String, String> params = new HashMap();
+        params.put("recorrido", seleccionRec);
+        params.put("fechaUbicacion", String.valueOf(fechaUbicacion));
+        params.put("linea", seleccionLin);
+        params.put("colectivo", seleccionCol);
+        params.put("latitud", lat);
+        params.put("longitud", lng);
+
+        JSONObject parameters = new JSONObject(params);
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, url, parameters,new Response.Listener<JSONObject>() {
+            @Override
+                    public void onResponse(JSONObject response) {
+//                        response = response.replaceAll ("\"","");
+                        presenter.showResponseInicioServicioOk(response.toString(),seleccionLin,seleccionCol,seleccionRec,fechaUbicacion,lat,lng);
+                    }
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        presenter.showResponseError("No se pudo iniciar el servicio");
+                    }
+                }
+        );
+        requestQueue.add(jsonRequest);
     }
 
     // todo esto trabajando en este para simulacion recorrido
