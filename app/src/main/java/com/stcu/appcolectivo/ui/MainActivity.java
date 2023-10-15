@@ -450,7 +450,7 @@ public class MainActivity extends Activity implements MainInterface.View {
                 Log.i("onStatusChanged", "onStatusChanged");
             }
         }
-    }
+    } // fin fetch coordinates
 
 
     // boton fin servicio
@@ -492,7 +492,7 @@ public class MainActivity extends Activity implements MainInterface.View {
 
 
     @Override
-    public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, Long fechaUbicacionI, String lat, String lng) {
+    public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, Long fechaUbicacionI, String lat, String lng) {
 
         try {
         JSONObject obj = new JSONObject(response);
@@ -501,6 +501,7 @@ public class MainActivity extends Activity implements MainInterface.View {
             Intent intentInicioServicioActivity = new Intent(MainActivity.this, ColectivoEnServicioActivity.class);
             intentInicioServicioActivity.putExtra("linea", seleccionLin);
             intentInicioServicioActivity.putExtra("colectivo", seleccionCol);
+            intentInicioServicioActivity.putExtra("recorrido", seleccionRec);
             intentInicioServicioActivity.putExtra("latitud", lat);
             intentInicioServicioActivity.putExtra("longitud", lng);
             intentInicioServicioActivity.putExtra("fechaUbicacion", String.valueOf(fechaUbicacionI));
@@ -697,7 +698,7 @@ public class MainActivity extends Activity implements MainInterface.View {
         public void showUbicacion(String strLatitud, String strLongitud) {}
 
         @Override
-        public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, Long fechaUbicacionI, String lat, String lng) {}
+        public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, Long fechaUbicacionI, String lat, String lng) {}
 
         @Override
         public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial) {}

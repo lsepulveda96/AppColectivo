@@ -10,7 +10,6 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -33,14 +32,14 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
 
     Boolean enTransito = true, notActiva = false;
     public static double distanciaOffSetMov = 20.0;
-    public static int tiempoMaxDetenido = 17;
+    public static int tiempoMaxDetenido = 8;
 
     private TextView tvLinea, tvColectivo, tvLatitud, tvLongitud, tvUbicacion, tvEstado;
     private String linea, colectivo, recorrido, latitud, longitud, fechaUbicacionInicialS, myLat, myLng, latAntigua, lngAntigua;
     private Long fechaUbicacionAntigua, fechaUbicacionInicial, fechaUbicacionActual;
     private Button finServicio;
     Double latActual, lngActual, distancia = 0.0;
-    int difTotal = 0, contDesvio = 0, contVerifParada = 0;
+    int segundosDetenidoStr = 0, contDesvio = 0, contVerifParada = 0;
     List<Coordenada> paradasRecorrido;
 
     private TrayectoARecorrerInterface.Presenter presenter;
@@ -105,10 +104,9 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                 throw new RuntimeException(e);
             }
 
-            for (int i=0;i<paradasRecorrido.size();i++) {
+//            for (int i=0;i<paradasRecorrido.size();i++) {
+            while (enTransito){ // mientras este en transito sigue, sino sale
 
-
-                if (enTransito) {
                     obtenerUbicacion();
 
                     latActual = getLatActual();
@@ -140,10 +138,24 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
 
                     // si esta detenido
                     if (distancia < distanciaOffSetMov) { // si es menor a 20.0 metros, esta detenido // que luego pueda ser configurable // 20.0
-                        difTotal = difTotal + difSeg; // suma el tiempo total detenido // tambien se puede con cont++ cada 3 intentos envia
+                        segundosDetenidoStr = segundosDetenidoStr + difSeg; // suma el tiempo total detenido // tambien se puede con cont++ cada 3 intentos envia
 //                        Toast.makeText(ColectivoEnServicioActivity.this, difTotal + " segundos detenido", Toast.LENGTH_SHORT).show();
-                        System.out.println(difTotal + " segundos detenido");
-                        tvEstado.setText("Unidad detenida");
+                        System.out.println(segundosDetenidoStr + " segundos detenido");
+
+
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                tvEstado.setText("Unidad detenida");
+                            }
+                        });
+
+
 
                         if (contVerifParada < 1) {
                             //si esta parado la primera vez detecta la parada
@@ -157,17 +169,25 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                         }
 
                         //si esta detenido por mas de 'x' tiempo
-                        if (difTotal > tiempoMaxDetenido) { // si el tiempo que esta detenido es mayor a 17 seg envia el informe (configurable) // 17
+                        if (segundosDetenidoStr > tiempoMaxDetenido) { // si el tiempo que esta detenido es mayor a 17 seg envia el informe (configurable) // 17
 
                             // si el colectivo todavia sigue parado, actualiza la notificacion
                             if (notActiva == true) {
-                                presenter.makeRequestPostActInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
+                                try {
+                                    presenter.makePostActualizacionNotifColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
+                                } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                                    throw new RuntimeException(e);
+                                }
 //                                Toast.makeText(ColectivoEnServicioActivity.this, "unidad detenida, actualizando informe..", Toast.LENGTH_SHORT).show();
                                 System.out.println("unidad detenida, actualizando informe..");
                             } else {
                                 // sino es la primera vez que el colectivo se para y crea la nueva notificacion y setea bandera en true
-                                presenter.makeRequestPostEnvioInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
-                                Toast.makeText(ColectivoEnServicioActivity.this, "unidad detenida, enviando informe..", Toast.LENGTH_SHORT).show();
+                                try {
+                                    presenter.makePostInformeColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
+                                } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                                    throw new RuntimeException(e);
+                                }
+//                                Toast.makeText(ColectivoEnServicioActivity.this, "unidad detenida, enviando informe..", Toast.LENGTH_SHORT).show();
                                 System.out.println("unidad detenida, enviando informe..");
                                 notActiva = true;
                             }
@@ -176,7 +196,11 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                     } else {
                         // si el colectivo estaba parado, y empezo a circular, actualiza la notificacion(con el tiempo final) y cambia la bandera a false
                         if (notActiva == true) {
-                            presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
+                            try {
+                                presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual),"" + segundosDetenidoStr);
+                            }catch (ExecutionException | InterruptedException | TimeoutException e) {
+                                throw new RuntimeException(e);
+                            }
                             notActiva = false; // resetea la bandera
                         }
 
@@ -213,14 +237,38 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                                 throw new RuntimeException(e);
                             }
 
-                            difTotal = 0; // resetea la suma
+                            segundosDetenidoStr = 0; // resetea la suma
                             tvEstado.setText("Unidad en circulacion");
                         }
                     }
                     fechaUbicacionAntigua = fechaUbicacionActual;
 //                TODO fin colectivo detenido
-                } // fin if en transito
-            }
+                } // fin while en transito
+
+
+                // hacer aca lo del boton cuando sale. el boton solo deberia poner la variable enTransito en false.
+                contDesvio = 0;
+                if (notActiva) {
+                    try {
+                        presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
+                    } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                notActiva = false; // resetea la bandera
+                //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
+                try {
+                    presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
+                } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    presenter.makeRequestPostFinColectivoRecorrido(linea, colectivo, recorrido);
+                } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                    throw new RuntimeException(e);
+                }
+//            finish();
+
             return true;
         } // fin doInBackGround
 
@@ -275,12 +323,27 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
         setFechaUbicacion(fechaUbicacionActual);
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+                }
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+            }
+        });
+
+
+      /*  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
         }
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);*/
+
+
     }
 
 
@@ -355,31 +418,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
         Toast.makeText( getApplicationContext() ,response, Toast.LENGTH_SHORT ).show();
     }
 
-    /**
-     * Detiene el servicio mediante el boton "Fin Servicio"
-     *
-     * @param  view    boton fin servicio
-     */
-    public void finServicio(View view) throws ExecutionException, InterruptedException, TimeoutException {
-        //resetea el contDesvio
-        contDesvio = 0;
 
-        presenter.makeRequestPostFin(linea, colectivo, recorrido);
-        enTransito = false;
-        if (notActiva) {
-            presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
-        }
-        notActiva = false; // resetea la bandera
-
-        //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
-        presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
-
-        Toast toast1 =
-                Toast.makeText(this,
-                        "Servicio finalizado", Toast.LENGTH_SHORT);
-        toast1.show();
-        finish();
-    }
 
     /**
      * Finaliza el servicio por haber llegado a la parada final del recorrido
@@ -387,10 +426,10 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
     public void finServicioSimple() throws ExecutionException, InterruptedException, TimeoutException {
         //resetea el contDesvio
         contDesvio = 0;
-        presenter.makeRequestPostFin(linea, colectivo, recorrido);
+        presenter.makeRequestPostFinColectivoRecorrido(linea, colectivo, recorrido);
         enTransito = false;
         if (notActiva) {
-            presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
+            presenter.makePostFinNotificacionColeDetenido(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + segundosDetenidoStr);
         }
         notActiva = false; // resetea la bandera
 
@@ -403,4 +442,87 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
         toast1.show();
         finish();
     }
-}
+
+
+
+
+// metodo antiguo andando bien
+    /**
+     * Detiene el servicio mediante el boton "Fin Servicio"
+     *
+     * @param  view    boton fin servicio
+     *//*
+    public void finServicio(View view) throws ExecutionException, InterruptedException, TimeoutException {
+
+
+        //resetea el contDesvio
+        contDesvio = 0;
+
+
+        enTransito = false;
+        if (notActiva) {
+            presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
+        }
+        notActiva = false; // resetea la bandera
+
+        //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
+        presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
+
+        presenter.makeRequestPostFinColectivoRecorrido(linea, colectivo, recorrido);
+//        Toast toast1 = Toast.makeText(this,"Servicio finalizado", Toast.LENGTH_SHORT);
+//        toast1.show();
+        System.out.println("Servicio finalizado");
+        finish(); // ver si va aca o en la salida del while
+    }*/
+
+
+
+
+    /**
+     * Detiene el servicio mediante el boton "Fin Servicio"
+     *
+     * @param  view    boton fin servicio
+     */
+    public void finServicio(View view) throws ExecutionException, InterruptedException, TimeoutException {
+        enTransito = false;
+//         new FinServicio().execute();
+    }
+
+
+    public class FinServicio extends AsyncTask<Void, Integer, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            //resetea el contDesvio
+            contDesvio = 0;
+            enTransito = false;
+            if (notActiva) {
+                try {
+                    presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
+                } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            notActiva = false; // resetea la bandera
+            //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
+            try {
+                presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
+            } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                presenter.makeRequestPostFinColectivoRecorrido(linea, colectivo, recorrido);
+            } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                throw new RuntimeException(e);
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            System.out.println("Servicio finalizado");
+            finish();
+        }
+    }
+
+} // fin clase

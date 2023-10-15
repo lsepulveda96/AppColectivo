@@ -35,7 +35,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
     private Long fechaUbicacionAntigua, fechaUbicacionInicial, fechaUbicacionActual;
     private Button finServicio;
     Double latActual, lngActual, distancia = 0.0;
-    int difTotal = 0;
+    int segundosDetenidoStr = 0;
     private int contDesvioAlIniciar = 0, contVerifParada = 0;
 
     List<Coordenada> paradasRecorrido, coordenadasSim;
@@ -234,8 +234,8 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                 // si esta detenido
                 if(distancia < distanciaOffSetMov ){ // si es menor a 20.0 metros, esta detenido // que luego pueda ser configurable // 20.0
 //                    System.out.println("entra en colectivo detenido");
-                    difTotal = difTotal + difSeg; // suma el tiempo total detenido // tambien se puede con cont++ cada 3 intentos envia
-                    Toast.makeText(SimulacionRecorridoActivity.this, difTotal+" segundos detenido", Toast.LENGTH_SHORT).show();
+                    segundosDetenidoStr = segundosDetenidoStr + difSeg; // suma el tiempo total detenido // tambien se puede con cont++ cada 3 intentos envia
+                    Toast.makeText(SimulacionRecorridoActivity.this, segundosDetenidoStr +" segundos detenido", Toast.LENGTH_SHORT).show();
                     tvEstado.setText("Unidad detenida");
 
                     if(contVerifParada < 1){
@@ -259,15 +259,27 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                     }
 
                     //si esta detenido por mas de 'x' tiempo
-                    if(difTotal > tiempoMaxDetenido){ // si el tiempo que esta detenido es mayor a 17 seg envia el informe (configurable) // 17
+                    if(segundosDetenidoStr > tiempoMaxDetenido){ // si el tiempo que esta detenido es mayor a 17 seg envia el informe (configurable) // 17
 
                         // si el colectivo todavia sigue parado, actualiza la notificacion
                         if(notificacionActiva == true){
-                            presenter.makeRequestPostActInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
+                            try {
+                                presenter.makePostActualizacionNotifColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
+                            } catch (ExecutionException e) {
+                                throw new RuntimeException(e);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            } catch (TimeoutException e) {
+                                throw new RuntimeException(e);
+                            }
                             Toast.makeText(SimulacionRecorridoActivity.this, "unidad detenida, actualizando informe..", Toast.LENGTH_SHORT).show();
                         }else{
                             // sino es la primera vez que el colectivo se para y crea la nueva notificacion y setea bander en true
-                            presenter.makeRequestPostEnvioInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
+                            try {
+                                presenter.makePostInformeColeDetenido(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + segundosDetenidoStr);
+                            }catch (ExecutionException | InterruptedException | TimeoutException e) {
+                                throw new RuntimeException(e);
+                            }
                             Toast.makeText(SimulacionRecorridoActivity.this, "unidad detenida, enviando informe..", Toast.LENGTH_SHORT).show();
                             notificacionActiva = true;
                         }
@@ -279,7 +291,11 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
                     // si el colectivo estaba parado, y empezo a circular, actualiza la notificacion(con el tiempo final) y cambia la bander a false
                     if(notificacionActiva == true) {
-                        presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
+                        try {
+                            presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
+                        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                            throw new RuntimeException(e);
+                        }
                         notificacionActiva = false; // resetea la bander
                     }
 
@@ -301,7 +317,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 //                        Toast.makeText( SimulacionRecorridoActivity.this, "Enviando ubicacion..", Toast.LENGTH_SHORT ).show();
                             System.out.println("enviando ubicacion..");
                             presenter.makeRequestPostEnvio(linea, colectivo, recorrido, getLat(), getLng());
-                            difTotal = 0; // resetea la suma
+                            segundosDetenidoStr = 0; // resetea la suma
                             System.out.println("unidad en circulacion");
 //                            runOnUiThread(new Runnable() {
 //                                @Override
@@ -465,14 +481,22 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
         //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
         presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
-        presenter.makeRequestPostFin(linea,colectivo,recorrido);
+        presenter.makeRequestPostFinColectivoRecorrido(linea,colectivo,recorrido);
 
         final Handler handler = new Handler();
         final Runnable r = new Runnable() {
             public void run() {
                 enTransito = false;
                 if(notificacionActiva) {
-                    presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
+                    try {
+                        presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
+                    } catch (ExecutionException e) {
+                        throw new RuntimeException(e);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    } catch (TimeoutException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
                 notificacionActiva = false; // resetea la bander
                 Toast.makeText( getApplicationContext(), "Servicio finalizado", Toast.LENGTH_SHORT ).show();
@@ -492,12 +516,12 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
         // TODO Arreglar
         presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
-        presenter.makeRequestPostFin(linea,colectivo,recorrido);
+        presenter.makeRequestPostFinColectivoRecorrido(linea,colectivo,recorrido);
 
         enTransito = false;
         if(notificacionActiva) {
             //refactorizarlo
-            presenter.makeRequestPostFinInforme(linea, colectivo, String.valueOf(latActual), String.valueOf(lngActual), String.valueOf(fechaUbicacionActual), "" + difTotal);
+            presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(fechaUbicacionActual), "" + segundosDetenidoStr);
         }
         notificacionActiva = false; // resetea la bander
 //        Toast.makeText( getApplicationContext(), "Servicio finalizado", Toast.LENGTH_SHORT ).show();

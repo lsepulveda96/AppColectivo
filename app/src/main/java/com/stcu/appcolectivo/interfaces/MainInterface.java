@@ -18,7 +18,7 @@ public interface MainInterface {
 
         void showUbicacion(String strLatitud, String strLongitud);
 
-        void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, Long fechaUbicacionI, String lat, String lng);
+        void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, Long fechaUbicacionI, String lat, String lng);
 
         void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial);
 

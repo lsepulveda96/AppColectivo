@@ -144,54 +144,8 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
 
         }
 
-
-
-
         return paradasRecorrido;
     }
-
-
-
-
-    public void makeRequestPostFinInforme(final String linea, final String colectivo, final String lat, final String lng, final String fuActualD, final String descripcion) {
-        final String url = ipv4+"rest/lineaColectivos/finNotificacion";
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response) {
-
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                          presenter.showResponse("No se pudo enviar la notificacion");
-                    }
-                }
-        ) {
-
-            @Override
-            protected Map<String, String> getParams()
-            {
-
-                Map<String, String>  params = new HashMap<String, String>();
-
-                params.put("linea", linea);
-                params.put("colectivo", colectivo);
-                params.put("latitud", lat);
-                params.put("longitud", lng);
-                params.put("fechaNotificacion", String.valueOf(System.currentTimeMillis()));
-                params.put("descripcion", descripcion);
-
-                return params;
-            }
-        };
-        requestQueue.add(postRequest);
-    }
-
 
 
 // metodo antiguo andando bien
@@ -254,12 +208,13 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
 
 
 
-
-    @Override
+    // trabajar en este metodo. Ver como estaba implementado
+    // metodo antiguo
+  /*  @Override
     public void makeRequestPostEnvioInforme(final String linea, final String colectivo, final String lat, final String lng, final String fuActualD, final String descripcion) {
         final String url = ipv4+"rest/lineaColectivos/enviarNotificacion";
         final long fechaUbicacion = System.currentTimeMillis();
-        System.out.println("Entra en req post envio informe y no deberia entrar!!!");
+
         StringRequest postRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>()
                 {
@@ -294,49 +249,80 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
             }
         };
         requestQueue.add(postRequest);
-    }
+    }*/
+
+
+
+
+
+
+
+
+
+
 
     @Override
-    public void makeRequestPostActInforme(final String linea, final String colectivo, final String lat, final String lng, final String fuActualD, final String descripcion) {
-        final String url = ipv4+"rest/lineaColectivos/actNotificacion";
-        final long fechaUbicacion = System.currentTimeMillis();
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response) {
+    public void makePostInformeColeDetenido(final String seleccionLin, final String seleccionCol, final String seleccionRec, final String latitud, final String longitud, final String segundosDetenidoStr) throws ExecutionException, InterruptedException, TimeoutException {
+// final String fuActualD,
+        final String url = ipv4 + "enviarNotificacionColectivoDetenido";
 
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                          presenter.showResponse("No se pudo actualizar la notificacion");
-                    }
-                }
-        ) {
+        Map<String, String> params = new HashMap();
+        params.put("linea", seleccionLin);
+        params.put("colectivo", seleccionCol);
+        params.put("recorrido", seleccionRec);
+        params.put("latitud", latitud);
+        params.put("longitud", longitud);
+//        params.put("fechaNotificacion",  String.valueOf(fechaUbicacion));
+        params.put("segundosDetenidoStr", segundosDetenidoStr);
+        JSONObject parameters = new JSONObject(params);
 
-            @Override
-            protected Map<String, String> getParams()
-            {
+        RequestFuture<JSONObject> future = RequestFuture.newFuture();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, parameters, future, future);
+        VolleySingleton.getmInstance(mActivity.getApplicationContext()).addToRequestQueue((jsonObjectRequest));
+        JSONObject resp = future.get(5, TimeUnit.SECONDS);
 
-                Map<String, String>  params = new HashMap<String, String>();
-
-                params.put("linea", linea);
-                params.put("colectivo", colectivo);
-                params.put("latitud", lat);
-                params.put("longitud", lng);
-                params.put("fechaNotificacion",  String.valueOf(fechaUbicacion));
-                params.put("descripcion", descripcion);
-
-                return params;
-            }
-        };
-        requestQueue.add(postRequest);
     }
 
 
+    // trabajar en este metodo tambien. ver como estaba implementado
+    @Override
+    public void makePostActualizacionNotifColeDetenido(String seleccionLin, String seleccionCol, String seleccionRec, String latitud, String longitud, final String segundosDetenidoStr) throws ExecutionException, InterruptedException, TimeoutException {
+        final String url = ipv4 + "actualizarNotificacionColeDetenido";
+//        final long fechaUbicacion = System.currentTimeMillis();
+        Map<String, String> params = new HashMap();
+        params.put("linea", seleccionLin);
+        params.put("colectivo", seleccionCol);
+        params.put("recorrido", seleccionRec);
+        params.put("latitud", latitud);
+        params.put("longitud", longitud);
+//        params.put("fechaNotificacion",  String.valueOf(fechaUbicacion));
+        params.put("segundosDetenidoStr", segundosDetenidoStr);
+        JSONObject parameters = new JSONObject(params);
+
+        RequestFuture<JSONObject> future = RequestFuture.newFuture();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, parameters, future, future);
+        VolleySingleton.getmInstance(mActivity.getApplicationContext()).addToRequestQueue((jsonObjectRequest));
+        JSONObject resp = future.get(5, TimeUnit.SECONDS);
+    }
+
+
+
+    public void makePostFinNotificacionColeDetenido(final String seleccionLin, final String seleccionCol, String seleccionRec, final String latitud, final String longitud, final String segundosDetenidoStr) throws ExecutionException, InterruptedException, TimeoutException {
+        final String url = ipv4 + "finNotificacionColeDetenido";
+        Map<String, String> params = new HashMap();
+        params.put("linea", seleccionLin);
+        params.put("colectivo", seleccionCol);
+        params.put("recorrido", seleccionRec);
+        params.put("latitud", latitud);
+        params.put("longitud", longitud);
+        params.put("segundosDetenidoStr", segundosDetenidoStr);
+        JSONObject parameters = new JSONObject(params);
+
+        RequestFuture<JSONObject> future = RequestFuture.newFuture();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, parameters, future, future);
+        VolleySingleton.getmInstance(mActivity.getApplicationContext()).addToRequestQueue((jsonObjectRequest));
+        JSONObject resp = future.get(5, TimeUnit.SECONDS);
+    }
 
 
 
@@ -546,7 +532,7 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
     }*/
 
     @Override
-    public void makeRequestPostFin(final String seleccionLin, final String seleccionCol, final String seleccionRec) throws ExecutionException, InterruptedException, TimeoutException {
+    public void makeRequestPostFinColectivoRecorrido(final String seleccionLin, final String seleccionCol, final String seleccionRec) throws ExecutionException, InterruptedException, TimeoutException {
         final String url = ipv4+"fin";
 
 
@@ -565,30 +551,6 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // todo trabajar en este metodo tambien
     // tomar de base este
     @Override
     public void makeRequestPostFinDesvio(final String linea, final String colectivo, String recorrido) throws ExecutionException, InterruptedException, TimeoutException {
@@ -606,22 +568,5 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, parameters, future, future);
         VolleySingleton.getmInstance(mActivity.getApplicationContext()).addToRequestQueue((jsonObjectRequest));
         JSONObject resp = future.get(5,TimeUnit.SECONDS);
-
-//        JSONObject parameters = new JSONObject(params);
-//
-//        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, url, parameters,new Response.Listener<JSONObject>() {
-//            @Override
-//            public void onResponse(JSONObject response) {
-//            }
-//        },  new Response.ErrorListener()
-//        {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                System.out.println("error Volley. fin desvio: " + error.toString());
-//                presenter.showResponse("No se pudo enviar la notificacion desvio");
-//            }
-//        });
-//        requestQueue.add(jsonRequest);
-
     }
 }

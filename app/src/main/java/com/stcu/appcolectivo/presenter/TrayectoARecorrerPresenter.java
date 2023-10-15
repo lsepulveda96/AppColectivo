@@ -47,16 +47,16 @@ public class TrayectoARecorrerPresenter implements TrayectoARecorrerInterface.Pr
     }
 
     @Override
-    public void makeRequestPostEnvioInforme(String linea, String colectivo, String lat, String lng, String fechaUbicacionStr, String difTotalStr) {
+    public void makePostInformeColeDetenido(String seleccionLin, String seleccionCol, String seleccionRec, String latitud, String longitud, String segundosDetenidoStr) throws ExecutionException, InterruptedException, TimeoutException {
         if(view != null){
-            model.makeRequestPostEnvioInforme(linea, colectivo, lat, lng, fechaUbicacionStr, difTotalStr);
+            model.makePostInformeColeDetenido(seleccionLin, seleccionCol, seleccionRec, latitud, longitud, segundosDetenidoStr);
         }
     }
 
     @Override
-    public void makeRequestPostActInforme(String linea, String colectivo, String lat, String lng, String fechaUbicacionStr, String difTotalStr) {
+    public void makePostActualizacionNotifColeDetenido(String seleccionLin, String seleccionCol, String seleccionRec, String latitud, String longitud, String segundosDetenidoStr) throws ExecutionException, InterruptedException, TimeoutException {
         if(view != null){
-            model.makeRequestPostActInforme(linea, colectivo, lat, lng, fechaUbicacionStr, difTotalStr);
+            model.makePostActualizacionNotifColeDetenido( seleccionLin, seleccionCol, seleccionRec, latitud, longitud, segundosDetenidoStr);
         }
     }
 
@@ -75,10 +75,10 @@ public class TrayectoARecorrerPresenter implements TrayectoARecorrerInterface.Pr
     }
 
     @Override
-    public void makeRequestPostFin(String linea, String colectivo, String recorrido) throws ExecutionException, InterruptedException, TimeoutException {
+    public void makeRequestPostFinColectivoRecorrido(String linea, String colectivo, String recorrido) throws ExecutionException, InterruptedException, TimeoutException {
         if(view != null){
 //            model.makeRequestPostFin(linea, colectivo, latitud, longitud);
-            model.makeRequestPostFin(linea, colectivo, recorrido);
+            model.makeRequestPostFinColectivoRecorrido(linea, colectivo, recorrido);
         }
     }
 
@@ -97,9 +97,9 @@ public class TrayectoARecorrerPresenter implements TrayectoARecorrerInterface.Pr
 //    }
 
     @Override
-    public void makeRequestPostFinInforme(String linea, String colectivo, String latActual, String lngActual, String fechaUbicacionActual, String difTotal) {
+    public void makePostFinNotificacionColeDetenido(String linea, String colectivo, String recorrido, String latActual, String lngActual, String segundosDetenidoStr) throws ExecutionException, InterruptedException, TimeoutException {
         if(view != null){
-            model.makeRequestPostFinInforme(linea, colectivo, latActual, lngActual, fechaUbicacionActual, difTotal);
+            model.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, latActual, lngActual, segundosDetenidoStr);
         }
     }
 

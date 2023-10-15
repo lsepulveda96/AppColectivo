@@ -98,7 +98,7 @@ public class MainPresenter implements MainInterface.Presenter {
     @Override
     public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, Long fechaUbicacionI, String lat, String lng) {
         if(view!=null){
-            view.showResponseInicioServicioOk(response, seleccionLin, seleccionCol, fechaUbicacionI, lat, lng);
+            view.showResponseInicioServicioOk(response, seleccionLin, seleccionCol, seleccionRec, fechaUbicacionI, lat, lng);
         }
     }
 

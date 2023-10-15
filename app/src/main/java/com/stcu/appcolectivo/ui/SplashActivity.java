@@ -38,7 +38,7 @@ public class SplashActivity extends Activity implements MainInterface.View  {
     }
 
     @Override
-    public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, Long fechaUbicacionI, String lat, String lng) {
+    public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, Long fechaUbicacionI, String lat, String lng) {
 
     }
 
