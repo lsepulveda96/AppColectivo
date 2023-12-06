@@ -38,7 +38,7 @@ import java.util.concurrent.TimeoutException;
 
 public class MainModel implements MainInterface.Model {
 //    public static String ipv4 = "http://stcu.mdn.unp.edu.ar:50002/stcu_app/";
-    public static String ipv4 = "http://192.168.0.108:50000/v1/mobile/";
+    public static String ipv4 = "http://192.168.0.102:50000/v1/mobile/";
 
     Activity mActivity;
     Context mContext;
@@ -199,6 +199,7 @@ public class MainModel implements MainInterface.Model {
             }
             System.out.println("Respuesta del servidor ok: " + lineasDisponibles.get(0));
 
+            presenter.showResponseError("");
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }

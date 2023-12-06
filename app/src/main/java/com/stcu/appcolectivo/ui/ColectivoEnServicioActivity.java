@@ -1,6 +1,7 @@
 package com.stcu.appcolectivo.ui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -32,7 +33,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
 
     Boolean enTransito = true, notActiva = false;
     public static double distanciaOffSetMov = 20.0;
-    public static int tiempoMaxDetenido = 8;
+    public static int tiempoMaxDetenido = 12; // equivale a 3 veces el envio de la ubicacion en el mismo lugar
 
     private TextView tvLinea, tvColectivo, tvLatitud, tvLongitud, tvUbicacion, tvEstado;
     private String linea, colectivo, recorrido, latitud, longitud, fechaUbicacionInicialS, myLat, myLng, latAntigua, lngAntigua;
@@ -87,6 +88,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
 
     public class InicioRecorrido extends AsyncTask<Void, Integer, Boolean> {
 
+        @SuppressLint("SuspiciousIndentation")
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
@@ -144,7 +146,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
 
 
                         try {
-                            Thread.sleep(2000);
+                            Thread.sleep(4000);
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
@@ -246,28 +248,27 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                 } // fin while en transito
 
 
-                // hacer aca lo del boton cuando sale. el boton solo deberia poner la variable enTransito en false.
-                contDesvio = 0;
-                if (notActiva) {
+                    // hacer aca lo del boton cuando sale. el boton solo deberia poner la variable enTransito en false.
+                    contDesvio = 0;
+                    if (notActiva) {
+                        try {
+                            presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
+                        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    notActiva = false; // resetea la bandera
+                    //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
                     try {
-                        presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
+                        presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
                     } catch (ExecutionException | InterruptedException | TimeoutException e) {
                         throw new RuntimeException(e);
                     }
-                }
-                notActiva = false; // resetea la bandera
-                //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
-                try {
-                    presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
-                } catch (ExecutionException | InterruptedException | TimeoutException e) {
-                    throw new RuntimeException(e);
-                }
-                try {
-                    presenter.makeRequestPostFinColectivoRecorrido(linea, colectivo, recorrido);
-                } catch (ExecutionException | InterruptedException | TimeoutException e) {
-                    throw new RuntimeException(e);
-                }
-//            finish();
+                    try {
+                        presenter.makeRequestPostFinColectivoRecorrido(linea, colectivo, recorrido);
+                    } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                        throw new RuntimeException(e);
+                    }
 
             return true;
         } // fin doInBackGround
@@ -303,6 +304,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
 
                 setLatActual(location.getLatitude()); // se pueden sacar por las dos de arriba
                 setLngActual(location.getLongitude());
+
             }
 
             @Override
@@ -334,15 +336,6 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
             }
         });
-
-
-      /*  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-        }
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);*/
-
 
     }
 
@@ -445,84 +438,13 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
 
 
 
-
-// metodo antiguo andando bien
-    /**
-     * Detiene el servicio mediante el boton "Fin Servicio"
-     *
-     * @param  view    boton fin servicio
-     *//*
-    public void finServicio(View view) throws ExecutionException, InterruptedException, TimeoutException {
-
-
-        //resetea el contDesvio
-        contDesvio = 0;
-
-
-        enTransito = false;
-        if (notActiva) {
-            presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
-        }
-        notActiva = false; // resetea la bandera
-
-        //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
-        presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
-
-        presenter.makeRequestPostFinColectivoRecorrido(linea, colectivo, recorrido);
-//        Toast toast1 = Toast.makeText(this,"Servicio finalizado", Toast.LENGTH_SHORT);
-//        toast1.show();
-        System.out.println("Servicio finalizado");
-        finish(); // ver si va aca o en la salida del while
-    }*/
-
-
-
-
     /**
      * Detiene el servicio mediante el boton "Fin Servicio"
      *
      * @param  view    boton fin servicio
      */
-    public void finServicio(View view) throws ExecutionException, InterruptedException, TimeoutException {
+    public void finServicio(View view) {
         enTransito = false;
-//         new FinServicio().execute();
-    }
-
-
-    public class FinServicio extends AsyncTask<Void, Integer, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            //resetea el contDesvio
-            contDesvio = 0;
-            enTransito = false;
-            if (notActiva) {
-                try {
-                    presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
-                } catch (ExecutionException | InterruptedException | TimeoutException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            notActiva = false; // resetea la bandera
-            //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
-            try {
-                presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
-            } catch (ExecutionException | InterruptedException | TimeoutException e) {
-                throw new RuntimeException(e);
-            }
-            try {
-                presenter.makeRequestPostFinColectivoRecorrido(linea, colectivo, recorrido);
-            } catch (ExecutionException | InterruptedException | TimeoutException e) {
-                throw new RuntimeException(e);
-            }
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            System.out.println("Servicio finalizado");
-            finish();
-        }
     }
 
 } // fin clase
