@@ -27,7 +27,7 @@
         android:text="Colectivo" />
 
     <TextView
-        android:id="@+id/tvLatitud"
+        android:id="@+id/tvNombreParada"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

@@ -1,15 +1,18 @@
 package com.stcu.appcolectivo.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.view.View;
 
+import com.bumptech.glide.Glide;
 import com.gpmess.example.volley.app.R;
 import com.stcu.appcolectivo.interfaces.TrayectoARecorrerInterface;
 import com.stcu.appcolectivo.model.Coordenada;
@@ -29,7 +32,8 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
     public static double distanciaOffSetMov = 20.0;
     public static int tiempoMaxDetenido = 17;
 
-    private TextView tvLinea ,tvColectivo, tvLatitud, tvLongitud, tvUbicacion;
+
+    private TextView tvLinea ,tvColectivo, tvNombreParada, tvLongitud, tvUbicacion;
     TextView tvEstado;
     private String linea, colectivo, recorrido, latitud, longitud, fechaUbicacionInicialS, myLat, myLng, latAntigua, lngAntigua;
     private Long fechaUbicacionAntigua, fechaUbicacionInicial, fechaUbicacionActual;
@@ -44,6 +48,9 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
     private TrayectoARecorrerInterface.Presenter presenter;
 
+    ImageView ivGifBus;
+
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +59,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         presenter = new TrayectoARecorrerPresenter(this, this, this);
         tvLinea = (TextView) findViewById(R.id.tvLinea);
         tvColectivo = (TextView) findViewById(R.id.tvColectivo);
-        tvLatitud = (TextView) findViewById(R.id.tvLatitud);
+        tvNombreParada = (TextView) findViewById(R.id.tvNombreParada);
         tvEstado = (TextView) findViewById(R.id.tvEstado);
         tvLongitud = (TextView) findViewById(R.id.tvLongitud);
         finServicio = (Button) findViewById(R.id.btnFinServicio);
@@ -69,8 +76,8 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
         tvLinea.setText(linea);
         tvColectivo.setText(colectivo);
-        tvLatitud.setText(latitud);
-        tvLongitud.setText(longitud);
+//        tvNombreParada.setText(latitud);
+//        tvLongitud.setText(longitud);
 
         setLat(latitud); // para que la primera vez no sea null, despues este valor se pisa
         setLng(longitud);
@@ -81,6 +88,9 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         latActual = Double.parseDouble(latitud);
         lngActual = Double.parseDouble(longitud);
 
+
+         ivGifBus = findViewById(R.id.gifbus);
+         ivGifBus.setVisibility(View.GONE);
         //seguir trabajando aca
         //.
 
@@ -319,12 +329,22 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                             presenter.makeRequestPostEnvio(linea, colectivo, recorrido, getLat(), getLng());
                             segundosDetenidoStr = 0; // resetea la suma
                             System.out.println("unidad en circulacion");
-//                            runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    tvEstado.setText( "Unidad en circulacion" );
-//                                }
-//                            });
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tvEstado.setText( "Unidad en circulacion" );
+
+
+                                    ivGifBus.setVisibility(View.VISIBLE);
+                                    //inserte gif cole en parada. posible error x estar fuera del hilo principal
+                                    Glide.with(SimulacionRecorridoActivity.this)
+                                            .load(R.drawable.bus_animation_fondo_violeta_andando)
+                                            .into(ivGifBus);
+
+
+                                }
+                            });
+
 
                         }
 
@@ -451,6 +471,25 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                     // es porque esta en o cerca de una parada de esa linea que esta en servicio
 //                    Toast.makeText( SimulacionRecorridoActivity.this, "Colectivo en parada", Toast.LENGTH_SHORT ).show();
                     System.out.println("++++ Colectivo en parada");
+
+
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            tvEstado.setText( "Unidad en parada" );
+
+                            tvNombreParada.setText(parada.getDireccion());
+
+                            ivGifBus.setVisibility(View.VISIBLE);
+                            //inserte gif cole en parada. posible error x estar fuera del hilo principal
+                            Glide.with(SimulacionRecorridoActivity.this)
+                                    .load(R.drawable.bus_animation_fondo_violeta_parada)
+                                    .into(ivGifBus);
+                        }
+                    });
+
 
                     presenter.makeRequestPostColeEnParada( parada.getCodigo(), denomLinea, unidad, denomRecorrido);
                 }

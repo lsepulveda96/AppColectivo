@@ -2,50 +2,153 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_gradient_color"
+    android:background="#ffff"
     tools:context="com.stcu.appcolectivo.ui.SimulacionRecorridoActivity">
 
 
+    <ImageView
+        android:id="@+id/fondovioleta"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:elevation="10dp"
+        android:padding="10dp"/>
+    <!--        android:background="@drawable/fondo_violeta"-->
 
-    <TextView
-        android:id="@+id/tvLinea"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="118dp"
-        android:text="Linea" />
 
-    <TextView
-        android:id="@+id/tvColectivo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="163dp"
-        android:text="Colectivo" />
 
-    <TextView
-        android:id="@+id/tvLatitud"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/linLayLinea"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="65dp"
-        android:text="Latitud"
-        android:visibility="invisible"
-        android:layout_alignParentRight="true" />
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/fondo_violeta"
+        android:padding="5dp">
 
-    <TextView
-        android:id="@+id/tvLongitud"
-        android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvTituloLinea"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:fontFamily="@font/poppins_regular"
+                android:textSize="25dp"
+                android:text="Linea" />
+
+            <TextView
+                android:id="@+id/tvLinea"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:fontFamily="@font/poppins_regular"
+                android:textSize="15dp"
+                android:textColor="#7C4DFF"
+                />
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+
+
+
+
+
+    <LinearLayout
+        android:id="@+id/linLayColectivo"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/tvLinea"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="-118dp"
-        android:text="Longitud"
-        android:visibility="invisible"
-        android:layout_alignParentRight="true" />
+        android:layout_below="@id/linLayLinea"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/fondo_violeta"
+        android:padding="5dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvTituloUnidad"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:fontFamily="@font/poppins_regular"
+                android:textSize="25dp"
+                android:text="Unidad" />
+
+            <TextView
+                android:id="@+id/tvColectivo"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:fontFamily="@font/poppins_regular"
+                android:textSize="15dp"
+                android:textColor="#7C4DFF" />
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+
+
+
+
+
+    <LinearLayout
+        android:id="@+id/linLayEstado"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linLayColectivo"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/fondo_violeta"
+        android:padding="5dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvTituloEstado"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:fontFamily="@font/poppins_regular"
+                android:textSize="25dp"
+                android:text="Estado de la unidad" />
+
+            <TextView
+                android:id="@+id/tvEstado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_regular"
+                android:textColor="#7C4DFF"
+                android:gravity="center"
+                android:textSize="15sp" />
+        </LinearLayout>
+    </LinearLayout>
 
     <Button
         android:id="@+id/btnFinServicio"
@@ -53,34 +156,96 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="149dp"
+        android:layout_marginBottom="20dp"
         android:background="@drawable/btn_follow_style"
+        android:textColor="#ffff"
         android:onClick="finServicio"
         android:text="Fin Servicio" />
 
-    <TextView
-        android:id="@+id/tvUbicacion"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+
+
+    <ImageView
+        android:id="@+id/gifbus"
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:layout_below="@+id/fondovioleta"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="214dp"
-        android:text="Ubicacion" />
+        android:layout_marginTop="30dp" />
+
+
 
     <TextView
-        android:id="@+id/tvInfo"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvTituloParada"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="204dp"
-        android:text="Estado unidad:" />
+        android:layout_above="@+id/tvNombreParada"
+        android:fontFamily="@font/poppins_regular"
+        android:gravity="center"
+        android:text="Ultima parada visitada"
+        android:textStyle="bold"/>
 
     <TextView
-        android:id="@+id/tvEstado"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvNombreParada"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="236dp" />
+        android:layout_above="@+id/btnFinServicio"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/poppins_regular"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="Parada"
+        android:textColor="@android:color/darker_gray" />
+    <!--    android:background="@drawable/boton_con_borde"-->
+
+
 </RelativeLayout>
+
+
+
+
+
+
+
+    <!--<TextView-->
+    <!--android:id="@+id/tvInfo"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentTop="true"-->
+    <!--android:layout_centerHorizontal="true"-->
+    <!--android:layout_marginTop="204dp"-->
+    <!--android:text="Estado unidad:" />-->
+
+
+    <!--    android:layout_alignParentTop="@+id/tvInfo"-->
+
+
+
+
+
+
+
+    <!--<TextView-->
+    <!--android:id="@+id/tvEstado"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:gravity="center"-->
+    <!--android:layout_height="wrap_content"-->
+
+    <!--android:layout_centerHorizontal="true"-->
+    <!--android:fontFamily="@font/poppins_regular"-->
+    <!--android:background="@drawable/boton_con_borde"-->
+    <!--android:textSize="30dp"-->
+    <!--android:text="Estado"-->
+    <!--android:padding="10dp"/>-->
+
+
+
+
+<!--<TextView-->
+<!--android:id="@+id/tvUbicacion"-->
+<!--android:layout_width="wrap_content"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:layout_alignParentBottom="true"-->
+<!--android:layout_centerHorizontal="true"-->
+<!--android:layout_marginBottom="100dp"-->
+<!--android:text="Ubicacion"-->
+<!--android:visibility="gone"/>-->

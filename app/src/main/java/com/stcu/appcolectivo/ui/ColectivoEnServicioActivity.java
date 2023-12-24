@@ -53,7 +53,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
         presenter = new TrayectoARecorrerPresenter(this, this, this);
         tvLinea = (TextView) findViewById(R.id.tvLinea);
         tvColectivo = (TextView) findViewById(R.id.tvColectivo);
-        tvLatitud = (TextView) findViewById(R.id.tvLatitud);
+        tvLatitud = (TextView) findViewById(R.id.tvNombreParada);
         tvEstado = (TextView) findViewById(R.id.tvEstado);
         tvLongitud = (TextView) findViewById(R.id.tvLongitud);
         finServicio = (Button) findViewById(R.id.btnFinServicio);
