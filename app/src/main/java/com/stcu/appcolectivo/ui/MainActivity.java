@@ -30,6 +30,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ExpandableListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,6 +60,10 @@ public class MainActivity extends Activity implements MainInterface.View {
 
     private MainInterface.Presenter presenter;
 
+    String eleccionLinea = "";
+    String eleccionColectivo = "";
+    String eleccionRecorrido = "";
+
     List<Colectivo> colectivosDisponibles;
     List<Linea> lineasDisponibles;
     List<Recorrido> recorridosDisponibles;
@@ -69,11 +74,13 @@ public class MainActivity extends Activity implements MainInterface.View {
     private String myLat, myLng;
     private Spinner itemSeleccionLinea, itemSeleccionColectivo, itemSeleccionRecorrido;
     ArrayAdapter<String> adapterSeleccionLinea, adapterSeleccionColectivo, adapterSeleccionRecorrido;
-    ArrayAdapter<String> adapterNuevoLinea;
     Long fechaUbicacionI;
     private ProgressDialog dialog4, dialog3, dialog1;
     private SwipeRefreshLayout swipe;
+    // TODO paso 0, agregar el autocompleter
     AutoCompleteTextView autoCompleteTextViewLinea;
+    AutoCompleteTextView autoCompleteTextViewColectivo;
+    AutoCompleteTextView autoCompleteTextViewRecorrido;
 
 
     Button searchBtn = null;
@@ -126,20 +133,35 @@ public class MainActivity extends Activity implements MainInterface.View {
         finServicio = findViewById(R.id.fin_button);
         finServicio.setEnabled(false); // se habilita cuando se inicia servicio
         btnIniciarServicio.setEnabled(false); // para que no pueda seleccionar una lista vacia
-        adapterSeleccionLinea = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
-        adapterSeleccionColectivo = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
-        adapterSeleccionRecorrido = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+
+
+        // TODO 1er cambio adapter
+//        adapterSeleccionLinea = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+//        adapterNuevoLinea = new ArrayAdapter<>(this,R.layout.dropdown_menu_popup_item);
+        adapterSeleccionLinea = new ArrayAdapter<>(this, R.layout.dropdown_menu_popup_item);
+
+
+        //adapterSeleccionColectivo = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+        adapterSeleccionColectivo = new ArrayAdapter<>(this, R.layout.dropdown_menu_popup_item);
+
+
+//        adapterSeleccionRecorrido = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+        adapterSeleccionRecorrido = new ArrayAdapter<>(this, R.layout.dropdown_menu_popup_item);
 
 
 
-        adapterNuevoLinea = new ArrayAdapter<>(this,R.layout.dropdown_menu_popup_item);
+        // TODO 2do cambio adapter x autocomplete
         autoCompleteTextViewLinea = findViewById(R.id.autoCompleteLinea);
+//        itemSeleccionLinea = findViewById(R.id.spinnerSelLinea);
 
 
+        //itemSeleccionColectivo = findViewById(R.id.spinnerSelColectivo);
+        autoCompleteTextViewColectivo = findViewById(R.id.autoCompleteColectivo);
 
-        itemSeleccionLinea = findViewById(R.id.spinnerSelLinea);
-        itemSeleccionColectivo = findViewById(R.id.spinnerSelColectivo);
-        itemSeleccionRecorrido = findViewById(R.id.spinnerSelRecorrido);
+        //itemSeleccionRecorrido = findViewById(R.id.spinnerSelRecorrido);
+        autoCompleteTextViewRecorrido = findViewById(R.id.autoCompleteRecorrido);
+
+
         tvLineaSeleccionada = findViewById(R.id.tvLineaSeleccionada);
         tvColectivoSeleccionado = findViewById(R.id.tvColectivoSeleccionado);
         tvNetwork = findViewById(R.id.tv_network);
@@ -157,31 +179,35 @@ public class MainActivity extends Activity implements MainInterface.View {
             for (Linea opcion : lineasDisponibles) {
                 adapterSeleccionLinea.add(opcion.getDenominacion());
             }
-            adapterSeleccionColectivo.clear();
 
+
+            adapterSeleccionColectivo.clear();
             for (Colectivo opcion2 : colectivosDisponibles) {
                 adapterSeleccionColectivo.add(opcion2.getUnidad());
             }
+
+             //TODO 3er cambio, set adapter
+//            itemSeleccionLinea.setAdapter(adapterSeleccionLinea);
+            autoCompleteTextViewLinea.setAdapter(adapterSeleccionLinea);
+
+            //TODO 4to cambio, set drop down view
             adapterSeleccionLinea.setDropDownViewResource(R.layout.textview_spinner_selected);
+//            autoCompleteTextViewLinea.setText(adapterSeleccionLinea.getItem(0));
+
+
+            //itemSeleccionColectivo.setAdapter(adapterSeleccionColectivo);
+            autoCompleteTextViewColectivo.setAdapter(adapterSeleccionColectivo);
             adapterSeleccionColectivo.setDropDownViewResource(R.layout.textview_spinner_selected);
-            itemSeleccionLinea.setAdapter(adapterSeleccionLinea);
 
-
-            adapterNuevoLinea.clear();
-            for (Linea opcion : lineasDisponibles) {
-                adapterNuevoLinea.add(opcion.getDenominacion());
-            }
-            autoCompleteTextViewLinea.setAdapter(adapterNuevoLinea);
-
-
-            itemSeleccionColectivo.setAdapter(adapterSeleccionColectivo);
-            itemSeleccionRecorrido.setAdapter(adapterSeleccionRecorrido);
 
             adapterSeleccionRecorrido.clear();
             for (Recorrido opcionRecorrido : recorridosDisponibles) {
                 adapterSeleccionRecorrido.add(opcionRecorrido.getDenominacion());
             }
-            itemSeleccionRecorrido.setAdapter(adapterSeleccionRecorrido);
+
+//            itemSeleccionRecorrido.setAdapter(adapterSeleccionRecorrido);
+//            adapterSeleccionRecorrido.setDropDownViewResource(R.layout.textview_spinner_selected);
+            autoCompleteTextViewRecorrido.setAdapter(adapterSeleccionRecorrido);
             adapterSeleccionRecorrido.setDropDownViewResource(R.layout.textview_spinner_selected);
 
 
@@ -224,7 +250,7 @@ public class MainActivity extends Activity implements MainInterface.View {
 
 
         // ante un cambio en la linea, llama nuevamente a sus recorrido correspondientes
-        itemSeleccionLinea.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+       /* itemSeleccionLinea.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 new ThreadActualizaRecorridoAsyncTask(getApplicationContext(), itemSeleccionLinea.getSelectedItem().toString()).execute();
@@ -234,7 +260,63 @@ public class MainActivity extends Activity implements MainInterface.View {
             public void onNothingSelected(AdapterView<?> adapterView) {
                 // escribir codigo..
             }
-        }); // fin Listener cambio de linea
+        }); // fin Listener cambio de linea*/
+
+        // TODO 5to cambio
+     /*   autoCompleteTextViewLinea.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+//                new ThreadActualizaRecorridoAsyncTask(getApplicationContext(), itemSeleccionLinea.getSelectedItem().toString()).execute();
+                Object item = adapterView.getItemAtPosition(i);
+                new ThreadActualizaRecorridoAsyncTask(getApplicationContext(), item.toString()).execute();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                // escribir codigo..
+            }
+        }); // fin Listener cambio de linea*/
+
+        autoCompleteTextViewLinea.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View arg1, int position, long arg3) {
+                Object item = parent.getItemAtPosition(position);
+                eleccionLinea = item.toString();
+                new ThreadActualizaRecorridoAsyncTask(getApplicationContext(), item.toString()).execute();
+            }
+        });
+
+        autoCompleteTextViewColectivo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View arg1, int position, long arg3) {
+                Object item = parent.getItemAtPosition(position);
+                eleccionColectivo = item.toString();
+            }
+        });
+
+        autoCompleteTextViewRecorrido.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View arg1, int position, long arg3) {
+                Object item = parent.getItemAtPosition(position);
+                eleccionRecorrido = item.toString();
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         //desplaza para abajo para actualizar, reemplaza boton actualizar
@@ -491,6 +573,7 @@ public class MainActivity extends Activity implements MainInterface.View {
                     Toast toast1 = Toast.makeText(getApplicationContext(),"No se pudo obtener la ubicación actual", Toast.LENGTH_LONG);
                     toast1.show();
                 }else{
+                    // TODO ojo cambiar!!
                     String seleccionLin = itemSeleccionLinea.getSelectedItem().toString();
                     String seleccionCol = itemSeleccionColectivo.getSelectedItem().toString();
                     tvLineaSeleccionada.setText("Linea: " + seleccionLin);
@@ -538,7 +621,6 @@ public class MainActivity extends Activity implements MainInterface.View {
     }
 
 
-    // todo trabajando en este metodo para simulacion recorrido
     @Override
     public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial) {
         try {
@@ -654,21 +736,30 @@ public class MainActivity extends Activity implements MainInterface.View {
                 for(Linea opcion: listaLineas){
                     adapterSeleccionLinea.add(opcion.getDenominacion());
                 }
+
                 adapterSeleccionColectivo.clear();
                 for(Colectivo opcion2: listaColectivos){
                     adapterSeleccionColectivo.add(opcion2.getUnidad());
                 }
 
-                itemSeleccionLinea.setAdapter(adapterSeleccionLinea);
+                // TODO paso 7 cambiar cuando actualiza
+//                itemSeleccionLinea.setAdapter(adapterSeleccionLinea);
+//                adapterSeleccionLinea.setDropDownViewResource(R.layout.textview_spinner_selected);
+                autoCompleteTextViewLinea.setAdapter(adapterSeleccionLinea);
                 adapterSeleccionLinea.setDropDownViewResource(R.layout.textview_spinner_selected);
-                itemSeleccionColectivo.setAdapter(adapterSeleccionColectivo);
+
+//                itemSeleccionColectivo.setAdapter(adapterSeleccionColectivo);
+//                adapterSeleccionColectivo.setDropDownViewResource(R.layout.textview_spinner_selected);
+                autoCompleteTextViewColectivo.setAdapter(adapterSeleccionColectivo);
                 adapterSeleccionColectivo.setDropDownViewResource(R.layout.textview_spinner_selected);
 
                 adapterSeleccionRecorrido.clear();
                 for(Recorrido opcionRecorrido: listaRecorridos){
                     adapterSeleccionRecorrido.add(opcionRecorrido.getDenominacion());
                 }
-                itemSeleccionRecorrido.setAdapter(adapterSeleccionRecorrido);
+//                itemSeleccionRecorrido.setAdapter(adapterSeleccionRecorrido);
+//                adapterSeleccionRecorrido.setDropDownViewResource(R.layout.textview_spinner_selected);
+                autoCompleteTextViewRecorrido.setAdapter(adapterSeleccionRecorrido);
                 adapterSeleccionRecorrido.setDropDownViewResource(R.layout.textview_spinner_selected);
 
                 // si los dos estan vacios
@@ -767,7 +858,10 @@ public class MainActivity extends Activity implements MainInterface.View {
             for(Recorrido opcionRecorrido: listaRecorridos){
                 adapterSeleccionRecorrido.add(opcionRecorrido.getDenominacion());
             }
-            itemSeleccionRecorrido.setAdapter(adapterSeleccionRecorrido);
+//            itemSeleccionRecorrido.setAdapter(adapterSeleccionRecorrido);
+//            adapterSeleccionRecorrido.setDropDownViewResource(R.layout.textview_spinner_selected);
+            autoCompleteTextViewRecorrido.setText("");
+            autoCompleteTextViewRecorrido.setAdapter(adapterSeleccionRecorrido);
             adapterSeleccionRecorrido.setDropDownViewResource(R.layout.textview_spinner_selected);
 
             System.out.println("los recorridos activos que recupero en onPostExcecute MainActiviy:");
@@ -782,9 +876,16 @@ public class MainActivity extends Activity implements MainInterface.View {
     public class ThreadConsultaTrayectoASimular extends AsyncTask<String, String, List<Coordenada>> {
 
         private Context ctx;
-        final String seleccionLin2 = itemSeleccionLinea.getSelectedItem().toString();
-        final String seleccionCol2 = itemSeleccionColectivo.getSelectedItem().toString();
-        final String seleccionRec2 = itemSeleccionRecorrido.getSelectedItem().toString();
+        //TODO paso 6, cambiar item seleccion linea. ver como tomar el item seleccionado
+
+        //final String seleccionLin2 = itemSeleccionLinea.getSelectedItem().toString();
+        final String seleccionLin2 = eleccionLinea;
+
+        //final String seleccionCol2 = itemSeleccionColectivo.getSelectedItem().toString();
+        final String seleccionCol2 = eleccionColectivo;
+
+        //final String seleccionRec2 = itemSeleccionRecorrido.getSelectedItem().toString();
+        final String seleccionRec2 = eleccionRecorrido;
 
         public ThreadConsultaTrayectoASimular(Context hostContext)
         {

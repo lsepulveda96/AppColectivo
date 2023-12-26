@@ -24,30 +24,7 @@
 
 
 
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:layout_below="@id/spinnerSelRecorrido"
-        android:layout_marginTop="15dp"
-        android:theme="@style/Theme.MaterialComponents.Light"
-        android:id="@+id/textImputLayoutLinea"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:startIconDrawable="@drawable/bus_line_icon"
-        >
 
-        <AutoCompleteTextView
-            android:id="@+id/autoCompleteLinea"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="none"
-            android:hint="Linea"/>
-
-    </com.google.android.material.textfield.TextInputLayout>
 
 
 
@@ -75,30 +52,59 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="100dp"
         android:fontFamily="@font/alata"
         android:text="Seleccionar linea:"
         android:textSize="16sp" />
 
 
-    <Spinner
-        android:id="@+id/spinnerSelLinea"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
+<!--    <Spinner-->
+<!--        android:id="@+id/spinnerSelLinea"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:layout_below="@+id/tvSeleccionLinea"-->
+<!--        android:layout_marginStart="50dp"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:layout_marginEnd="50dp"-->
+<!--        android:spinnerMode="dialog"-->
+<!--        android:background="@drawable/spinner_selector"/>-->
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textImputLayoutLinea"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_below="@+id/tvSeleccionLinea"
-        android:layout_marginStart="50dp"
         android:layout_marginTop="10dp"
-        android:layout_marginEnd="50dp"
-        android:spinnerMode="dialog"
-        android:background="@drawable/spinner_selector"/>
+        android:theme="@style/Theme.MaterialComponents.Light"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:startIconDrawable="@drawable/bus_line_icon"
+        app:helperText="*Requerido"
+        app:helperTextTextColor="#f00"
+        >
+
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteLinea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:hint="Linea"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
 
     <TextView
         android:id="@+id/tvSeleccionColectivo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
-        android:layout_below="@+id/spinnerSelLinea"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/textImputLayoutLinea"
         android:fontFamily="@font/alata"
         android:text="Seleccionar colectivo:"
         android:textAllCaps="false"
@@ -109,7 +115,7 @@
         android:id="@+id/tvSeleccionRecorrido"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/spinnerSelColectivo"
+        android:layout_below="@+id/textImputLayoutColectivo"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
         android:fontFamily="@font/alata"
@@ -117,28 +123,92 @@
         android:textAllCaps="false"
         android:textSize="16sp" />
 
-    <Spinner
-        android:id="@+id/spinnerSelColectivo"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
+<!--    <Spinner-->
+<!--        android:id="@+id/spinnerSelColectivo"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:layout_below="@+id/tvSeleccionColectivo"-->
+<!--        android:layout_marginStart="50dp"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:layout_marginEnd="50dp"-->
+<!--        android:spinnerMode="dialog"-->
+<!--        android:background="@drawable/spinner_selector" />-->
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textImputLayoutColectivo"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_below="@+id/tvSeleccionColectivo"
-        android:layout_marginStart="50dp"
         android:layout_marginTop="10dp"
-        android:layout_marginEnd="50dp"
-        android:spinnerMode="dialog"
-        android:background="@drawable/spinner_selector" />
-
-
-    <Spinner
-        android:id="@+id/spinnerSelRecorrido"
+        android:theme="@style/Theme.MaterialComponents.Light"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:startIconDrawable="@drawable/bus_icon"
+        app:helperText="*Requerido"
+        app:helperTextTextColor="#f00"
+        >
+
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteColectivo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Colectivo"
+            android:inputType="none" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+
+
+<!--    <Spinner-->
+<!--        android:id="@+id/spinnerSelRecorrido"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:layout_below="@+id/tvSeleccionRecorrido"-->
+<!--        android:layout_marginStart="50dp"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:layout_marginEnd="50dp"-->
+<!--        android:background="@drawable/spinner_selector"-->
+<!--        android:spinnerMode="dialog" />-->
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textImputLayoutRecorrido"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_below="@+id/tvSeleccionRecorrido"
-        android:layout_marginStart="50dp"
         android:layout_marginTop="10dp"
-        android:layout_marginEnd="50dp"
-        android:background="@drawable/spinner_selector"
-        android:spinnerMode="dialog" />
+        android:theme="@style/Theme.MaterialComponents.Light"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:startIconDrawable="@drawable/road_map_icon"
+        app:helperText="*Requerido"
+        app:helperTextTextColor="#f00"
+        >
+
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteRecorrido"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:hint="Recorrido"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+
+
+
+
 
     <TextView
         android:id="@+id/tvLineaSeleccionada"
@@ -154,7 +224,7 @@
         android:id="@+id/btnIniciarServicio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/spinnerSelRecorrido"
+        android:layout_below="@+id/textImputLayoutRecorrido"
         android:layout_marginTop="100dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
@@ -203,6 +273,13 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="13dp"
         android:text="" />
+
+
+
+
+
+
+
 
 
 
