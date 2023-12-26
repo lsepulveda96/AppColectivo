@@ -25,6 +25,20 @@
                                               <map>
                                                 <entry key="color" value="000000" />
                                                 <entry key="imagePath" value="C:\Users\PC\AppData\Local\Temp\ic_android_black_24dp.xml" />
+                                                <entry key="opacityPercent" value="60" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
+                                      <entry key="image">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="color" value="000000" />
+                                                <entry key="imagePath" value="C:\Users\PC\Documents\AndroidStudioProjects\AppColectivo\app\src\main\res\drawable\line_bus_icon.png" />
+                                                <entry key="opacityPercent" value="80" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -54,6 +68,15 @@
                                       </entry>
                                     </map>
                                   </option>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="assetType" value="IMAGE" />
+                                      <entry key="imageAsset" value="C:\Users\PC\Documents\AndroidStudioProjects\AppColectivo\app\src\main\res\drawable\line_bus_icon.png" />
+                                      <entry key="outputName" value="bus_line_icon" />
+                                      <entry key="theme" value="CUSTOM" />
+                                      <entry key="themeColor" value="000000" />
+                                    </map>
+                                  </option>
                                 </PersistentState>
                               </value>
                             </entry>
@@ -79,8 +102,9 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\PC\Documents\AndroidStudioProjects\AppColectivo\app\src\main\res\drawable\logo_stcu_amarillo.png" />
+                                                <entry key="imagePath" value="C:\Users\PC\Documents\AndroidStudioProjects\AppColectivo\app\src\main\res\drawable\line_bus_icon.png" />
                                                 <entry key="scalingPercent" value="79" />
+                                                <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -112,7 +136,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="stcu_icon_amarillo" />
+                                      <entry key="outputName" value="bus_line_icon" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -130,6 +154,19 @@
                                               <map>
                                                 <entry key="color" value="000000" />
                                                 <entry key="imagePath" value="C:\Users\PC\AppData\Local\Temp\ic_android_black_24dp.xml" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
+                                      <entry key="image">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="color" value="000000" />
+                                                <entry key="imagePath" value="C:\Users\PC\Documents\AndroidStudioProjects\AppColectivo\app\src\main\res\drawable\line_bus_icon.png" />
+                                                <entry key="paddingPercent" value="5" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -157,6 +194,14 @@
                                           </PersistentState>
                                         </value>
                                       </entry>
+                                    </map>
+                                  </option>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="assetType" value="IMAGE" />
+                                      <entry key="dogEared" value="true" />
+                                      <entry key="imageAsset" value="C:\Users\PC\Documents\AndroidStudioProjects\AppColectivo\app\src\main\res\drawable\line_bus_icon.png" />
+                                      <entry key="outputName" value="bus_line_icon" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -281,6 +326,11 @@
                                 </PersistentState>
                               </value>
                             </entry>
+                          </map>
+                        </option>
+                        <option name="values">
+                          <map>
+                            <entry key="outputIconType" value="ACTIONBAR" />
                           </map>
                         </option>
                       </PersistentState>

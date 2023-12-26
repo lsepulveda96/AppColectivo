@@ -7,17 +7,50 @@
     tools:context="com.stcu.appcolectivo.ui.MainActivity">
 
 
+
+
 <!--    desliza para actualizar-->
+
+    <!--ver que hacia esto-->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
+
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="2000dp"/>
+            android:layout_height="2000dp" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-<!--ver que hacia esto-->
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_below="@id/spinnerSelRecorrido"
+        android:layout_marginTop="15dp"
+        android:theme="@style/Theme.MaterialComponents.Light"
+        android:id="@+id/textImputLayoutLinea"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:startIconDrawable="@drawable/bus_line_icon"
+        >
+
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteLinea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:hint="Linea"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+
     <Button
         android:id="@+id/button"
         android:layout_width="wrap_content"
@@ -170,6 +203,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="13dp"
         android:text="" />
+
+
 
 
 </RelativeLayout>

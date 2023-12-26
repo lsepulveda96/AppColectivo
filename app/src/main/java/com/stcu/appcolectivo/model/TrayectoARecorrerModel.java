@@ -30,7 +30,7 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
 //    public static String ipv4 = "http://stcu.mdn.unp.edu.ar:50002/stcu_app/";
 
     // ip local casa
-    public static String ipv4 = "http://192.168.0.101:50000/v1/mobile/";
+    public static String ipv4 = "http://192.168.0.100:50000/v1/mobile/";
     Activity mActivity;
     Context mContext;
     RequestQueue requestQueue;

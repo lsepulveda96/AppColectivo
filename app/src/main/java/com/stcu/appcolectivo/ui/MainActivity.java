@@ -2,6 +2,7 @@ package com.stcu.appcolectivo.ui;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -67,9 +69,11 @@ public class MainActivity extends Activity implements MainInterface.View {
     private String myLat, myLng;
     private Spinner itemSeleccionLinea, itemSeleccionColectivo, itemSeleccionRecorrido;
     ArrayAdapter<String> adapterSeleccionLinea, adapterSeleccionColectivo, adapterSeleccionRecorrido;
+    ArrayAdapter<String> adapterNuevoLinea;
     Long fechaUbicacionI;
     private ProgressDialog dialog4, dialog3, dialog1;
     private SwipeRefreshLayout swipe;
+    AutoCompleteTextView autoCompleteTextViewLinea;
 
 
     Button searchBtn = null;
@@ -101,6 +105,7 @@ public class MainActivity extends Activity implements MainInterface.View {
 
     }
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,6 +129,14 @@ public class MainActivity extends Activity implements MainInterface.View {
         adapterSeleccionLinea = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
         adapterSeleccionColectivo = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
         adapterSeleccionRecorrido = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+
+
+
+        adapterNuevoLinea = new ArrayAdapter<>(this,R.layout.dropdown_menu_popup_item);
+        autoCompleteTextViewLinea = findViewById(R.id.autoCompleteLinea);
+
+
+
         itemSeleccionLinea = findViewById(R.id.spinnerSelLinea);
         itemSeleccionColectivo = findViewById(R.id.spinnerSelColectivo);
         itemSeleccionRecorrido = findViewById(R.id.spinnerSelRecorrido);
@@ -152,6 +165,15 @@ public class MainActivity extends Activity implements MainInterface.View {
             adapterSeleccionLinea.setDropDownViewResource(R.layout.textview_spinner_selected);
             adapterSeleccionColectivo.setDropDownViewResource(R.layout.textview_spinner_selected);
             itemSeleccionLinea.setAdapter(adapterSeleccionLinea);
+
+
+            adapterNuevoLinea.clear();
+            for (Linea opcion : lineasDisponibles) {
+                adapterNuevoLinea.add(opcion.getDenominacion());
+            }
+            autoCompleteTextViewLinea.setAdapter(adapterNuevoLinea);
+
+
             itemSeleccionColectivo.setAdapter(adapterSeleccionColectivo);
             itemSeleccionRecorrido.setAdapter(adapterSeleccionRecorrido);
 
