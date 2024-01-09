@@ -10,8 +10,6 @@
 
 
 <!--    desliza para actualizar-->
-
-    <!--ver que hacia esto-->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe"
         android:layout_width="match_parent"
@@ -83,9 +81,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:startIconDrawable="@drawable/bus_line_icon"
-        app:helperText="*Requerido"
-        app:helperTextTextColor="#f00"
         >
+<!--        app:helperText="*Requerido"-->
+<!--        app:helperTextTextColor="#f00"-->
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteLinea"
@@ -149,9 +147,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:startIconDrawable="@drawable/bus_icon"
-        app:helperText="*Requerido"
-        app:helperTextTextColor="#f00"
         >
+<!--        app:helperText="*Requerido"-->
+<!--        app:helperTextTextColor="#f00"-->
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteColectivo"
@@ -191,9 +189,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:startIconDrawable="@drawable/road_map_icon"
-        app:helperText="*Requerido"
-        app:helperTextTextColor="#f00"
         >
+<!--        app:helperText="*Requerido"-->
+<!--        app:helperTextTextColor="#f00"-->
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteRecorrido"
@@ -233,6 +231,18 @@
         android:onClick="iniciarServicio"
         android:text="Iniciar Servicio" />
 
+
+<!--    <ProgressBar-->
+<!--        android:id="@+id/progressCircularGPS"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_below="@id/btnIniciarServicio"-->
+<!--        android:layout_marginHorizontal="20dp"-->
+<!--        android:layout_marginTop="80dp"-->
+<!--        android:visibility="gone"-->
+<!--        >-->
+
+<!--    </ProgressBar>-->
 
     <Button
         android:id="@+id/fin_button"

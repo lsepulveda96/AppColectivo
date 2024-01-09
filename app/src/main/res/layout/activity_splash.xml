@@ -70,6 +70,6 @@
         android:layout_marginTop="64dp"
         android:layout_marginEnd="137dp"
         android:layout_marginRight="137dp"
-        android:src="@drawable/splash_icon" />
+        android:src="@drawable/logo_stcu_violeta" />
 
 </RelativeLayout>

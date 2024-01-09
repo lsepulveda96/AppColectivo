@@ -30,7 +30,7 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
 //    public static String ipv4 = "http://stcu.mdn.unp.edu.ar:50002/stcu_app/";
 
     // ip local casa
-    public static String ipv4 = "http://192.168.0.102:50000/v1/mobile/";
+    public static String ipv4 = "http://192.168.0.103:50000/v1/mobile/";
     Activity mActivity;
     Context mContext;
     RequestQueue requestQueue;
@@ -201,7 +201,7 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
     // metodo antiguo andando bien
     @Override
     public void makeRequestPostEnvioDesvio(final String linea, final String colectivo, final String recorrido, final Double lat, final Double lng) throws ExecutionException, InterruptedException, TimeoutException {
-        final String url = ipv4+"envioDesvio";
+        final String url = ipv4+"detectarDesvio";
 
         Map<String, String> params = new HashMap();
         params.put("linea",linea);

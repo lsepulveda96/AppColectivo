@@ -102,9 +102,8 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\PC\Documents\AndroidStudioProjects\AppColectivo\app\src\main\res\drawable\line_bus_icon.png" />
+                                                <entry key="imagePath" value="C:\Users\PC\Documents\AndroidStudioProjects\AppColectivo\app\src\main\res\drawable\logo_stcu_violeta.png" />
                                                 <entry key="scalingPercent" value="79" />
-                                                <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -136,7 +135,8 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="bus_line_icon" />
+                                      <entry key="backgroundColor" value="ffffff" />
+                                      <entry key="outputName" value="stcu_icon_violet" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -326,11 +326,6 @@
                                 </PersistentState>
                               </value>
                             </entry>
-                          </map>
-                        </option>
-                        <option name="values">
-                          <map>
-                            <entry key="outputIconType" value="ACTIONBAR" />
                           </map>
                         </option>
                       </PersistentState>

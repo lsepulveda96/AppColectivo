@@ -575,6 +575,13 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         Toast.makeText( getApplicationContext() ,response, Toast.LENGTH_SHORT ).show();
     }
 
-
-
+    @Override
+    protected void onDestroy() {
+        try {
+            finServicioSimple();
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            throw new RuntimeException(e);
+        }
+        super.onDestroy();
+    }
 }
