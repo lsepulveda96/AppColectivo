@@ -56,17 +56,6 @@
         android:textSize="16sp" />
 
 
-<!--    <Spinner-->
-<!--        android:id="@+id/spinnerSelLinea"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="60dp"-->
-<!--        android:layout_below="@+id/tvSeleccionLinea"-->
-<!--        android:layout_marginStart="50dp"-->
-<!--        android:layout_marginTop="10dp"-->
-<!--        android:layout_marginEnd="50dp"-->
-<!--        android:spinnerMode="dialog"-->
-<!--        android:background="@drawable/spinner_selector"/>-->
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textImputLayoutLinea"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -161,20 +150,6 @@
     </com.google.android.material.textfield.TextInputLayout>
 
 
-
-
-<!--    <Spinner-->
-<!--        android:id="@+id/spinnerSelRecorrido"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="60dp"-->
-<!--        android:layout_below="@+id/tvSeleccionRecorrido"-->
-<!--        android:layout_marginStart="50dp"-->
-<!--        android:layout_marginTop="10dp"-->
-<!--        android:layout_marginEnd="50dp"-->
-<!--        android:background="@drawable/spinner_selector"-->
-<!--        android:spinnerMode="dialog" />-->
-
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textImputLayoutRecorrido"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -208,13 +183,13 @@
 
 
 
-    <TextView
-        android:id="@+id/tvLineaSeleccionada"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/tvColectivoSeleccionado"
-        android:layout_centerHorizontal="true"
-        android:text="" />
+<!--    <TextView-->
+<!--        android:id="@+id/tvLineaSeleccionada"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_above="@+id/tvColectivoSeleccionado"-->
+<!--        android:layout_centerHorizontal="true"-->
+<!--        android:text="" />-->
 
 
 
@@ -223,39 +198,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textImputLayoutRecorrido"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="140dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:background="@drawable/btn_follow_style"
         android:textColor="#ffff"
+        android:enabled="false"
         android:onClick="iniciarServicio"
+        android:background="@drawable/button_effect"
         android:text="Iniciar Servicio" />
+<!--    android:background="@drawable/btn_follow_style"-->
 
-
-<!--    <ProgressBar-->
-<!--        android:id="@+id/progressCircularGPS"-->
+<!--    <Button-->
+<!--        android:id="@+id/fin_button"-->
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="wrap_content"-->
-<!--        android:layout_below="@id/btnIniciarServicio"-->
-<!--        android:layout_marginHorizontal="20dp"-->
-<!--        android:layout_marginTop="80dp"-->
-<!--        android:visibility="gone"-->
-<!--        >-->
-
-<!--    </ProgressBar>-->
-
-    <Button
-        android:id="@+id/fin_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btnIniciarServicio"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:background="@drawable/btn_follow_style"
-        android:textColor="#ffff"
-        android:onClick="finServicio"
-        android:text="Fin Servicio" />
+<!--        android:layout_below="@+id/btnIniciarServicio"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:layout_marginLeft="20dp"-->
+<!--        android:layout_marginRight="20dp"-->
+<!--        android:background="@drawable/btn_follow_style"-->
+<!--        android:textColor="#ffff"-->
+<!--        android:onClick="finServicio"-->
+<!--        android:text="Fin Servicio" />-->
 
     <TextView
         android:id="@+id/tv_network"
@@ -275,14 +239,14 @@
         android:visibility="gone" />
 
 <!--para probar-->
-    <TextView
-        android:id="@+id/tvColectivoSeleccionado"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="13dp"
-        android:text="" />
+<!--    <TextView-->
+<!--        android:id="@+id/tvColectivoSeleccionado"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:layout_centerHorizontal="true"-->
+<!--        android:layout_marginBottom="13dp"-->
+<!--        android:text="" />-->
 
 
 

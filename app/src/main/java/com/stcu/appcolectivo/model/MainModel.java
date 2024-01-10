@@ -38,14 +38,11 @@ import java.util.concurrent.TimeoutException;
 
 public class MainModel implements MainInterface.Model {
 //    public static String ipv4 = "http://stcu.mdn.unp.edu.ar:50002/stcu_app/";
-    public static String ipv4 = "http://192.168.0.103:50000/v1/mobile/";
+    public static String ipv4 = "http://192.168.0.104:50000/v1/mobile/";
 
     Activity mActivity;
     Context mContext;
     RequestQueue requestQueue;
-    List<String> listadoLineas = new ArrayList<String>();
-    List<String> listadoColectivos = new ArrayList<String>();
-    List<Coordenada> listaParadas;
     private List<Coordenada> listaCoordenadasTrayecto;
     private List<Recorrido> listaRecorridosActivos;
     Coordenada parada;

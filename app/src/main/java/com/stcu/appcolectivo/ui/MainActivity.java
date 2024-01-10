@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -31,7 +32,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,28 +63,23 @@ public class MainActivity extends Activity implements MainInterface.View {
     String eleccionLinea = "";
     String eleccionColectivo = "";
     String eleccionRecorrido = "";
-
     List<Colectivo> colectivosDisponibles;
     List<Linea> lineasDisponibles;
     List<Recorrido> recorridosDisponibles;
     List<Coordenada> coordenadasSim;
     Boolean listasOkThread, listasEstanCargadas;
-    Button btnGPS, finServicio, btnIniciarServicio;
-    TextView tvUbicacion, tvNetwork, tvColectivoSeleccionado, tvLineaSeleccionada;
+    Button btnGPS, btnIniciarServicio; //finServicio,
+    TextView tvUbicacion, tvNetwork; //, tvColectivoSeleccionado, tvLineaSeleccionada;
     private String myLat, myLng;
-    ArrayAdapter<Linea> adapterSelLinea;
     ArrayAdapter<String> adapterSeleccionLinea, adapterSeleccionColectivo, adapterSeleccionRecorrido;
     Long fechaUbicacionI;
-    private ProgressDialog dialog4, dialog3, dialog1;
+    private ProgressDialog progressDialogGPS;
     private SwipeRefreshLayout swipe;
     // TODO paso 0, agregar el autocompleter
     AutoCompleteTextView autoCompleteTextViewLinea;
     AutoCompleteTextView autoCompleteTextViewColectivo;
     AutoCompleteTextView autoCompleteTextViewRecorrido;
-
-    Button searchBtn = null;
     Intent locatorService = null;
-    AlertDialog alertDialog = null;
 
     //necesario para comprobar internet en tiempo real
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -129,10 +124,10 @@ public class MainActivity extends Activity implements MainInterface.View {
         tvUbicacion = findViewById(R.id.tvUbicacion);
         btnGPS = findViewById(R.id.button);
         btnIniciarServicio = findViewById(R.id.btnIniciarServicio);
-        finServicio = findViewById(R.id.fin_button);
-        finServicio.setEnabled(false); // se habilita cuando se inicia servicio
-        btnIniciarServicio.setEnabled(false); // para que no pueda seleccionar una lista vacia
-
+//        finServicio = findViewById(R.id.fin_button);
+//        finServicio.setEnabled(false); // se habilita cuando se inicia servicio
+//        btnIniciarServicio.setEnabled(false); // para que no pueda seleccionar una lista vacia
+//        btnIniciarServicio.setClickable(false);
 
         // TODO 1er cambio adapter
         adapterSeleccionLinea = new ArrayAdapter<>(this, R.layout.dropdown_menu_popup_item);
@@ -148,8 +143,8 @@ public class MainActivity extends Activity implements MainInterface.View {
 
         autoCompleteTextViewRecorrido = findViewById(R.id.autoCompleteRecorrido);
 
-        tvLineaSeleccionada = findViewById(R.id.tvLineaSeleccionada);
-        tvColectivoSeleccionado = findViewById(R.id.tvColectivoSeleccionado);
+//        tvLineaSeleccionada = findViewById(R.id.tvLineaSeleccionada);
+//        tvColectivoSeleccionado = findViewById(R.id.tvColectivoSeleccionado);
         tvNetwork = findViewById(R.id.tv_network);
 
         // if(listasEstanCargadas) // llamo a lo normal, sino hago un cartel con las op. reintentar. cancelar
@@ -166,45 +161,33 @@ public class MainActivity extends Activity implements MainInterface.View {
                 adapterSeleccionLinea.add(opcion.getDenominacion());
             }
 
-
             adapterSeleccionColectivo.clear();
             for (Colectivo opcion2 : colectivosDisponibles) {
                 adapterSeleccionColectivo.add(opcion2.getUnidad());
             }
 
              //TODO 3er cambio, set adapter
-//            itemSeleccionLinea.setAdapter(adapterSeleccionLinea);
             autoCompleteTextViewLinea.setAdapter(adapterSeleccionLinea);
 
             //TODO 4to cambio, set drop down view
             adapterSeleccionLinea.setDropDownViewResource(R.layout.textview_spinner_selected);
-//            autoCompleteTextViewLinea.setText(adapterSeleccionLinea.getItem(0));
-
-
-            //itemSeleccionColectivo.setAdapter(adapterSeleccionColectivo);
             autoCompleteTextViewColectivo.setAdapter(adapterSeleccionColectivo);
             adapterSeleccionColectivo.setDropDownViewResource(R.layout.textview_spinner_selected);
-
-
             adapterSeleccionRecorrido.clear();
             for (Recorrido opcionRecorrido : recorridosDisponibles) {
                 adapterSeleccionRecorrido.add(opcionRecorrido.getDenominacion());
             }
-
-//            itemSeleccionRecorrido.setAdapter(adapterSeleccionRecorrido);
-//            adapterSeleccionRecorrido.setDropDownViewResource(R.layout.textview_spinner_selected);
             autoCompleteTextViewRecorrido.setAdapter(adapterSeleccionRecorrido);
             adapterSeleccionRecorrido.setDropDownViewResource(R.layout.textview_spinner_selected);
 
 
             // si los dos estan vacios
-            if (adapterSeleccionLinea.isEmpty() || adapterSeleccionColectivo.isEmpty()) {
-                Toast.makeText(getApplicationContext(), "No se pudo cargar el listado de lineas y colectivos", Toast.LENGTH_SHORT).show();
-            } else {
-                btnIniciarServicio.setEnabled(true); // para que pueda guardar la eleccion
-                finServicio.setEnabled(true);
-            }
-
+            if (adapterSeleccionLinea.isEmpty() || adapterSeleccionColectivo.isEmpty() || adapterSeleccionRecorrido.isEmpty()) //{
+                Toast.makeText(getApplicationContext(), "Error al cargar listas", Toast.LENGTH_SHORT).show();
+//            } else {
+////                btnIniciarServicio.setEnabled(true); // para que pueda guardar la eleccion
+////                finServicio.setEnabled(true);
+//            }
 
         } else {
             AlertDialog.Builder alertaListasVacias = new AlertDialog.Builder(MainActivity.this);
@@ -236,33 +219,6 @@ public class MainActivity extends Activity implements MainInterface.View {
 
 
         // ante un cambio en la linea, llama nuevamente a sus recorrido correspondientes
-       /* itemSeleccionLinea.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                new ThreadActualizaRecorridoAsyncTask(getApplicationContext(), itemSeleccionLinea.getSelectedItem().toString()).execute();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                // escribir codigo..
-            }
-        }); // fin Listener cambio de linea*/
-
-        // TODO 5to cambio
-     /*   autoCompleteTextViewLinea.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-//                new ThreadActualizaRecorridoAsyncTask(getApplicationContext(), itemSeleccionLinea.getSelectedItem().toString()).execute();
-                Object item = adapterView.getItemAtPosition(i);
-                new ThreadActualizaRecorridoAsyncTask(getApplicationContext(), item.toString()).execute();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                // escribir codigo..
-            }
-        }); // fin Listener cambio de linea*/
-
         autoCompleteTextViewLinea.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -270,7 +226,8 @@ public class MainActivity extends Activity implements MainInterface.View {
                 Object item = parent.getItemAtPosition(position);
                 eleccionLinea = item.toString();
                 new ThreadActualizaRecorridoAsyncTask(getApplicationContext(), item.toString()).execute();
-                enableBtnIniciarServicio();
+                btnIniciarServicio.setEnabled(!eleccionColectivo.isEmpty() && !eleccionLinea.isEmpty() && !eleccionRecorrido.isEmpty());
+//                enableBtnIniciarServicio();
             }
         });
         autoCompleteTextViewLinea.setInputType(InputType.TYPE_NULL);
@@ -281,7 +238,8 @@ public class MainActivity extends Activity implements MainInterface.View {
             public void onItemClick(AdapterView<?> parent, View arg1, int position, long arg3) {
                 Object item = parent.getItemAtPosition(position);
                 eleccionColectivo = item.toString();
-                enableBtnIniciarServicio();
+                btnIniciarServicio.setEnabled(!eleccionColectivo.isEmpty() && !eleccionLinea.isEmpty() && !eleccionRecorrido.isEmpty());
+//                enableBtnIniciarServicio();
             }
         });
         autoCompleteTextViewColectivo.setInputType(InputType.TYPE_NULL);
@@ -291,7 +249,8 @@ public class MainActivity extends Activity implements MainInterface.View {
             public void onItemClick(AdapterView<?> parent, View arg1, int position, long arg3) {
                 Object item = parent.getItemAtPosition(position);
                 eleccionRecorrido = item.toString();
-                enableBtnIniciarServicio();
+                btnIniciarServicio.setEnabled(!eleccionColectivo.isEmpty() && !eleccionLinea.isEmpty() && !eleccionRecorrido.isEmpty());
+//                enableBtnIniciarServicio();
             }
         });
         autoCompleteTextViewRecorrido.setInputType(InputType.TYPE_NULL);
@@ -308,8 +267,15 @@ public class MainActivity extends Activity implements MainInterface.View {
     } // fin onCreate
 
     private void enableBtnIniciarServicio() {
-        if(!eleccionColectivo.isEmpty() && !eleccionLinea.isEmpty() && !eleccionRecorrido.isEmpty())
+        if(eleccionColectivo.isEmpty() || eleccionLinea.isEmpty() || eleccionRecorrido.isEmpty()) {
+            Toast.makeText(this, "btn bloqueado", Toast.LENGTH_SHORT).show();
+            btnIniciarServicio.setEnabled(false);
+            btnIniciarServicio.setClickable(false);
+        }else{
+            Toast.makeText(this, "btn habilitado", Toast.LENGTH_SHORT).show();
             btnIniciarServicio.setEnabled(true);
+            btnIniciarServicio.setClickable(true);
+        }
     }
 
     @Override
@@ -333,44 +299,6 @@ public class MainActivity extends Activity implements MainInterface.View {
         return itemId == R.id.action_settings || super.onOptionsItemSelected(item);
 
     }  // fin menu desplegable
-
-
-
-
-/*    //boton iniciar servicio
-    public void iniciarServicio(View view) {
-
-        // TODO 5to refactoring
-        presenter.obtenerUbicacion();
-
-//        new InicioServicio().execute();
-
-        dialog3 = new ProgressDialog( this );
-        dialog3.setMessage( "Detectando ubicación.." );
-        dialog3.show();
-
-        final Handler handler = new Handler();
-        final Runnable r = new Runnable(){
-            public void run(){
-                dialog3.cancel();
-                if(getLat().equals("0")){
-                    Toast toast1 = Toast.makeText(getApplicationContext(),"No se pudo obtener su ubicación actual", Toast.LENGTH_LONG);
-                    toast1.show();
-                }else{
-                    String seleccionLin = itemSeleccionLinea.getSelectedItem().toString();
-                    String seleccionCol = itemSeleccionColectivo.getSelectedItem().toString();
-                    tvLineaSeleccionada.setText("Linea: " + seleccionLin);
-                    tvColectivoSeleccionado.setText("Colectivo: " + seleccionCol);
-
-                    fechaUbicacionI = System.currentTimeMillis();
-                    setFechaUbicacionI(fechaUbicacionI);
-                    presenter.enviarInicioServicioAServidor(seleccionLin, seleccionCol, fechaUbicacionI);
-                }
-            }
-        };
-        handler.postDelayed(r,5000);
-
-    } // fin boton iniciar servicio*/
 
 
     //boton iniciar servicio
@@ -410,8 +338,6 @@ public class MainActivity extends Activity implements MainInterface.View {
 
 
     public class FetchCordinates extends AsyncTask<String, Integer, Boolean> {
-//        ProgressDialog progDailog = null;
-
         private ProgressDialog progressDialogGPS;
 
         public double lati = 0.0;
@@ -440,13 +366,8 @@ public class MainActivity extends Activity implements MainInterface.View {
 
         @Override
         protected void onPostExecute(Boolean result) {
-//            progressCircularGPS.setVisibility(View.GONE);
-//            Toast.makeText(getApplicationContext(),
-//                    "LATITUDE :" + lati + " LONGITUDE :" + longi,
-//                    Toast.LENGTH_LONG).show();
             progressDialogGPS.dismiss();
             if(getLat().equals("0")){
-//                System.out.println("no se pudo obtener su ubicacion actual");
                 Toast.makeText(MainActivity.this, "No se pudo obtener su ubicacion actual", Toast.LENGTH_SHORT).show();
             }else{
                 Toast.makeText(MainActivity.this, "servicio inciado", Toast.LENGTH_SHORT).show();
@@ -479,12 +400,6 @@ public class MainActivity extends Activity implements MainInterface.View {
                 }
             });
 
-//            tratar de hacer esto cuando esta buscando la ubicacion
-//            progDailog.setMessage("Loading...");
-//            progDailog.setIndeterminate(true);
-//            progDailog.setCancelable(true);
-//            progDailog.show();
-
             int timeoutGPS = 0;
             while ((this.lati == 0.0 | this.longi == 0.0) & timeoutGPS < 10) {
                 try {
@@ -502,12 +417,7 @@ public class MainActivity extends Activity implements MainInterface.View {
 
             @Override
             public void onLocationChanged(Location location) {
-/*                int lat = (int) location.getLatitude(); // * 1E6);
-                int log = (int) location.getLongitude(); // * 1E6);
-                int acc = (int) (location.getAccuracy());
-                String info = location.getProvider();*/
                 try {
-//                    if(lati != 0.0 | longi != 0.0){
                     lati = location.getLatitude();
                     longi = location.getLongitude();
                     System.out.println("la latitud obtenida: " + lati);
@@ -515,9 +425,6 @@ public class MainActivity extends Activity implements MainInterface.View {
                     System.out.println("la longitud obtenida: " + longi);
                     setLat(String.valueOf(lati));
                     setLng(String.valueOf(longi));
-//                    }else{
-//                        throw new RuntimeException();
-//                    }
                 } catch (Exception e) {
                     System.out.println("error obteniendo la dir" + e);
                 }
@@ -543,30 +450,30 @@ public class MainActivity extends Activity implements MainInterface.View {
 
 
     // boton fin servicio
-    public void finServicio(View view) {
-        presenter.obtenerUbicacion();
-        dialog4 = new ProgressDialog( this );
-        dialog4.setMessage( "Detectando ubicación.." );
-        dialog4.show();
-
-        final Handler handler = new Handler();
-        final Runnable r = new Runnable(){
-            public void run(){
-                dialog4.cancel();
-
-                if(getLat().equals("0")) {
-                    Toast toast1 = Toast.makeText(getApplicationContext(),"No se pudo obtener la ubicación actual", Toast.LENGTH_LONG);
-                    toast1.show();
-                }else{
-                    // TODO ojo cambiar!!
-                    tvLineaSeleccionada.setText("Linea: " + eleccionLinea);
-                    tvColectivoSeleccionado.setText("Colectivo: " + eleccionColectivo);
-                    presenter.makeRequestPostFin(eleccionLinea, eleccionColectivo, getLat(), getLng());
-                }
-            }
-        };
-        handler.postDelayed(r,2500);
-    } // fin boton Fin servicio
+//    public void finServicio(View view) {
+//        presenter.obtenerUbicacion();
+//        progressDialogGPS = new ProgressDialog( this );
+//        progressDialogGPS.setMessage( "Detectando ubicación.." );
+//        progressDialogGPS.show();
+//
+//        final Handler handler = new Handler();
+//        final Runnable r = new Runnable(){
+//            public void run(){
+//                progressDialogGPS.cancel();
+//
+//                if(getLat().equals("0")) {
+//                    Toast toast1 = Toast.makeText(getApplicationContext(),"No se pudo obtener la ubicación actual", Toast.LENGTH_LONG);
+//                    toast1.show();
+//                }else{
+//                    // TODO ojo cambiar!!
+//                    tvLineaSeleccionada.setText("Linea: " + eleccionLinea);
+//                    tvColectivoSeleccionado.setText("Colectivo: " + eleccionColectivo);
+//                    presenter.makeRequestPostFin(eleccionLinea, eleccionColectivo, getLat(), getLng());
+//                }
+//            }
+//        };
+//        handler.postDelayed(r,2500);
+//    } // fin boton Fin servicio
 
 
     @Override
@@ -743,8 +650,8 @@ public class MainActivity extends Activity implements MainInterface.View {
                 if(adapterSeleccionLinea.isEmpty() || adapterSeleccionColectivo.isEmpty()){
                     Toast.makeText( getApplicationContext() ,"No se pudo cargar el listado de lineas y colectivos", Toast.LENGTH_SHORT ).show();
                 }else {
-                    btnIniciarServicio.setEnabled( true ); // para que pueda guardar la eleccion
-                    finServicio.setEnabled( true );
+//                    btnIniciarServicio.setEnabled( true ); // para que pueda guardar la eleccion
+//                    finServicio.setEnabled( true );
 
                     autoCompleteTextViewLinea.setText("");
                     autoCompleteTextViewColectivo.setText("");
@@ -927,14 +834,14 @@ public class MainActivity extends Activity implements MainInterface.View {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    tvLineaSeleccionada.setText("Linea: " + eleccionLinea);
-                    tvColectivoSeleccionado.setText("Colectivo: " + eleccionColectivo);
-                }
-            });
+//
+//            new Handler(Looper.getMainLooper()).post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    tvLineaSeleccionada.setText("Linea: " + eleccionLinea);
+//                    tvColectivoSeleccionado.setText("Colectivo: " + eleccionColectivo);
+//                }
+//            });
 
             presenter.enviarInicioServicioAServidor(eleccionLinea, eleccionColectivo, eleccionRecorrido, getLat(), getLng());
 
@@ -947,6 +854,11 @@ public class MainActivity extends Activity implements MainInterface.View {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(mBroadcastReceiver);
+        super.onDestroy();
+    }
 }
 
 

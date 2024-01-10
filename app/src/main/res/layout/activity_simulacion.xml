@@ -157,7 +157,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/btn_follow_style"
+        android:background="@drawable/btn_violet"
         android:textColor="#ffff"
         android:onClick="finServicio"
         android:text="Fin Servicio" />

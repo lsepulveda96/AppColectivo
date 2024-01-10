@@ -61,7 +61,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         tvColectivo = (TextView) findViewById(R.id.tvColectivo);
         tvNombreParada = (TextView) findViewById(R.id.tvNombreParada);
         tvEstado = (TextView) findViewById(R.id.tvEstado);
-        tvLongitud = (TextView) findViewById(R.id.tvLongitud);
+//        tvLongitud = (TextView) findViewById(R.id.tvLongitud);
         finServicio = (Button) findViewById(R.id.btnFinServicio);
         tvUbicacion = (TextView) findViewById(R.id.tvUbicacion);
 
@@ -369,7 +369,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         @Override
         protected void onPostExecute(Boolean aBoolean){
             System.out.println("recorrido sim terminado");
-            finish();
+//            finish();
         }
 
     } // fin thread inicio recorrido
@@ -548,6 +548,97 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
     public void finServicioSimple() throws ExecutionException, InterruptedException, TimeoutException {
 
+//        //resetea el contador de desvio
+//        contDesvioAlIniciar = 0;
+//        //nuevo: resetea el cont de coord a simular
+//        contCoorSim = 0;
+//        //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
+//        // TODO Arreglar
+//        presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
+//        presenter.makeRequestPostFinColectivoRecorrido(linea,colectivo,recorrido);
+//
+//        enTransito = false;
+//        if(notificacionActiva) {
+//            //refactorizarlo
+//            presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(fechaUbicacionActual), "" + segundosDetenidoStr);
+//        }
+//        notificacionActiva = false; // resetea la bander
+////        Toast.makeText( getApplicationContext(), "Servicio finalizado", Toast.LENGTH_SHORT ).show();
+//        System.out.println("servicio finalizado+++++++++++++++");
+
+    }
+
+
+
+    @Override
+    public void showResponse(String response) {
+        Toast.makeText( getApplicationContext() ,response, Toast.LENGTH_SHORT ).show();
+    }
+
+
+        @Override
+    protected void onDestroy() {
+//        try {
+            FinServicio finServicio1 = new FinServicio();
+            finServicio1.execute();
+
+//            finServicioSimple();
+//        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+////            System.out.println("error: " + e);
+//            throw new RuntimeException(e);
+//        }
+//        finish();
+        super.onDestroy();
+    }
+
+    public class FinServicio extends AsyncTask<Void, Integer, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            //resetea el contador de desvio
+            contDesvioAlIniciar = 0;
+            //nuevo: resetea el cont de coord a simular
+            contCoorSim = 0;
+            //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
+            // TODO Arreglar
+            try {
+                presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
+
+            presenter.makeRequestPostFinColectivoRecorrido(linea,colectivo,recorrido);
+
+            enTransito = false;
+            if(notificacionActiva) {
+                //refactorizarlo
+                presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(fechaUbicacionActual), "" + segundosDetenidoStr);
+            }
+                notificacionActiva = false; // resetea la bander
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } catch (TimeoutException e) {
+                throw new RuntimeException(e);
+            }
+
+//        Toast.makeText( getApplicationContext(), "Servicio finalizado", Toast.LENGTH_SHORT ).show();
+            System.out.println("servicio finalizado+++++++++++++++");
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            finish();
+            super.onPostExecute(aBoolean);
+        }
+    }
+}
+
+
+
+/*
+* backup
+*     public void finServicioSimple() throws ExecutionException, InterruptedException, TimeoutException {
+
         //resetea el contador de desvio
         contDesvioAlIniciar = 0;
         //nuevo: resetea el cont de coord a simular
@@ -567,21 +658,5 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         System.out.println("servicio finalizado+++++++++++++++");
 
     }
-
-
-
-    @Override
-    public void showResponse(String response) {
-        Toast.makeText( getApplicationContext() ,response, Toast.LENGTH_SHORT ).show();
-    }
-
-    @Override
-    protected void onDestroy() {
-        try {
-            finServicioSimple();
-        } catch (ExecutionException | InterruptedException | TimeoutException e) {
-            throw new RuntimeException(e);
-        }
-        super.onDestroy();
-    }
-}
+    *
+    * */

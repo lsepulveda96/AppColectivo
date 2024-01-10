@@ -13,9 +13,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.gpmess.example.volley.app.R;
 import com.stcu.appcolectivo.interfaces.TrayectoARecorrerInterface;
 import com.stcu.appcolectivo.model.Coordenada;
@@ -35,7 +37,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
     public static double distanciaOffSetMov = 20.0;
     public static int tiempoMaxDetenido = 12; // equivale a 3 veces el envio de la ubicacion en el mismo lugar
 
-    private TextView tvLinea, tvColectivo, tvLatitud, tvLongitud, tvUbicacion, tvEstado;
+    private TextView tvLinea, tvColectivo, tvLatitud, tvLongitud, tvUbicacion, tvEstado, tvNombreParada;
     private String linea, colectivo, recorrido, latitud, longitud, fechaUbicacionInicialS, myLat, myLng, latAntigua, lngAntigua;
     private Long fechaUbicacionAntigua, fechaUbicacionInicial, fechaUbicacionActual;
     private Button finServicio;
@@ -43,7 +45,10 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
     int segundosDetenidoStr = 0, contDesvio = 0, contVerifParada = 0;
     List<Coordenada> paradasRecorrido;
 
+
     private TrayectoARecorrerInterface.Presenter presenter;
+
+    ImageView ivGifBus;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -53,11 +58,11 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
         presenter = new TrayectoARecorrerPresenter(this, this, this);
         tvLinea = (TextView) findViewById(R.id.tvLinea);
         tvColectivo = (TextView) findViewById(R.id.tvColectivo);
-        tvLatitud = (TextView) findViewById(R.id.tvNombreParada);
+        tvNombreParada = (TextView) findViewById(R.id.tvNombreParada);
         tvEstado = (TextView) findViewById(R.id.tvEstado);
-        tvLongitud = (TextView) findViewById(R.id.tvLongitud);
+//        tvLongitud = (TextView) findViewById(R.id.tvLongitud);
         finServicio = (Button) findViewById(R.id.btnFinServicio);
-        tvUbicacion = (TextView) findViewById(R.id.tvUbicacion);
+//        tvUbicacion = (TextView) findViewById(R.id.tvUbicacion);
 
         linea = getIntent().getExtras().getString("linea");
         colectivo = getIntent().getExtras().getString("colectivo");
@@ -68,10 +73,13 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
         fechaUbicacionInicial = Long.valueOf(fechaUbicacionInicialS);
         fechaUbicacionAntigua = fechaUbicacionInicial;
 
+        ivGifBus = findViewById(R.id.gifbus);
+        ivGifBus.setVisibility(View.GONE);
+
         tvLinea.setText(linea);
         tvColectivo.setText(colectivo);
-        tvLatitud.setText(latitud);
-        tvLongitud.setText(longitud);
+//        tvLatitud.setText(latitud);
+//        tvLongitud.setText(longitud);
 
         setLat(latitud); // para que la primera vez no sea null, despues este valor se pisa
         setLng(longitud);
@@ -106,7 +114,6 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                 throw new RuntimeException(e);
             }
 
-//            for (int i=0;i<paradasRecorrido.size();i++) {
             while (enTransito){ // mientras este en transito sigue, sino sale
 
                     obtenerUbicacion();
@@ -143,7 +150,19 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                         segundosDetenidoStr = segundosDetenidoStr + difSeg; // suma el tiempo total detenido // tambien se puede con cont++ cada 3 intentos envia
 //                        Toast.makeText(ColectivoEnServicioActivity.this, difTotal + " segundos detenido", Toast.LENGTH_SHORT).show();
                         System.out.println(segundosDetenidoStr + " segundos detenido");
+                        // aca poner imagen cole detenido
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                tvEstado.setText( "Unidad detenida" );
 
+                                ivGifBus.setVisibility(View.VISIBLE);
+                                //inserte gif cole en parada. posible error x estar fuera del hilo principal
+                                Glide.with(ColectivoEnServicioActivity.this)
+                                        .load(R.drawable.bus_animation_fondo_violeta_alerta)
+                                        .into(ivGifBus);
+                            }
+                        });
 
                         try {
                             Thread.sleep(4000);
@@ -298,7 +317,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                tvUbicacion.setText(location.getLatitude() + "" + location.getLongitude());
+//                tvUbicacion.setText(location.getLatitude() + "" + location.getLongitude());
                 setLat(String.valueOf(location.getLatitude()));
                 setLng(String.valueOf(location.getLongitude()));
 
@@ -356,6 +375,23 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                         // es porque esta en o cerca de una parada de esa linea que esta en servicio
                         Toast.makeText( this, "Colectivo en parada", Toast.LENGTH_SHORT ).show();
                         presenter.makeRequestPostColeEnParada( parada.getCodigo(), denom, unidad, denomRecorrido ); // a rest lineaColectivo
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                tvEstado.setText( "Unidad en parada" );
+
+                                tvNombreParada.setText(parada.getDireccion());
+
+                                ivGifBus.setVisibility(View.VISIBLE);
+                                //inserte gif cole en parada. posible error x estar fuera del hilo principal
+                                Glide.with(ColectivoEnServicioActivity.this)
+                                        .load(R.drawable.bus_animation_fondo_violeta_parada)
+                                        .into(ivGifBus);
+                            }
+                        });
+
                     }
                 }
             }
