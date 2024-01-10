@@ -162,8 +162,6 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
             for (int i=0;i<paradasRecorrido.size();i++) {
 
 
-
-
             if(enTransito){
 
                 // porque ya es la segunda vez que entra
@@ -337,7 +335,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
                                     ivGifBus.setVisibility(View.VISIBLE);
                                     //inserte gif cole en parada. posible error x estar fuera del hilo principal
-                                    Glide.with(SimulacionRecorridoActivity.this)
+                                    Glide.with(getApplicationContext())
                                             .load(R.drawable.bus_animation_fondo_violeta_andando)
                                             .into(ivGifBus);
 
@@ -358,7 +356,9 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
                 fechaUbicacionAntigua = fechaUbicacionActual;
 //              TODO fin colectivo detenido
-            } //fin if en transito
+            }else{ //fin if en transito
+                break; // para salir del for
+            }
 
             } // fin for
 
@@ -369,7 +369,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         @Override
         protected void onPostExecute(Boolean aBoolean){
             System.out.println("recorrido sim terminado");
-//            finish();
+            finish();
         }
 
     } // fin thread inicio recorrido
@@ -484,7 +484,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
                             ivGifBus.setVisibility(View.VISIBLE);
                             //inserte gif cole en parada. posible error x estar fuera del hilo principal
-                            Glide.with(SimulacionRecorridoActivity.this)
+                            Glide.with(getApplicationContext())
                                     .load(R.drawable.bus_animation_fondo_violeta_parada)
                                     .into(ivGifBus);
                         }
@@ -512,8 +512,13 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
     }
 
     public void finServicio(View view) throws ExecutionException, InterruptedException, TimeoutException {
+        enTransito = false;
+//        finish();
+//        FinServicio finServicio1 = new FinServicio();
+//        finServicio1.execute();
+
         //resetea el contDesvio
-        contDesvioAlIniciar = 0;
+      /*  contDesvioAlIniciar = 0;
 
         //nueva, resetea cont coordenada a simular
         contCoorSim = 0;
@@ -542,11 +547,15 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                 finish();
             }
         };
-        handler.postDelayed( r, 3000 );
+        handler.postDelayed( r, 3000 );*/
 
     }
 
     public void finServicioSimple() throws ExecutionException, InterruptedException, TimeoutException {
+          enTransito = false;
+//        finish();
+//        FinServicio finServicio1 = new FinServicio();
+//        finServicio1.execute();
 
 //        //resetea el contador de desvio
 //        contDesvioAlIniciar = 0;
