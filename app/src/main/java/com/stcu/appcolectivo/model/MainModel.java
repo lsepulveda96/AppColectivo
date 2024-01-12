@@ -37,8 +37,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class MainModel implements MainInterface.Model {
-//    public static String ipv4 = "http://stcu.mdn.unp.edu.ar:50002/stcu_app/";
-    public static String ipv4 = "http://192.168.0.104:50000/v1/mobile/";
+
+//    public static String ipv4 = "http://192.168.0.104:50000/v1/mobile/"; //antigua
+
+    // ip local actual
+//    public static String ipv4 = "http://192.168.0.104:50004/stcu2service/v1/mobile/";
+
+    //ip remoto actual
+    public static String ipv4 =  "http://138.36.99.248:50004/stcu2service/v1/mobile/";
+
 
     Activity mActivity;
     Context mContext;
