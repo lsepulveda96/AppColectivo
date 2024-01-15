@@ -124,10 +124,7 @@ public class MainActivity extends Activity implements MainInterface.View {
         tvUbicacion = findViewById(R.id.tvUbicacion);
         btnGPS = findViewById(R.id.button);
         btnIniciarServicio = findViewById(R.id.btnIniciarServicio);
-//        finServicio = findViewById(R.id.fin_button);
-//        finServicio.setEnabled(false); // se habilita cuando se inicia servicio
-//        btnIniciarServicio.setEnabled(false); // para que no pueda seleccionar una lista vacia
-//        btnIniciarServicio.setClickable(false);
+
 
         // TODO 1er cambio adapter
         adapterSeleccionLinea = new ArrayAdapter<>(this, R.layout.dropdown_menu_popup_item);
@@ -143,8 +140,6 @@ public class MainActivity extends Activity implements MainInterface.View {
 
         autoCompleteTextViewRecorrido = findViewById(R.id.autoCompleteRecorrido);
 
-//        tvLineaSeleccionada = findViewById(R.id.tvLineaSeleccionada);
-//        tvColectivoSeleccionado = findViewById(R.id.tvColectivoSeleccionado);
         tvNetwork = findViewById(R.id.tv_network);
 
         // if(listasEstanCargadas) // llamo a lo normal, sino hago un cartel con las op. reintentar. cancelar
@@ -330,9 +325,9 @@ public class MainActivity extends Activity implements MainInterface.View {
             fetchCordinates.execute();
             return true;
         } catch (Exception error) {
+            Toast.makeText(this, "Error al iniciar servicio", Toast.LENGTH_SHORT).show();
             return false;
         }
-
     }
 
 
@@ -369,6 +364,7 @@ public class MainActivity extends Activity implements MainInterface.View {
             progressDialogGPS.dismiss();
             if(getLat().equals("0")){
                 Toast.makeText(MainActivity.this, "No se pudo obtener su ubicacion actual", Toast.LENGTH_SHORT).show();
+                // aca deberia ir el cambio de activity
             }else{
                 Toast.makeText(MainActivity.this, "servicio inciado", Toast.LENGTH_SHORT).show();
                 new InicioServicio().execute();
@@ -410,6 +406,7 @@ public class MainActivity extends Activity implements MainInterface.View {
                 System.out.println("esperando a la respuesta de la locacion gps" + timeoutGPS);
                 timeoutGPS++;
             }
+            //this.cancel(true); // probar para cancelar el hilo
             return null;
         }
 
@@ -834,17 +831,7 @@ public class MainActivity extends Activity implements MainInterface.View {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-//
-//            new Handler(Looper.getMainLooper()).post(new Runnable() {
-//                @Override
-//                public void run() {
-//                    tvLineaSeleccionada.setText("Linea: " + eleccionLinea);
-//                    tvColectivoSeleccionado.setText("Colectivo: " + eleccionColectivo);
-//                }
-//            });
-
             presenter.enviarInicioServicioAServidor(eleccionLinea, eleccionColectivo, eleccionRecorrido, getLat(), getLng());
-
             return true;
         }
 

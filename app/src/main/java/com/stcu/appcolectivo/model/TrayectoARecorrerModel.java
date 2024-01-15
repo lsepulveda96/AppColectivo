@@ -27,10 +27,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model {
-//    public static String ipv4 = "http://stcu.mdn.unp.edu.ar:50002/stcu_app/";
 
     // ip local actual
-    //public static String ipv4 = "http://192.168.0.104:50004/stcu2service/v1/mobile/";
+//    public static String ipv4 = "http://192.168.0.104:50004/stcu2service/v1/mobile/";
 
     // ip remoto actual
     public static String ipv4 =  "http://138.36.99.248:50004/stcu2service/v1/mobile/";
@@ -94,7 +93,7 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
     }
 
 
-    public void makeRequestPostEnvio(final String seleccionLin, final String seleccionCol, String seleccionRec, final String latitud, final String longitud) throws ExecutionException, InterruptedException, TimeoutException {
+    public void makeRequestPostEnviarUbicacion(final String seleccionLin, final String seleccionCol, String seleccionRec, final String latitud, final String longitud) throws ExecutionException, InterruptedException, TimeoutException {
 
         final String url = ipv4+"enviarUbicacion";
 
@@ -172,6 +171,15 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
         params.put("segundosDetenidoStr", segundosDetenidoStr);
         JSONObject parameters = new JSONObject(params);
 
+        System.out.println("los datos que envia al detener la notificacion cole detenido: ");
+        System.out.println("linea: " + seleccionLin);
+
+        params.put("colectivo", seleccionCol);
+        params.put("recorrido", seleccionRec);
+        params.put("latitud", latitud);
+        params.put("longitud", longitud);
+        params.put("segundosDetenidoStr", segundosDetenidoStr);
+
         RequestFuture<JSONObject> future = RequestFuture.newFuture();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, parameters, future, future);
         VolleySingleton.getmInstance(mActivity.getApplicationContext()).addToRequestQueue((jsonObjectRequest));
@@ -204,7 +212,7 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
 
     // metodo antiguo andando bien
     @Override
-    public void makeRequestPostEnvioDesvio(final String linea, final String colectivo, final String recorrido, final Double lat, final Double lng) throws ExecutionException, InterruptedException, TimeoutException {
+    public void makeRequestPostDetectarDesvio(final String linea, final String colectivo, final String recorrido, final Double lat, final Double lng) throws ExecutionException, InterruptedException, TimeoutException {
         final String url = ipv4+"detectarDesvio";
 
         Map<String, String> params = new HashMap();

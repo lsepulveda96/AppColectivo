@@ -40,9 +40,9 @@ public class TrayectoARecorrerPresenter implements TrayectoARecorrerInterface.Pr
     }
 
     @Override
-    public void makeRequestPostEnvio(String linea, String colectivo, String recorrido, String lat, String lng) throws ExecutionException, InterruptedException, TimeoutException {
+    public void makeRequestPostEnviarUbicacion(String linea, String colectivo, String recorrido, String lat, String lng) throws ExecutionException, InterruptedException, TimeoutException {
         if(view != null){
-            model.makeRequestPostEnvio(linea, colectivo, recorrido, lat, lng);
+            model.makeRequestPostEnviarUbicacion(linea, colectivo, recorrido, lat, lng);
         }
     }
 
@@ -61,9 +61,9 @@ public class TrayectoARecorrerPresenter implements TrayectoARecorrerInterface.Pr
     }
 
     @Override
-    public void makeRequestPostEnvioDesvio(String linea, String colectivo, String recorrido, Double latActual, Double lngActual) throws ExecutionException, InterruptedException, TimeoutException {
+    public void makeRequestPostDetectarDesvio(String linea, String colectivo, String recorrido, Double latActual, Double lngActual) throws ExecutionException, InterruptedException, TimeoutException {
         if(view != null){
-            model.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
+            model.makeRequestPostDetectarDesvio(linea, colectivo, recorrido, latActual, lngActual);
         }
     }
 

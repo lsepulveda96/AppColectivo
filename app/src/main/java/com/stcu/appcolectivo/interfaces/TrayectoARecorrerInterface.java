@@ -45,13 +45,13 @@ public interface TrayectoARecorrerInterface {
 
         void showResponse(String response);
 
-        void makeRequestPostEnvio(String linea, String colectivo, String recorrido, String lat, String lng) throws ExecutionException, InterruptedException, TimeoutException;
+        void makeRequestPostEnviarUbicacion(String linea, String colectivo, String recorrido, String lat, String lng) throws ExecutionException, InterruptedException, TimeoutException;
 
         void makePostInformeColeDetenido(String seleccionLin, String seleccionCol, String seleccionRec, String latitud, String longitud, String segundosDetenidoStr) throws ExecutionException, InterruptedException, TimeoutException;
 
         void makePostActualizacionNotifColeDetenido(String seleccionLin, String seleccionCol, String seleccionRec, String latitud, String longitud, String segundosDetenidoStr) throws ExecutionException, InterruptedException, TimeoutException;
 
-        void makeRequestPostEnvioDesvio(String linea, String colectivo, String recorrido, Double latActual, Double lngActual) throws ExecutionException, InterruptedException, TimeoutException;
+        void makeRequestPostDetectarDesvio(String linea, String colectivo, String recorrido, Double latActual, Double lngActual) throws ExecutionException, InterruptedException, TimeoutException;
 
         void makeRequestPostColeEnParada(int codigo, String denomLinea, String unidad, String denomRecorrido) throws ExecutionException, InterruptedException, TimeoutException;
 
@@ -72,14 +72,14 @@ public interface TrayectoARecorrerInterface {
 
         void makeRequestPostFinDesvio(String linea, String colectivo, String recorrido) throws ExecutionException, InterruptedException, TimeoutException;
 
-        void makeRequestPostEnvio(String linea, String colectivo, String recorrido, String lat, String lng) throws ExecutionException, InterruptedException, TimeoutException;
+        void makeRequestPostEnviarUbicacion(String linea, String colectivo, String recorrido, String lat, String lng) throws ExecutionException, InterruptedException, TimeoutException;
 
 //        void makeRequestPostEnvioInforme(String linea, String colectivo, String lat, String lng, String fechaUbicacionStr, String segundosDetenidoStr);
         void makePostInformeColeDetenido(final String seleccionLin, final String seleccionCol, final String seleccionRec, final String latitud, final String longitud, final String segundosDetenidoStr) throws ExecutionException, InterruptedException, TimeoutException;
 
         void makePostActualizacionNotifColeDetenido(final String seleccionLin, final String seleccionCol, final String seleccionRec, final String latitud, final String longitud, final String segundosDetenidoStr) throws ExecutionException, InterruptedException, TimeoutException;
 
-        void makeRequestPostEnvioDesvio(String linea, String colectivo, String recorrido, Double latActual, Double lngActual) throws ExecutionException, InterruptedException, TimeoutException;
+        void makeRequestPostDetectarDesvio(String linea, String colectivo, String recorrido, Double latActual, Double lngActual) throws ExecutionException, InterruptedException, TimeoutException;
 
         void makeRequestPostColeEnParada(int codigo, String denomLinea, String unidad, String denomRecorrido) throws ExecutionException, InterruptedException, TimeoutException;
 //        void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, Long fechaUbicacionI);

@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -61,7 +60,6 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         tvColectivo = (TextView) findViewById(R.id.tvColectivo);
         tvNombreParada = (TextView) findViewById(R.id.tvNombreParada);
         tvEstado = (TextView) findViewById(R.id.tvEstado);
-//        tvLongitud = (TextView) findViewById(R.id.tvLongitud);
         finServicio = (Button) findViewById(R.id.btnFinServicio);
         tvUbicacion = (TextView) findViewById(R.id.tvUbicacion);
 
@@ -76,8 +74,6 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
         tvLinea.setText(linea);
         tvColectivo.setText(colectivo);
-//        tvNombreParada.setText(latitud);
-//        tvLongitud.setText(longitud);
 
         setLat(latitud); // para que la primera vez no sea null, despues este valor se pisa
         setLng(longitud);
@@ -88,13 +84,8 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         latActual = Double.parseDouble(latitud);
         lngActual = Double.parseDouble(longitud);
 
-
-         ivGifBus = findViewById(R.id.gifbus);
-         ivGifBus.setVisibility(View.GONE);
-        //seguir trabajando aca
-        //.
-
-
+        ivGifBus = findViewById(R.id.gifbus);
+        ivGifBus.setVisibility(View.GONE);
 
         new InicioRecorridoSim().execute();
 
@@ -213,7 +204,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
 
                     try {
-                        presenter.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
+                        presenter.makeRequestPostDetectarDesvio(linea, colectivo, recorrido, latActual, lngActual);
                         System.out.println("Detectando desvio..");
                         contDesvioAlIniciar++;
                     } catch (ExecutionException | InterruptedException | TimeoutException e) {
@@ -321,10 +312,10 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                             finish();
                         }else{
                             System.out.println("no es parada final");
-                            presenter.makeRequestPostEnvioDesvio(linea, colectivo, recorrido, latActual, lngActual);
+                            presenter.makeRequestPostDetectarDesvio(linea, colectivo, recorrido, latActual, lngActual);
 //                        Toast.makeText( SimulacionRecorridoActivity.this, "Enviando ubicacion..", Toast.LENGTH_SHORT ).show();
                             System.out.println("enviando ubicacion..");
-                            presenter.makeRequestPostEnvio(linea, colectivo, recorrido, getLat(), getLng());
+                            presenter.makeRequestPostEnviarUbicacion(linea, colectivo, recorrido, getLat(), getLng());
                             segundosDetenidoStr = 0; // resetea la suma
                             System.out.println("unidad en circulacion");
                             runOnUiThread(new Runnable() {
@@ -336,7 +327,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                                     ivGifBus.setVisibility(View.VISIBLE);
                                     //inserte gif cole en parada. posible error x estar fuera del hilo principal
                                     Glide.with(getApplicationContext())
-                                            .load(R.drawable.bus_animation_fondo_violeta_andando)
+                                            .load(R.drawable.bus_animation_fondo_violeta_circulando)
                                             .into(ivGifBus);
 
 
