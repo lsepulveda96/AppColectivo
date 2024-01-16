@@ -36,9 +36,9 @@ import java.util.concurrent.TimeoutException;
 public class ColectivoEnServicioActivity extends Activity implements TrayectoARecorrerInterface.View {
 
     Boolean enTransito = true, notificacionActiva = false, coleEstaDesviado = false;
-    public static double distanciaOffSetMov = 15.0; // en mts
-    public static int tiempoMaxDetenido = 15; // equivale a 3 veces el envio de la ubicacion en el mismo lugar
-    private static double distanciaOffSetParada = 25.0; // en mts
+    public static double distanciaOffSetMov = 15.0; // en mts. mientras menor es el numero, mas detectara que se mueve
+    public static int tiempoMaxDetenido = 20; // equivale a 4 veces el envio de la ubicacion en el mismo lugar
+    private static double distanciaOffSetParada = 75.0; // en mts
     public static int tiempoEnvioNuevaCoord = 5; // en segundos
 
     private TextView tvLinea, tvColectivo, tvEstado, tvNombreParada;

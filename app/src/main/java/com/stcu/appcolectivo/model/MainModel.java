@@ -44,17 +44,14 @@ public class MainModel implements MainInterface.Model {
     //ip remoto actual
     public static String ipv4 =  "http://138.36.99.248:50004/stcu2service/v1/mobile/";
 
-
+    static int timeOutRequest = 10; // en segundos
     Activity mActivity;
     Context mContext;
     RequestQueue requestQueue;
     private List<Coordenada> listaCoordenadasTrayecto;
     private List<Recorrido> listaRecorridosActivos;
-    Coordenada parada;
     Coordenada coord;
 
-    String myLat;
-    String myLng;
     private MainInterface.Presenter presenter;
 
     public MainModel(MainInterface.Presenter presenter, Context mContext, Activity mActivity) {
@@ -65,113 +62,6 @@ public class MainModel implements MainInterface.Model {
         requestQueue = Volley.newRequestQueue(mContext);
     }
 
-    //metodo que anda bien consultaLineasActivas
-    /*
-    public List<Linea> consultaLineasActivas() {
-        System.out.println("entra dentro de consulta lineas");
-        requestQueue = Volley.newRequestQueue(mContext);
-
-        String url = ipv4+"lineas/activas";
-
-        //List<String> lineasDisponibles = new ArrayList<>();
-        List<Linea> lineasDisponibles = new ArrayList<>();
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-
-                            JSONArray ja = response.getJSONArray("data"); // get the JSONArray
-
-                            for(int i=0;i<ja.length();i++){
-                                JSONObject linea = ja.getJSONObject(i);
-                                String denominacion = linea.getString("denominacion");
-                                String descripcion = linea.getString("descripcion");
-                                boolean enServicio = linea.getBoolean("enServicio");
-                                Long idLinea = Long.parseLong(linea.getString("id"));
-                                lineasDisponibles.add(new Linea(idLinea, denominacion,descripcion,enServicio));
-                            }
-
-//                            presenter.showLineasDisponibles(lineasDisponibles);
-                            System.out.println("Respuesta del servidor ok: " + lineasDisponibles.get(0));
-
-
-
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        System.out.println("Respuesta del servidor con error: " + error.toString());
-
-                    }
-                });
-
-        requestQueue.add(jsonObjectRequest);
-
-        return lineasDisponibles;
-    }
-     */
-
-    //metodo que anda bien consultaColectivosActivos
-    /*    @Override
-    public List<Colectivo> consultaColectivosActivos() {
-        System.out.println("entra dentro de consulta colectivos");
-        requestQueue = Volley.newRequestQueue(mContext);
-
-        String url = ipv4+"colectivos";
-
-        List<Colectivo> colectivos = new ArrayList<>();
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-
-
-                            JSONArray ja = response.getJSONArray("data"); // get the JSONArray
-
-                            for(int i=0;i<ja.length();i++){
-                                JSONObject colectivo = ja.getJSONObject(i);
-                                Long idColectivo = Long.parseLong(colectivo.getString("id"));
-                                String patente = colectivo.getString("patente");
-                                String unidad = colectivo.getString("unidad");
-                                String marca = colectivo.getString("marca");
-                                colectivos.add(new Colectivo(idColectivo,unidad,patente,marca));
-                            }
-
-//                            presenter.showLineasDisponibles(lineasDisponibles);
-
-                            System.out.println("Respuesta del servidor ok: " + colectivos.get(0));
-
-
-
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
-                        }
-
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        System.out.println("Respuesta del servidor con error: " + error.toString());
-
-                    }
-                });
-
-        requestQueue.add(jsonObjectRequest);
-        return colectivos;
-    }*/
-
-    //metodo para probar asyncTask
     @Override
     public List<Linea> consultaLineasActivas() throws ExecutionException, InterruptedException, TimeoutException {
         System.out.println("entra dentro de consulta lineas");
@@ -186,7 +76,7 @@ public class MainModel implements MainInterface.Model {
 
         VolleySingleton.getmInstance(mActivity.getApplicationContext()).addToRequestQueue((jsonObjectRequest));
 
-        JSONObject resp = future.get(5,TimeUnit.SECONDS);
+        JSONObject resp = future.get(timeOutRequest,TimeUnit.SECONDS);
 
         try {
             JSONArray ja = resp.getJSONArray("data"); // get the JSONArray
@@ -213,7 +103,7 @@ public class MainModel implements MainInterface.Model {
     //metodo para probar asyncTask
     @Override
     public List<Colectivo> consultaColectivosActivos() throws ExecutionException, InterruptedException, TimeoutException {
-        System.out.println("entra dentro de consulta colectivos");
+        System.out.println("consulta colectivos activos");
 
         String url = ipv4+"colectivos";
 
@@ -227,7 +117,7 @@ public class MainModel implements MainInterface.Model {
 
         VolleySingleton.getmInstance(mActivity.getApplicationContext()).addToRequestQueue((jsonObjectRequest));
 
-        JSONObject resp = future.get(5,TimeUnit.SECONDS);
+        JSONObject resp = future.get(timeOutRequest,TimeUnit.SECONDS);
         try {
             JSONArray ja = resp.getJSONArray("data"); // get the JSONArray
             for(int i=0;i<ja.length();i++){
@@ -247,9 +137,6 @@ public class MainModel implements MainInterface.Model {
     }
 
 
-
-
-
     public NetworkInfo isNetAvailable() {
 
         ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -258,67 +145,6 @@ public class MainModel implements MainInterface.Model {
 
         return activeNetwork;
    }
-
-   // metodo antiguo sin future.get. andando
-/*    *//**
-     * Metodo que recupera la lista de coordenadas a utilizar para simular el trayecto seleccionado
-     * @param denom denominacion de la linea seleccionada
-     * @param seleccionRec2 seleccion de uno de los recorridos activos de esa linea seleccionada
-     * @return lista de coordenadas del trayecto seleccionado
-     *//*
-    public List<Coordenada> consultaTrayectoASimular(String denom, String seleccionRec2) {
-        listaCoordenadasTrayecto = new ArrayList<Coordenada>();
-        String url = ipv4 + "trayectos/" + denom +"/"+ seleccionRec2;
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-
-                            JSONArray paradas = response.getJSONArray("data"); // get the JSONArray
-
-                            for (int i = 0; i < paradas.length(); i++) {
-                                JSONObject parada = paradas.getJSONObject(i);
-
-                                JSONObject coordLng = new JSONObject(parada.getString("parada")).getJSONObject("coordenada");
-                                String longitud = coordLng.getString("lng");
-
-                                JSONObject coordLat = new JSONObject(parada.getString("parada")).getJSONObject("coordenada");
-                                String latitud = coordLat.getString("lat");
-
-                                String direccion= new JSONObject(parada.getString("parada")).getString("direccion");
-
-                                // esto quizas se deba llamar Parada, o paradaRecorrido en vez de coordenada
-                                coord = new Coordenada();
-                                coord.setLatitud(Double.parseDouble(latitud));
-                                coord.setLongitud(Double.parseDouble(longitud));
-                                coord.setDireccion(direccion);
-                                listaCoordenadasTrayecto.add(coord);
-                            }
-
-//                            System.out.println("Respuesta del servidor ok: " + colectivos.get(0));
-
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        System.out.println("Respuesta del servidor con error: " + error.toString());
-                    }
-                });
-
-        requestQueue.add(jsonObjectRequest);
-        return listaCoordenadasTrayecto;
-    }*/
-
-
-
-
 
 
     /**
@@ -339,7 +165,7 @@ public class MainModel implements MainInterface.Model {
 
         VolleySingleton.getmInstance(mActivity.getApplicationContext()).addToRequestQueue((jsonObjectRequest));
 
-        JSONObject resp = future.get(5,TimeUnit.SECONDS);
+        JSONObject resp = future.get(timeOutRequest,TimeUnit.SECONDS);
 
         JSONArray paradas = resp.getJSONArray("data"); // get the JSONArray
 
@@ -362,55 +188,9 @@ public class MainModel implements MainInterface.Model {
             listaCoordenadasTrayecto.add(coord);
         }
 
-//      System.out.println("Respuesta del servidor ok: " + colectivos.get(0));
         return listaCoordenadasTrayecto;
     }
 
-
-
-
-
-
-
-
-
-
- /*   public void obtenerUbicacion() {
-
-        System.out.println("entra en obtenerUbicacion Model");
-
-        if ( Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission( mActivity, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission( mActivity, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return  ;
-        }
-
-        LocationManager locationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
-        LocationListener locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                System.out.println("se pudo obtenr la ubicacion" + location.getLongitude() + " --- " + location.getLongitude());
-                presenter.showUbicacion(String.valueOf(location.getLatitude()), String.valueOf(location.getLongitude()));
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-            }
-        };
-        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-
-    }*/
 
 
     public void obtenerUbicacion() {
@@ -448,59 +228,6 @@ public class MainModel implements MainInterface.Model {
 
     }
 
-    // metodo antiguo
-
-   /*
-   @Override
-   public void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, Long fechaUbicacionI) {
-        //llamo al presenter para enviar el resultado devuelta
-        //TODO 4 -cuando tiene el dato no se lo envia directo a la vista, pasa devuelta por el presenter
-//        presenter.showResultPresenter(String.valueOf(resultado));
-
-
-        final String url = ipv4+"rest/lineaColectivos/inicio"; // uni
-        final Long fechaUbicacion = System.currentTimeMillis();
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>()
-                {
-                    //                    @Override
-                    public void onResponse(String response) {
-
-                        response = response.replaceAll ("\"","");
-                        presenter.showResponseInicioServicioOk(response,seleccionLin,seleccionCol,fechaUbicacionI);
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        presenter.showResponseError("No se pudo iniciar el servicio");
-                    }
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams()
-            {
-                Map<String, String>  params = new HashMap<String, String>();
-
-//                MainActivity activity = (MainActivity) getActivity();
-                //esto lo puedo pasar por paramtros
-                MainActivity activity = (MainActivity) mActivity;
-                myLat = activity.getLat();
-                myLng = activity.getLng();
-
-                params.put("linea", seleccionLin);
-                params.put("colectivo", seleccionCol);
-                params.put("latitud", myLat);
-                params.put("longitud", myLng);
-                params.put("fechaUbicacion", String.valueOf(fechaUbicacion));
-
-                return params;
-            }
-        };
-        requestQueue.add(postRequest);
-//        addToQueue(postRequest);
-    }*/
 
     @Override
     public void enviarInicioServicioAServidor(String seleccionLin, String seleccionCol, String seleccionRec, String lat, String lng) {
@@ -534,7 +261,6 @@ public class MainModel implements MainInterface.Model {
         requestQueue.add(jsonRequest);
     }
 
-    // todo esto trabajando en este para simulacion recorrido
     /**
      * Metodo utilizado para inicializar la simulacion del recorrido
      *
@@ -584,23 +310,13 @@ public class MainModel implements MainInterface.Model {
                     public void onResponse(String response) {
                         response = response.replaceAll ("\"","");
                         presenter.showResponse(response);
-//                        Toast toast1 =
-//                                Toast.makeText(getActivity(),
-//                                        response, Toast.LENGTH_LONG);
-//                        toast1.show();
-
                     }
                 },
                 new Response.ErrorListener()
                 {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
                         presenter.showResponseError("No se pudo realizar la operacion");
-//                        Toast toast1 = Toast.makeText(getActivity(),"No se pudo realizar la operacion", Toast.LENGTH_SHORT);
-//                        toast1.show();
-//                        Toast.makeText( getActivity(),"Vuelva a intentarlo",Toast.LENGTH_SHORT ).show();
-
                     }
                 }
         ) {
@@ -619,53 +335,8 @@ public class MainModel implements MainInterface.Model {
             }
         };
         requestQueue.add(postRequest);
-//        addToQueue(postRequest);
     }
 
-
-
-    // consultaRecorridosActivos andando antigua. sin future get
-   /* public List<Recorrido> consultaRecorridosActivos(String denomLinea) {
-        listaRecorridosActivos = new ArrayList<Recorrido>();
-        String url = ipv4 + "recorridosActivos/" + denomLinea;
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-
-                            JSONArray ja = response.getJSONArray("data"); // get the JSONArray
-
-                            for(int i=0;i<ja.length();i++){
-                                JSONObject recorridoActivo = ja.getJSONObject(i);
-                                Long idRecorrido = Long.parseLong(recorridoActivo.getString("id"));
-                                String denominacion = recorridoActivo.getString("denominacion");
-                                boolean activo = Boolean.parseBoolean(recorridoActivo.getString("activo"));
-
-                                listaRecorridosActivos.add(new Recorrido(idRecorrido,denominacion,activo));
-                            }
-
-//                            presenter.showLineasDisponibles(lineasDisponibles);
-
-                            System.out.println("Respuesta del servidor ok: " + listaRecorridosActivos.get(0));
-
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        System.out.println("Respuesta del servidor con error: " + error.toString());
-
-                    }
-                });
-        requestQueue.add(jsonObjectRequest);
-        return listaRecorridosActivos;
-    }*/
 
     public List<Recorrido> consultaRecorridosActivos(String denomLinea) throws ExecutionException, InterruptedException, TimeoutException {
         listaRecorridosActivos = new ArrayList<Recorrido>();
@@ -677,9 +348,8 @@ public class MainModel implements MainInterface.Model {
                 (Request.Method.GET, url, future, future);
 
         VolleySingleton.getmInstance(mActivity.getApplicationContext()).addToRequestQueue((jsonObjectRequest));
-//        requestQueue.add(jsonObjectRequest);
 
-        JSONObject resp = future.get(5,TimeUnit.SECONDS);
+        JSONObject resp = future.get(timeOutRequest,TimeUnit.SECONDS);
 
         try {
             JSONArray ja = resp.getJSONArray("data"); // get the JSONArray
@@ -693,16 +363,12 @@ public class MainModel implements MainInterface.Model {
                 listaRecorridosActivos.add(new Recorrido(idRecorrido,denominacion,activo));
             }
 
-//        presenter.showLineasDisponibles(lineasDisponibles);
-
-            System.out.println("Respuesta del servidor ok: " + listaRecorridosActivos.get(0));
+            System.out.println("+++++ consultaRecorridosActivos get first element: " + listaRecorridosActivos.get(0));
 
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-
         return listaRecorridosActivos;
     }
-
 
 }
