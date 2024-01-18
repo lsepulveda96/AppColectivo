@@ -108,34 +108,20 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
 
 
-
-//    public void hilo(){
-//
-//        try {
-//            Thread.sleep(6000); // cuanto tiempo duerme el hilo, esto deberia poder elegirse por el user
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-
-
     // cambiar lo del return true
     public class InicioRecorridoSim extends AsyncTask<Void,Integer,Boolean> {
 
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-//            hilo();
             // para indicar que esta en la parada inicial
             try {
                 paradasRecorrido = presenter.consultaParadasRecorrido(linea,recorrido);
                 coordenadasSim = paradasRecorrido;
+                // todo aca traer recorrido a simular
+
                 System.out.println("el resultado de la consulta paradas recorrido");
-//                for (Coordenada coord: paradasRecorrido
-//                ) {
-//                    System.out.println("Parada recorrido- id: " + coord.getCodigo() + ".  direccion: "  + coord.getDireccion());
-//                }
+//                for (Coordenada coord: paradasRecorrido) {System.out.println("Parada recorrido- id: " + coord.getCodigo() + ".  direccion: "  + coord.getDireccion());}
             }  catch (ExecutionException | InterruptedException | TimeoutException | JSONException e) {
                 System.out.println("Error en consulta paradas recorridos: " + e);
                 throw new RuntimeException(e);
@@ -150,6 +136,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
             System.out.println("la primera parada a recorrer: " + paradasRecorrido.get(0).getDireccion() +", codigo:" + paradasRecorrido.get(0).getCodigo());
 
 
+            // TODO ojo con este for cuando cambie el recorrido a simular, deberia ser for coordenadasRecorridoASimular.size()
             for (int i=0;i<paradasRecorrido.size();i++) {
 
 

@@ -157,8 +157,6 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                     segundosDetenidoStr = segundosDetenidoStr + difSeg; // suma el tiempo total detenido // tambien se puede con cont++ cada 3 intentos envia
                     System.out.println(segundosDetenidoStr + " segundos detenido");
 
-                    // aca estaba thread sleep
-
                     if (contVerifParada < 1) {
                         //si esta parado la primera vez detecta la parada
                         try {
@@ -181,7 +179,6 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                             public void run() {
                                 tvEstado.setText( "Unidad detenida" );
                                 ivGifBus.setVisibility(View.VISIBLE);
-                                //inserte gif cole en parada. posible error x estar fuera del hilo principal
                                 Glide.with(ColectivoEnServicioActivity.this)
                                         .load(R.drawable.bus_animation_fondo_violeta_alerta)
                                         .into(ivGifBus);
@@ -393,7 +390,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
             double distancia = calcularDistancia(latActual,lngActual,parada.getLatitud(),parada.getLongitud());
             if (distancia < distanciaOffSetParada) {
 
-                Toaster.get().showToast(getApplicationContext(),   "Colectivo en parada", Toast.LENGTH_SHORT);
+//                Toaster.get().showToast(getApplicationContext(),   "Colectivo en parada", Toast.LENGTH_SHORT);
 
                 ColectivoEnServicioActivity.this.runOnUiThread(new Runnable() {
                     @Override
@@ -401,7 +398,6 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                         tvEstado.setText( "Unidad en parada" );
                         tvNombreParada.setText(parada.getDireccion());
                         ivGifBus.setVisibility(View.VISIBLE);
-                        //inserte gif cole en parada. posible error x estar fuera del hilo principal
                         Glide.with(ColectivoEnServicioActivity.this)
                                 .load(R.drawable.bus_animation_fondo_violeta_parada)
                                 .into(ivGifBus);
@@ -415,13 +411,18 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
 //                        Toast.makeText( this, "Colectivo en parada final", Toast.LENGTH_LONG ).show();
                     Toaster.get().showToast(getApplicationContext(),   "Colectivo en parada final", Toast.LENGTH_SHORT);
                     presenter.makeRequestPostColeEnParada( parada.getCodigo(), denom, unidad, denomRecorrido); // a rest lineaColectivo
+
+                    try {
+                        Thread.sleep(2000 );
+                    } catch (InterruptedException e) {}
+
 //                    finServicioSimple();
                     enTransito = false;
 //                    finish();
                 }else {
                     // es porque esta en o cerca de una parada de esa linea que esta en servicio
 //                        Toast.makeText( this, "Colectivo en parada", Toast.LENGTH_LONG ).show();
-                    Toaster.get().showToast(getApplicationContext(),   "Colectivo en parada", Toast.LENGTH_SHORT);
+//                    Toaster.get().showToast(getApplicationContext(),   "Colectivo en parada", Toast.LENGTH_SHORT);
                     presenter.makeRequestPostColeEnParada( parada.getCodigo(), denom, unidad, denomRecorrido ); // a rest lineaColectivo
 
                 }
