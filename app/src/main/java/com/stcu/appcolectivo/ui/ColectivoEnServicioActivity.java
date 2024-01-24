@@ -272,15 +272,11 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                                         .into(ivGifBus);
                             }
                         });
-                    }
+                    } // fin else colectivo circulando
                 }
                 fechaUbicacionAntigua = fechaUbicacionActual;
                 latAntigua = String.valueOf(latActual);
                 lngAntigua = String.valueOf(lngActual);
-
-
-
-
 
             } // fin while en transito
 
@@ -389,9 +385,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
         for(Coordenada parada: listitaParadas){
             double distancia = calcularDistancia(latActual,lngActual,parada.getLatitud(),parada.getLongitud());
             if (distancia < distanciaOffSetParada) {
-
 //                Toaster.get().showToast(getApplicationContext(),   "Colectivo en parada", Toast.LENGTH_SHORT);
-
                 ColectivoEnServicioActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -413,7 +407,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                     presenter.makeRequestPostColeEnParada( parada.getCodigo(), denom, unidad, denomRecorrido); // a rest lineaColectivo
 
                     try {
-                        Thread.sleep(2000 );
+                        Thread.sleep(3000 ); // para que muestre gif ultima parada
                     } catch (InterruptedException e) {}
 
 //                    finServicioSimple();

@@ -110,16 +110,16 @@ public class MainPresenter implements MainInterface.Presenter {
 //    }
 
     @Override
-    public void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String seleccionRec2, String latitud, String longitud) {
+    public void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String seleccionRec2, String latitud, String longitud, List<Coordenada> coordenadasSim) {
         if(view != null){
-            model.makeRequestPostSimulacion(seleccionLin2, seleccionCol2, seleccionRec2, latitud, longitud);
+            model.makeRequestPostSimulacion(seleccionLin2, seleccionCol2, seleccionRec2, latitud, longitud, coordenadasSim);
         }
     }
 
     @Override
-    public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial) {
+    public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial, List<Coordenada> coordenadasSim) {
         if(view!=null){
-            view.showResponsePostSimulacionOk( response,  seleccionLin,  seleccionCol,  seleccionRec, latInicial,  lngInicial);
+            view.showResponsePostSimulacionOk( response,  seleccionLin,  seleccionCol,  seleccionRec, latInicial,  lngInicial, coordenadasSim);
         }
     }
 

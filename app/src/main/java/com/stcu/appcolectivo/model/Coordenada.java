@@ -1,6 +1,11 @@
 package com.stcu.appcolectivo.model;
 
-public class Coordenada {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
+public class Coordenada implements Parcelable {
 
     private double latitud;
     private double longitud;
@@ -14,6 +19,25 @@ public class Coordenada {
         this.longitud = longitud;
     }
 
+    protected Coordenada(Parcel in) {
+        latitud = in.readDouble();
+        longitud = in.readDouble();
+        direccion = in.readString();
+        codigo = in.readInt();
+    }
+
+    public static final Creator<Coordenada> CREATOR = new Creator<Coordenada>() {
+        @Override
+        public Coordenada createFromParcel(Parcel in) {
+            return new Coordenada(in);
+        }
+
+        @Override
+        public Coordenada[] newArray(int size) {
+            return new Coordenada[size];
+        }
+    };
+
     public double getLatitud() { return this.latitud; }
     public void setLatitud( double l ) { this.latitud = l; }
 
@@ -25,4 +49,17 @@ public class Coordenada {
 
     public int getCodigo() { return this.codigo; }
     public void setCodigo( int cod ) { this.codigo = cod; }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel parcel, int i) {
+        parcel.writeDouble(latitud);
+        parcel.writeDouble(longitud);
+        parcel.writeString(direccion);
+        parcel.writeInt(codigo);
+    }
 }

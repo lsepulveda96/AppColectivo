@@ -20,7 +20,7 @@ public interface MainInterface {
 
         void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, Long fechaUbicacionI, String lat, String lng);
 
-        void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial);
+        void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial, List<Coordenada> coordenadasSim);
 
         void showResponse(String response);
 
@@ -49,9 +49,9 @@ public interface MainInterface {
 
         void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, Long fechaUbicacionI, String myLat, String myLng);
 
-        void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String seleccionRec2, String latitud, String longitud);
+        void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String seleccionRec2, String latitud, String longitud, List<Coordenada> coordenadasSim);
 
-        void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial);
+        void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial, List<Coordenada> coordenadasSim);
 
         void makeRequestPostFin(String seleccionLin, String seleccionCol, String lat, String lng);
 
@@ -76,7 +76,7 @@ public interface MainInterface {
 
         void obtenerUbicacion();
 
-        void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String seleccionRec2, String latitud, String longitud);
+        void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String seleccionRec2, String latitud, String longitud, List<Coordenada> coordenadasSim);
 
         void makeRequestPostFin(String seleccionLin, String seleccionCol, String lat, String lng);
 

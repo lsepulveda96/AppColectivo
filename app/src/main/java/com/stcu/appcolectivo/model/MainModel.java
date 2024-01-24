@@ -149,14 +149,14 @@ public class MainModel implements MainInterface.Model {
 
     /**
      * Metodo que recupera la lista de coordenadas a utilizar para simular el trayecto seleccionado
-     * @param denom denominacion de la linea seleccionada
-     * @param seleccionRec2 seleccion de uno de los recorridos activos de esa linea seleccionada
+     * @param seleccionLineaDenom denominacion de la linea seleccionada
+     * @param seleccionRecDenom seleccion de uno de los recorridos activos de esa linea seleccionada
      * @return lista de coordenadas del trayecto seleccionado
      */
-    public List<Coordenada> consultaTrayectoASimular(String denom, String seleccionRec2) throws JSONException, ExecutionException, InterruptedException, TimeoutException {
+    public List<Coordenada> consultaTrayectoASimular(String seleccionLineaDenom, String seleccionRecDenom) throws JSONException, ExecutionException, InterruptedException, TimeoutException {
 
         listaCoordenadasTrayecto = new ArrayList<Coordenada>();
-        String url = ipv4 + "trayectos/" + denom +"/"+ seleccionRec2;
+        String url = ipv4 + "trayectos/simulacion/" + seleccionLineaDenom +"/"+ seleccionRecDenom;
 
         RequestFuture<JSONObject> future = RequestFuture.newFuture();
 
@@ -167,9 +167,28 @@ public class MainModel implements MainInterface.Model {
 
         JSONObject resp = future.get(timeOutRequest,TimeUnit.SECONDS);
 
-        JSONArray paradas = resp.getJSONArray("data"); // get the JSONArray
+        JSONArray coordenadasSim = resp.getJSONArray("data"); // get the JSONArray
 
-        for (int i = 0; i < paradas.length(); i++) {
+        for (int i = 0; i < coordenadasSim.length(); i++) {
+            JSONObject coordSim = coordenadasSim.getJSONObject(i);
+
+            String latitud = coordSim.getString("lat");
+            String longitud = coordSim.getString("lng");
+
+            System.out.println(" informacion recuperada de la nueva consulta trayectos a recorrer sim: " + latitud + " - " + longitud);
+//            JSONObject coordLng = new JSONObject(coordSim.getString("parada")).getJSONObject("coordenada");
+//            String longitud = coordLng.getString("lng");
+
+//            JSONObject coordLat = new JSONObject(coordSim.getString("parada")).getJSONObject("coordenada");
+//            String latitud = coordLat.getString("lat");
+
+            coord = new Coordenada();
+            coord.setLatitud(Double.parseDouble(latitud));
+            coord.setLongitud(Double.parseDouble(longitud));
+            listaCoordenadasTrayecto.add(coord);
+        }
+
+      /*  for (int i = 0; i < paradas.length(); i++) {
             JSONObject parada = paradas.getJSONObject(i);
 
             JSONObject coordLng = new JSONObject(parada.getString("parada")).getJSONObject("coordenada");
@@ -186,7 +205,7 @@ public class MainModel implements MainInterface.Model {
             coord.setLongitud(Double.parseDouble(longitud));
             coord.setDireccion(direccion);
             listaCoordenadasTrayecto.add(coord);
-        }
+        }*/
 
         return listaCoordenadasTrayecto;
     }
@@ -269,10 +288,11 @@ public class MainModel implements MainInterface.Model {
      * @param seleccionRec
      * @param latInicial
      * @param lngInicial
+     * @param coordenadasSim
      */
-    public void makeRequestPostSimulacion(final String seleccionLin, final String seleccionCol, final String seleccionRec, final String latInicial, final String lngInicial) {
+    public void makeRequestPostSimulacion(final String seleccionLin, final String seleccionCol, final String seleccionRec, final String latInicial, final String lngInicial, List<Coordenada> coordenadasSim) {
 
-        final String url = ipv4+"inicio"; // uni
+        final String url = ipv4+"inicio";
         final long fechaUbicacion = System.currentTimeMillis();
         Map<String, String> params = new HashMap();
         params.put("linea",seleccionLin);
@@ -281,13 +301,14 @@ public class MainModel implements MainInterface.Model {
         params.put("latitud", latInicial);
         params.put("longitud", lngInicial);
         params.put("fechaUbicacion", String.valueOf(fechaUbicacion));
+        // ver si agregar aca
 
         JSONObject parameters = new JSONObject(params);
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, url, parameters,new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        presenter.showResponsePostSimulacionOk(response.toString(),seleccionLin,seleccionCol,seleccionRec,latInicial, lngInicial);
+                        presenter.showResponsePostSimulacionOk(response.toString(),seleccionLin,seleccionCol,seleccionRec,latInicial, lngInicial, coordenadasSim);
                     }
                 },  new Response.ErrorListener()
                 {
@@ -351,19 +372,28 @@ public class MainModel implements MainInterface.Model {
 
         JSONObject resp = future.get(timeOutRequest,TimeUnit.SECONDS);
 
+
         try {
-            JSONArray ja = resp.getJSONArray("data"); // get the JSONArray
 
-            for(int i=0;i<ja.length();i++){
-                JSONObject recorridoActivo = ja.getJSONObject(i);
-                Long idRecorrido = Long.parseLong(recorridoActivo.getString("id"));
-                String denominacion = recorridoActivo.getString("denominacion");
-                boolean activo = Boolean.parseBoolean(recorridoActivo.getString("activo"));
 
-                listaRecorridosActivos.add(new Recorrido(idRecorrido,denominacion,activo));
+            Boolean recorridosActivosIsEmpty = Boolean.parseBoolean(resp.getString("error"));
+
+
+
+            if(!recorridosActivosIsEmpty) {
+
+                JSONArray ja = resp.getJSONArray("data"); // get the JSONArray
+                for (int i = 0; i < ja.length(); i++) {
+                    JSONObject recorridoActivo = ja.getJSONObject(i);
+                    Long idRecorrido = Long.parseLong(recorridoActivo.getString("id"));
+                    String denominacion = recorridoActivo.getString("denominacion");
+                    boolean activo = Boolean.parseBoolean(recorridoActivo.getString("activo"));
+
+                    listaRecorridosActivos.add(new Recorrido(idRecorrido, denominacion, activo));
+                }
+
+                System.out.println("+++++ consultaRecorridosActivos get first element: " + listaRecorridosActivos.get(0));
             }
-
-            System.out.println("+++++ consultaRecorridosActivos get first element: " + listaRecorridosActivos.get(0));
 
         } catch (JSONException e) {
             throw new RuntimeException(e);

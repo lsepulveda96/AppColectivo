@@ -12,7 +12,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -22,6 +21,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Parcelable;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -218,6 +218,7 @@ public class MainActivity extends Activity implements MainInterface.View {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View arg1, int position, long arg3) {
+                eleccionRecorrido = "";
                 Object item = parent.getItemAtPosition(position);
                 eleccionLinea = item.toString();
                 new ThreadActualizaRecorridoAsyncTask(getApplicationContext(), item.toString()).execute();
@@ -243,6 +244,7 @@ public class MainActivity extends Activity implements MainInterface.View {
             @Override
             public void onItemClick(AdapterView<?> parent, View arg1, int position, long arg3) {
                 Object item = parent.getItemAtPosition(position);
+                System.out.println("++++++++++++++++++++++++++++++++++++++++++++++ el item que trae el recorrido " + item.toString());
                 eleccionRecorrido = item.toString();
                 btnIniciarServicio.setEnabled(!eleccionColectivo.isEmpty() && !eleccionLinea.isEmpty() && !eleccionRecorrido.isEmpty());
 //                enableBtnIniciarServicio();
@@ -508,8 +510,9 @@ public class MainActivity extends Activity implements MainInterface.View {
     }
 
 
+    // recibe respuesta ok para iniciar la simulacion, y envia los parametros necesarios por medio de intent.putExtra al activity SimulacionRecorridoActivity
     @Override
-    public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial) {
+    public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial, List<Coordenada> coordenadasSim) {
         try {
             JSONObject obj = new JSONObject(response);
             String respuesta = obj.getString("mensaje");
@@ -524,6 +527,7 @@ public class MainActivity extends Activity implements MainInterface.View {
                 intentSimRecorridoActivity.putExtra("latitud", latInicial);
                 intentSimRecorridoActivity.putExtra("longitud", lngInicial);
                 intentSimRecorridoActivity.putExtra("fechaUbicacion", String.valueOf(System.currentTimeMillis()));
+                intentSimRecorridoActivity.putParcelableArrayListExtra("coordenadasSim", (ArrayList<? extends Parcelable>) coordenadasSim);
                 this.startActivity(intentSimRecorridoActivity);
             }
 
@@ -643,13 +647,10 @@ public class MainActivity extends Activity implements MainInterface.View {
                 autoCompleteTextViewRecorrido.setAdapter(adapterSeleccionRecorrido);
                 adapterSeleccionRecorrido.setDropDownViewResource(R.layout.textview_spinner_selected);
 
-                // si los dos estan vacios
+                // si no se pudo cargar los listados desde el servidor
                 if(adapterSeleccionLinea.isEmpty() || adapterSeleccionColectivo.isEmpty()){
                     Toast.makeText( getApplicationContext() ,"No se pudo cargar el listado de lineas y colectivos", Toast.LENGTH_SHORT ).show();
                 }else {
-//                    btnIniciarServicio.setEnabled( true ); // para que pueda guardar la eleccion
-//                    finServicio.setEnabled( true );
-
                     autoCompleteTextViewLinea.setText("");
                     autoCompleteTextViewColectivo.setText("");
                     autoCompleteTextViewRecorrido.setText("");
@@ -705,7 +706,7 @@ public class MainActivity extends Activity implements MainInterface.View {
         public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, Long fechaUbicacionI, String lat, String lng) {}
 
         @Override
-        public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial) {}
+        public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial, List<Coordenada> coordenadasSim) {}
 
         @Override
         public void showResponse(String response) {}
@@ -734,6 +735,7 @@ public class MainActivity extends Activity implements MainInterface.View {
         protected List<Recorrido> doInBackground(String... params) {
             try {
                 List<Recorrido> recorridos = presenter.consultaRecorridoActivos(lineaSeleccionadaLocal);
+
                 return recorridos;
             } catch (ExecutionException | InterruptedException | TimeoutException e) {
                 System.out.println("error al traer recorridos activos: " + e);
@@ -744,22 +746,20 @@ public class MainActivity extends Activity implements MainInterface.View {
 
         @Override
         protected void onPostExecute(List<Recorrido> result){
+
             List<Recorrido> listaRecorridos = result;
             adapterSeleccionRecorrido.clear();
             for(Recorrido opcionRecorrido: listaRecorridos){
                 adapterSeleccionRecorrido.add(opcionRecorrido.getDenominacion());
+                System.out.println("recorrido: " + opcionRecorrido.getDenominacion());
             }
-//            itemSeleccionRecorrido.setAdapter(adapterSeleccionRecorrido);
-//            adapterSeleccionRecorrido.setDropDownViewResource(R.layout.textview_spinner_selected);
             autoCompleteTextViewRecorrido.setText("");
             eleccionRecorrido = "";
             autoCompleteTextViewRecorrido.setAdapter(adapterSeleccionRecorrido);
             adapterSeleccionRecorrido.setDropDownViewResource(R.layout.textview_spinner_selected);
 
-            System.out.println("los recorridos activos que recupero en onPostExcecute MainActiviy:");
-            for (Recorrido recorrido:listaRecorridos) {
-                System.out.println("recorrido: " + recorrido.getDenominacion());
-            }
+            if(listaRecorridos.isEmpty())
+                btnIniciarServicio.setEnabled(false);
 
         }
     } // fin thread para actulizar recorrido al modificar item linea
@@ -792,7 +792,7 @@ public class MainActivity extends Activity implements MainInterface.View {
 //                    Toast.makeText( getApplicationContext() ,"Iniciando simulacion..", Toast.LENGTH_SHORT ).show();
                     System.out.println("iniciando simulacion..");
                     Coordenada coordInicial = coordenadasSim.get( 0 ); // para cargar la coordenada inicial
-                    presenter.makeRequestPostSimulacion( seleccionLin2, seleccionCol2, seleccionRec2, String.valueOf( coordInicial.getLatitud() ), String.valueOf( coordInicial.getLongitud() ) );
+                    presenter.makeRequestPostSimulacion( seleccionLin2, seleccionCol2, seleccionRec2, String.valueOf( coordInicial.getLatitud() ), String.valueOf( coordInicial.getLongitud() ), coordenadasSim );
                     //aca tiene que venir la respuesta con "servicio iniciado" llamada desde el model presenter
                     //cambiar de activity a simulacionRecorrido
                 } else {
