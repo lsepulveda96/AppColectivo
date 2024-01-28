@@ -29,10 +29,10 @@ import java.util.concurrent.TimeoutException;
 public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model {
 
 //     ip local actual
-    public static String ipv4 = "http://192.168.0.104:50004/stcu2service/v1/mobile/";
+//    public static String ipv4 = "http://192.168.0.104:50004/stcu2service/v1/mobile/";
 
     // ip remoto actual
-//    public static String ipv4 =  "http://138.36.99.248:50004/stcu2service/v1/mobile/";
+    public static String ipv4 =  "http://138.36.99.248:50004/stcu2service/v1/mobile/";
 
     static int timeOutRequest = 10; // en segundos
     Activity mActivity;
