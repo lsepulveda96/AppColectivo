@@ -39,6 +39,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.bumptech.glide.Glide;
 import com.gpmess.example.volley.app.R;
 import com.stcu.appcolectivo.interfaces.MainInterface;
 import com.stcu.appcolectivo.model.Colectivo;
@@ -59,6 +60,13 @@ import java.util.concurrent.TimeoutException;
 public class MainActivity extends Activity implements MainInterface.View {
 
     private MainInterface.Presenter presenter;
+
+
+
+    public LocationManager mLocationManager;
+    public FetchCordinates.VeggsterLocationListener mVeggsterLocationListener;
+    boolean permisoGPSaceptado = false;
+
 
     String eleccionLinea = "";
     String eleccionColectivo = "";
@@ -111,6 +119,10 @@ public class MainActivity extends Activity implements MainInterface.View {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+
+
+
         //necesario para comprobar internet en tiempo real
         IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(mBroadcastReceiver, intentFilter);
@@ -161,7 +173,7 @@ public class MainActivity extends Activity implements MainInterface.View {
                 adapterSeleccionColectivo.add(opcion2.getUnidad());
             }
 
-             //TODO 3er cambio, set adapter
+            //TODO 3er cambio, set adapter
             autoCompleteTextViewLinea.setAdapter(adapterSeleccionLinea);
 
             //TODO 4to cambio, set drop down view
@@ -261,14 +273,30 @@ public class MainActivity extends Activity implements MainInterface.View {
 
         }); // fin swipe actualiza listas
 
+
+
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            }
+        }
+
+
+
     } // fin onCreate
 
     private void enableBtnIniciarServicio() {
-        if(eleccionColectivo.isEmpty() || eleccionLinea.isEmpty() || eleccionRecorrido.isEmpty()) {
+        if (eleccionColectivo.isEmpty() || eleccionLinea.isEmpty() || eleccionRecorrido.isEmpty()) {
             Toast.makeText(this, "btn bloqueado", Toast.LENGTH_SHORT).show();
             btnIniciarServicio.setEnabled(false);
             btnIniciarServicio.setClickable(false);
-        }else{
+        } else {
             Toast.makeText(this, "btn habilitado", Toast.LENGTH_SHORT).show();
             btnIniciarServicio.setEnabled(true);
             btnIniciarServicio.setClickable(true);
@@ -333,7 +361,6 @@ public class MainActivity extends Activity implements MainInterface.View {
     }
 
 
-
     public class FetchCordinates extends AsyncTask<String, Integer, Boolean> {
         private ProgressDialog progressDialogGPS;
 
@@ -355,7 +382,7 @@ public class MainActivity extends Activity implements MainInterface.View {
         }
 
         @Override
-        protected void onCancelled(){
+        protected void onCancelled() {
             System.out.println("Cancelado por usuario");
             mLocationManager.removeUpdates(mVeggsterLocationListener);
             progressDialogGPS.dismiss();
@@ -364,10 +391,10 @@ public class MainActivity extends Activity implements MainInterface.View {
         @Override
         protected void onPostExecute(Boolean result) {
             progressDialogGPS.dismiss();
-            if(getLat().equals("0")){
+            if (getLat().equals("0")) {
                 Toast.makeText(MainActivity.this, "No se pudo obtener su ubicacion actual", Toast.LENGTH_SHORT).show();
                 // aca deberia ir el cambio de activity
-            }else{
+            } else {
                 Toast.makeText(MainActivity.this, "servicio inciado", Toast.LENGTH_SHORT).show();
                 new InicioServicio().execute();
             }
@@ -379,11 +406,15 @@ public class MainActivity extends Activity implements MainInterface.View {
             mVeggsterLocationListener = new VeggsterLocationListener();
             mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
+//            new Handler(Looper.getMainLooper()).post(new Runnable() {
+//                @Override
+//                public void run() {
+
+            MainActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
 
-                    if (ContextCompat.checkSelfPermission(MainActivity.this,
+                        /* if (ContextCompat.checkSelfPermission(MainActivity.this,
                             Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
                         if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
                                 Manifest.permission.ACCESS_FINE_LOCATION)){
@@ -394,9 +425,30 @@ public class MainActivity extends Activity implements MainInterface.View {
                                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
                         }
                     }
-                    mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mVeggsterLocationListener);
+                    mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mVeggsterLocationListener);*/
+
+
+//                    System.out.println("el resultado de haber aceptado el permiso: " + permisoGPSaceptado);
+//                    if (permisoGPSaceptado) {
+                        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+                            return;
+                        }
+                        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mVeggsterLocationListener);
+//                    }
                 }
             });
+
+//                }
+//
+//            });
+
 
             int timeoutGPS = 0;
             while ((this.lati == 0.0 | this.longi == 0.0) & timeoutGPS < 10) {
@@ -579,6 +631,7 @@ public class MainActivity extends Activity implements MainInterface.View {
 
         public ThreadRecargaListaAsyncTask(Context hostContext, Activity mActivity)
         {
+            btnIniciarServicio.setEnabled(false);
             ctx = hostContext;
             presenter = new MainPresenter(this, ctx, mActivity);
         }
@@ -845,6 +898,28 @@ public class MainActivity extends Activity implements MainInterface.View {
     protected void onDestroy() {
         unregisterReceiver(mBroadcastReceiver);
         super.onDestroy();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults){
+
+        switch (requestCode){
+            case 1: {
+
+                if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    if (ContextCompat.checkSelfPermission(MainActivity.this,
+                            Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED){
+                        Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+                        permisoGPSaceptado = true;
+                    }
+                }else{
+                    Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
+                    permisoGPSaceptado = false;
+                }
+                return;
+            }
+        }
     }
 }
 

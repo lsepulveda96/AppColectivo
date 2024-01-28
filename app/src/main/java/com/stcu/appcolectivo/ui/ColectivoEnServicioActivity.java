@@ -38,7 +38,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
     Boolean enTransito = true, notificacionActiva = false, coleEstaDesviado = false;
     public static double distanciaOffSetMov = 15.0; // en mts. mientras menor es el numero, mas detectara que se mueve
     public static int tiempoMaxDetenido = 20; // equivale a 4 veces el envio de la ubicacion en el mismo lugar
-    private static double distanciaOffSetParada = 75.0; // en mts
+    private static double distanciaOffSetParada = 60.0; // en mts
     public static int tiempoEnvioNuevaCoord = 5; // en segundos
 
     private TextView tvLinea, tvColectivo, tvEstado, tvNombreParada;
@@ -219,13 +219,13 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
 
                     // si el colectivo estaba parado, y empezo a circular, actualiza la notificacion(con el tiempo final) y cambia la bandera a false
                     if (notificacionActiva == true) {
-                        try {
-                            presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual),"" + segundosDetenidoStr);
+                       /*  try {
+                            // todo presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual),"" + segundosDetenidoStr);
                         }catch (ExecutionException | InterruptedException | TimeoutException e) {
 //                                Toast.makeText(ColectivoEnServicioActivity.this, "Error makePostFinNotificacionColeDetenido -linea 229", Toast.LENGTH_LONG).show();
                             Toaster.get().showToast(getApplicationContext(),  "Error makePostFinNotificacionColeDetenido -linea 229", Toast.LENGTH_SHORT);
 //                                throw new RuntimeException(e);
-                        }
+                        }*/
                         notificacionActiva = false; // resetea la bandera
                     }
 
@@ -249,7 +249,11 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                         try {
                             presenter.makeRequestPostDetectarDesvio(linea, colectivo, recorrido, latActual, lngActual);
                         } catch (ExecutionException | InterruptedException | TimeoutException e) {
-                            Toaster.get().showToast(getApplicationContext(),   "error makeRequestPostDetectarDesvio -linea 255", Toast.LENGTH_SHORT);
+                            Toaster.get().showToast(getApplicationContext(),   "error makeRequestPostDetectarDesvio-linea 255", Toast.LENGTH_SHORT);
+                            Toaster.get().showToast(getApplicationContext(),   "linea: " + linea + " - cole:" + colectivo + " - recorrido: " + recorrido +
+                                    "- lat: " + latActual + " - lng: " + lngActual, Toast.LENGTH_LONG);
+                            Toaster.get().showToast(getApplicationContext(),   "error de la pila: " + e.getMessage(), Toast.LENGTH_LONG);
+
 //                                throw new RuntimeException(e);
                         }
 //                        Toaster.get().showToast(getApplicationContext(),   "enviando ubicacion, detectando desvio..", Toast.LENGTH_SHORT);
@@ -258,6 +262,10 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                             presenter.makeRequestPostEnviarUbicacion(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual));
                         } catch (ExecutionException | InterruptedException | TimeoutException e) {
                             Toaster.get().showToast(getApplicationContext(),   "error makeRequestPostEnvio - linea 265", Toast.LENGTH_SHORT);
+                            Toaster.get().showToast(getApplicationContext(),   "linea: " + linea + " - cole:" + colectivo + " - recorrido: " + recorrido +
+                                    "- lat: " + latActual + " - lng: " + lngActual, Toast.LENGTH_LONG);
+                            Toaster.get().showToast(getApplicationContext(),   "error de la pila: " + e.getMessage(), Toast.LENGTH_LONG);
+
 //                                throw new RuntimeException(e);
                         }
 
@@ -524,10 +532,10 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
                 System.out.println("datos para finalizar el servicio: " + linea + " - " + colectivo + " - " + recorrido);
 
                 //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
-                presenter.makeRequestPostFinDesvio(linea, colectivo,recorrido);
+                //todo presenter.makeRequestPostFinDesvio(linea, colectivo,recorrido);
 
                 if (notificacionActiva) {
-                    presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
+                    // todo presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
                 }
                 notificacionActiva = false; // resetea la bandera
 

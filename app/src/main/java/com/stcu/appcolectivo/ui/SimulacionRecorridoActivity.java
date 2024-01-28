@@ -162,7 +162,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
                 // porque ya es la segunda vez que entra
                 // esto creo que es redundante
-                if(contCoorSim < coordenadasSim.size()-1) {
+                if(contCoorSim < coordenadasSim.size()) {
                     contCoorSim++;
                 }else{
                     try {
@@ -284,6 +284,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                                 presenter.makePostActualizacionNotifColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
                             } catch (ExecutionException | InterruptedException | TimeoutException e) {
                                 Toaster.get().showToast(getApplicationContext(), "error makePostActualizacionNotifColeDetenido - 258" , Toast.LENGTH_SHORT);
+                                Toaster.get().showToast(getApplicationContext(), "error " + e.getMessage(), Toast.LENGTH_SHORT);
                             }
 //                            Toast.makeText(SimulacionRecorridoActivity.this, "unidad detenida, actualizando informe..", Toast.LENGTH_SHORT).show();
                             System.out.println( "unidad detenida, actualizando informe..");
@@ -293,6 +294,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                                 presenter.makePostInformeColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
                             }catch (ExecutionException | InterruptedException | TimeoutException e) {
                                 Toaster.get().showToast(getApplicationContext(), "error makePostInformeColeDetenido - 293" , Toast.LENGTH_SHORT);
+                                Toaster.get().showToast(getApplicationContext(), "error " + e.getMessage(), Toast.LENGTH_SHORT);
 //                                throw new RuntimeException(e);
                             }
                             //Toast.makeText(SimulacionRecorridoActivity.this, "unidad detenida, enviando informe..", Toast.LENGTH_SHORT).show();
@@ -307,12 +309,12 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
 
                     // si el colectivo estaba parado, y empezo a circular, actualiza la notificacion(con el tiempo final) y cambia la bander a false
                     if(notificacionActiva == true) {
-                        try {
-                            presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
+                      /*  try {
+                          // todo  presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(lngActual), "" + segundosDetenidoStr);
                         } catch (ExecutionException | InterruptedException | TimeoutException e) {
 //                            throw new RuntimeException(e);
                             Toaster.get().showToast(getApplicationContext(), "error makePostFinNotificacionColeDetenido - 312" , Toast.LENGTH_SHORT);
-                        }
+                        } */
                         notificacionActiva = false; // resetea la bander
                     }
 
@@ -620,18 +622,18 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
             //por si hay una notificacion de desvio activa // nose como puedo detenerla sino
             // TODO Arreglar
             try {
-                presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
+               // todo  presenter.makeRequestPostFinDesvio(linea, colectivo, recorrido);
 
             presenter.makeRequestPostFinColectivoRecorrido(linea,colectivo,recorrido);
 
             enTransito = false;
             if(notificacionActiva) {
                 //refactorizarlo
-                presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(fechaUbicacionActual), "" + segundosDetenidoStr);
+               // todo presenter.makePostFinNotificacionColeDetenido(linea, colectivo, recorrido, String.valueOf(latActual), String.valueOf(fechaUbicacionActual), "" + segundosDetenidoStr);
             }
                 notificacionActiva = false; // resetea la bander
             } catch (ExecutionException | InterruptedException | TimeoutException e) {
-                Toaster.get().showToast(getApplicationContext(), "error makePostFinNotificacionColeDetenido - 631" , Toast.LENGTH_SHORT);
+                Toaster.get().showToast(getApplicationContext(), "error makeRequestPostFinColectivoRecorrido - 631" , Toast.LENGTH_SHORT);
             }
 
 //        Toaster.makeText( getApplicationContext(), "Servicio finalizado", Toast.LENGTH_SHORT ).show(); // daba error
