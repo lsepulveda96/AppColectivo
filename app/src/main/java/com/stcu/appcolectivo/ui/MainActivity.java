@@ -406,30 +406,10 @@ public class MainActivity extends Activity implements MainInterface.View {
             mVeggsterLocationListener = new VeggsterLocationListener();
             mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-//            new Handler(Looper.getMainLooper()).post(new Runnable() {
-//                @Override
-//                public void run() {
-
             MainActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
 
-                        /* if (ContextCompat.checkSelfPermission(MainActivity.this,
-                            Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                                Manifest.permission.ACCESS_FINE_LOCATION)){
-                            ActivityCompat.requestPermissions(MainActivity.this,
-                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-                        }else{
-                            ActivityCompat.requestPermissions(MainActivity.this,
-                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-                        }
-                    }
-                    mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mVeggsterLocationListener);*/
-
-
-//                    System.out.println("el resultado de haber aceptado el permiso: " + permisoGPSaceptado);
-//                    if (permisoGPSaceptado) {
                         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                             // TODO: Consider calling
                             //    ActivityCompat#requestPermissions
@@ -441,13 +421,8 @@ public class MainActivity extends Activity implements MainInterface.View {
                             return;
                         }
                         mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mVeggsterLocationListener);
-//                    }
                 }
             });
-
-//                }
-//
-//            });
 
 
             int timeoutGPS = 0;
