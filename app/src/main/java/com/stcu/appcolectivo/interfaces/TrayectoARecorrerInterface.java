@@ -1,6 +1,6 @@
 package com.stcu.appcolectivo.interfaces;
 
-import com.stcu.appcolectivo.model.Coordenada;
+import com.stcu.appcolectivo.model.Parada;
 
 import org.json.JSONException;
 
@@ -26,7 +26,7 @@ public interface TrayectoARecorrerInterface {
     }
 
     interface Presenter {
-        List<Coordenada> consultaParadasRecorrido(String linea, String recorrido) throws JSONException, ExecutionException, InterruptedException, TimeoutException;
+        List<Parada> consultaParadasRecorrido(String linea, String recorrido) throws JSONException, ExecutionException, InterruptedException, TimeoutException;
 
 //        void makeRequestPostFin(String linea, String colectivo, String latitud, String longitud);
         void makeRequestPostFinColectivoRecorrido(String linea, String colectivo, String recorrido) throws ExecutionException, InterruptedException, TimeoutException;
@@ -63,7 +63,7 @@ public interface TrayectoARecorrerInterface {
     }
 
     interface Model {
-        List<Coordenada> consultaParadasRecorrido(String linea, String recorrido) throws ExecutionException, InterruptedException, TimeoutException, JSONException;
+        List<Parada> consultaParadasRecorrido(String linea, String recorrido) throws ExecutionException, InterruptedException, TimeoutException, JSONException;
 
 //        void makeRequestPostFin(String linea, String colectivo, String latitud, String longitud);
         void makeRequestPostFinColectivoRecorrido(String linea, String colectivo, String recorrido) throws ExecutionException, InterruptedException, TimeoutException;

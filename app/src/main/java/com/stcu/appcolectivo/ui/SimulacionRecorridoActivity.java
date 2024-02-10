@@ -17,7 +17,7 @@ import android.view.View;
 import com.bumptech.glide.Glide;
 import com.gpmess.example.volley.app.R;
 import com.stcu.appcolectivo.interfaces.TrayectoARecorrerInterface;
-import com.stcu.appcolectivo.model.Coordenada;
+import com.stcu.appcolectivo.model.Parada;
 import com.stcu.appcolectivo.presenter.TrayectoARecorrerPresenter;
 
 import org.json.JSONException;
@@ -31,11 +31,13 @@ import java.util.concurrent.TimeoutException;
 public class SimulacionRecorridoActivity extends Activity implements TrayectoARecorrerInterface.View{
 
     Boolean enTransito = true;
-    public static double distanciaOffSetMov = 15.0;
-    private static double distanciaOffSetParada = 60.0; // en mts
+    //public static double distanciaOffSetMov = 15.0;
+    // private static double distanciaOffSetParada = 20.0; // en mts
+    //public static int tiempoEnvioNuevaCoord = 9; // en segundos
+    public static double distanciaOffSetMov = 10.0;
+    private static double distanciaOffSetParada = 10.0; // en mts
     public static int tiempoMaxDetenido = 30;
-    public static int tiempoEnvioNuevaCoord = 5; // en segundos
-//public static int tiempoEnvioNuevaCoord = 4; // en segundos para probar sim
+    public static int tiempoEnvioNuevaCoord = 10; // en segundos
     boolean coleEnParada = false;
 
 
@@ -43,14 +45,14 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
     private TextView tvLinea ,tvColectivo, tvNombreParada, tvLongitud, tvUbicacion;
     TextView tvEstado;
     private String linea, colectivo, recorrido, latitud, longitud, fechaUbicacionInicialS, myLat, myLng, latAntigua, lngAntigua;
-    List<Coordenada> coordsTrayectoASimular;
+    List<Parada> coordsTrayectoASimular;
     private Long fechaUbicacionAntigua, fechaUbicacionInicial, fechaUbicacionActual;
     private Button finServicio;
     Double latActual, lngActual, distancia = 0.0;
     int segundosDetenidoStr = 0;
     private int contDesvioAlIniciar = 0, contVerifParada = 0;
 
-    List<Coordenada> paradasRecorrido, coordenadasSim;
+    List<Parada> paradasRecorrido, coordenadasSim;
     // la empiezo en 0 para que se sume siempre (tambien la primera vez)
     private int contCoorSim = 0;
 
@@ -112,7 +114,7 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
             try {
                 paradasRecorrido = presenter.consultaParadasRecorrido(linea,recorrido);
                 System.out.println(" Coordenadas trayecto a simular ++++++++++++++++++++++++++++++++++++: " );
-                for (Coordenada coord: coordsTrayectoASimular) {System.out.println("lat : " + coord.getLatitud() + ".  lng : "  + coord.getLongitud());}
+                for (Parada coord: coordsTrayectoASimular) {System.out.println("lat : " + coord.getLatitud() + ".  lng : "  + coord.getLongitud());}
                 coordenadasSim = coordsTrayectoASimular;
 
             }  catch (ExecutionException | InterruptedException | TimeoutException | JSONException e) {
@@ -150,15 +152,15 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                         }
                     }
 
-                    try {
+            /*        try {
                         Thread.sleep(tiempoEnvioNuevaCoord*1000 );
                     } catch (InterruptedException e) {
                         System.out.println("error durmiendo el hilo");
-                    }
+                    }*/
 
                     latActual = getLatActual();
                     lngActual = getLngActual();
-                    fechaUbicacionActual = getFechaUbicacion(); // la que recive de la ubicacion actual
+                    fechaUbicacionActual = getFechaUbicacion(); // la que recibe de la ubicacion actual
 
                     // TODO inicio colectivo detenido
                     distancia = calcularDistancia(Double.parseDouble(latAntigua), Double.parseDouble(lngAntigua), latActual, lngActual);
@@ -187,7 +189,17 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                             });
                         }
 
+                        // enviar cada menos tiempo
+
                     }else{ //fin if si el colectivo estaba parado
+
+                        // enviar coordenada cada mas tiempo
+                        try {
+                            Thread.sleep(tiempoEnvioNuevaCoord*1000 );
+                        } catch (InterruptedException e) {
+                            System.out.println("error durmiendo el hilo");
+                        }
+
                         // la distancia entre paradas fue MAYOR de 20 mts, el colectivo ESTA circulando
                         // contador en 0 para que cuando se vuelve a parar la primera vez verifique si es parada
                         contVerifParada = 0;
@@ -225,11 +237,15 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                             Toaster.get().showToast(getApplicationContext(), "error verificacion desvio, envio nueva ubicacion - 356" , Toast.LENGTH_SHORT);
                             Toaster.get().showToast(getApplicationContext(), "error " + e.getMessage(), Toast.LENGTH_SHORT);
                         }
+
+
                     } // fin else colectivo circulando
 
                     fechaUbicacionAntigua = fechaUbicacionActual;
                     latAntigua = String.valueOf(latActual);
                     lngAntigua = String.valueOf(lngActual);
+
+
                     // TODO fin colectivo detenido
                 }else{ //fin if en transito
                     break; // para salir del for
@@ -314,9 +330,9 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
         this.fechaUbicacionActual = fechaUbicacion;
     }
 
-    public boolean detectarParada(List<Coordenada> listaParadasRecorrido, Double latActual, Double lngActual, String denomLinea, String unidad, String denomRecorrido ) throws ExecutionException, InterruptedException, TimeoutException {
+    public boolean detectarParada(List<Parada> listaParadasRecorrido, Double latActual, Double lngActual, String denomLinea, String unidad, String denomRecorrido ) throws ExecutionException, InterruptedException, TimeoutException {
         boolean esFin = false;
-        for(Coordenada parada: listaParadasRecorrido){
+        for(Parada parada: listaParadasRecorrido){
 //            System.out.println("Parada actual: " + parada.getCodigo() + " - " + parada.getDireccion());
 //            System.out.println("Parada final: " + getParadaFinal().getCodigo());
             double distancia = calcularDistancia(latActual,lngActual,parada.getLatitud(),parada.getLongitud());
@@ -354,13 +370,13 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
     }
 
 
-    public void setParadaInicio(Coordenada coordenada, String linea, String colectivo, String denomRecorrido) throws ExecutionException, InterruptedException, TimeoutException {
+    public void setParadaInicio(Parada coordenada, String linea, String colectivo, String denomRecorrido) throws ExecutionException, InterruptedException, TimeoutException {
         SimulacionRecorridoActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 coleEnParada = true;
                 tvEstado.setText( "Unidad en parada" );
-      //          tvNombreParada.setText(parada.getDireccion());
+                tvNombreParada.setText(paradasRecorrido.get(0).getDireccion());
                 ivGifBus.setVisibility(View.VISIBLE);
                 //inserte gif cole en parada. posible error x estar fuera del hilo principal
                 Glide.with(SimulacionRecorridoActivity.this)
@@ -373,8 +389,8 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
     }
 
     // Si hay que cambiar la parada final, se hace aca
-    public Coordenada getParadaFinal() {
-        Coordenada paradaFinal = paradasRecorrido.get(paradasRecorrido.size()-1);
+    public Parada getParadaFinal() {
+        Parada paradaFinal = paradasRecorrido.get(paradasRecorrido.size()-1);
         return paradaFinal;
     }
 

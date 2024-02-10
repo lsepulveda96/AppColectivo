@@ -5,36 +5,36 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
-public class Coordenada implements Parcelable {
+public class Parada implements Parcelable {
 
     private double latitud;
     private double longitud;
     private String direccion;
     private int codigo;
 
-    public Coordenada() {}
+    public Parada() {}
 
-    public Coordenada(double latitud, double longitud ) {
+    public Parada(double latitud, double longitud ) {
         this.latitud = latitud;
         this.longitud = longitud;
     }
 
-    protected Coordenada(Parcel in) {
+    protected Parada(Parcel in) {
         latitud = in.readDouble();
         longitud = in.readDouble();
         direccion = in.readString();
         codigo = in.readInt();
     }
 
-    public static final Creator<Coordenada> CREATOR = new Creator<Coordenada>() {
+    public static final Creator<Parada> CREATOR = new Creator<Parada>() {
         @Override
-        public Coordenada createFromParcel(Parcel in) {
-            return new Coordenada(in);
+        public Parada createFromParcel(Parcel in) {
+            return new Parada(in);
         }
 
         @Override
-        public Coordenada[] newArray(int size) {
-            return new Coordenada[size];
+        public Parada[] newArray(int size) {
+            return new Parada[size];
         }
     };
 

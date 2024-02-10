@@ -22,7 +22,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.gpmess.example.volley.app.R;
 import com.stcu.appcolectivo.interfaces.TrayectoARecorrerInterface;
-import com.stcu.appcolectivo.model.Coordenada;
+import com.stcu.appcolectivo.model.Parada;
 import com.stcu.appcolectivo.presenter.TrayectoARecorrerPresenter;
 
 import org.json.JSONException;
@@ -47,7 +47,7 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
     private Button finServicio;
     Double latActual, lngActual, distancia = 0.0;
     int segundosDetenidoStr = 0, contVerifParada = 0;
-    List<Coordenada> paradasRecorrido;
+    List<Parada> paradasRecorrido;
 
     private TrayectoARecorrerInterface.Presenter presenter;
 
@@ -388,9 +388,9 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
 
 
 
-    public boolean detectarParada(List<Coordenada> listitaParadas, Double latActual, Double lngActual, String denom, String unidad, String denomRecorrido) throws ExecutionException, InterruptedException, TimeoutException {
+    public boolean detectarParada(List<Parada> listitaParadas, Double latActual, Double lngActual, String denom, String unidad, String denomRecorrido) throws ExecutionException, InterruptedException, TimeoutException {
         boolean esFin = false;
-        for(Coordenada parada: listitaParadas){
+        for(Parada parada: listitaParadas){
             double distancia = calcularDistancia(latActual,lngActual,parada.getLatitud(),parada.getLongitud());
             if (distancia < distanciaOffSetParada) {
 //                Toaster.get().showToast(getApplicationContext(),   "Colectivo en parada", Toast.LENGTH_SHORT);
@@ -433,8 +433,8 @@ public class ColectivoEnServicioActivity extends Activity implements TrayectoARe
         return esFin;
     }
 
-    public Coordenada getParadaFinal() {
-        Coordenada paradaFinal = paradasRecorrido.get(paradasRecorrido.size()-1);
+    public Parada getParadaFinal() {
+        Parada paradaFinal = paradasRecorrido.get(paradasRecorrido.size()-1);
         return paradaFinal;
     }
 

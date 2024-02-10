@@ -5,7 +5,7 @@ import android.net.NetworkInfo;
 import com.stcu.appcolectivo.model.Colectivo;
 import com.stcu.appcolectivo.model.Linea;
 import com.stcu.appcolectivo.model.Recorrido;
-import com.stcu.appcolectivo.model.Coordenada;
+import com.stcu.appcolectivo.model.Parada;
 
 import org.json.JSONException;
 
@@ -20,7 +20,7 @@ public interface MainInterface {
 
         void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, Long fechaUbicacionI, String lat, String lng);
 
-        void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial, List<Coordenada> coordenadasSim);
+        void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial, List<Parada> coordenadasSim);
 
         void showResponse(String response);
 
@@ -40,7 +40,7 @@ public interface MainInterface {
 
         NetworkInfo isNetAvailable();
 
-        List<Coordenada> consultaTrayectoASimular(String seleccionLin2, String seleccionRec2) throws JSONException, ExecutionException, InterruptedException, TimeoutException;
+        List<Parada> consultaTrayectoASimular(String seleccionLin2, String seleccionRec2) throws JSONException, ExecutionException, InterruptedException, TimeoutException;
 
         //para mostar ubicacion pedida anteriormente
         void showUbicacion(String strLatitud, String strLongitud);
@@ -49,9 +49,9 @@ public interface MainInterface {
 
         void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, Long fechaUbicacionI, String myLat, String myLng);
 
-        void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String seleccionRec2, String latitud, String longitud, List<Coordenada> coordenadasSim);
+        void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String seleccionRec2, String latitud, String longitud, List<Parada> coordenadasSim);
 
-        void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial, List<Coordenada> coordenadasSim);
+        void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial, List<Parada> coordenadasSim);
 
         void makeRequestPostFin(String seleccionLin, String seleccionCol, String lat, String lng);
 
@@ -72,11 +72,11 @@ public interface MainInterface {
 
         NetworkInfo isNetAvailable();
 
-        List<Coordenada> consultaTrayectoASimular(String seleccionLin2, String seleccionRec2) throws JSONException, ExecutionException, InterruptedException, TimeoutException;
+        List<Parada> consultaTrayectoASimular(String seleccionLin2, String seleccionRec2) throws JSONException, ExecutionException, InterruptedException, TimeoutException;
 
         void obtenerUbicacion();
 
-        void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String seleccionRec2, String latitud, String longitud, List<Coordenada> coordenadasSim);
+        void makeRequestPostSimulacion(String seleccionLin2, String seleccionCol2, String seleccionRec2, String latitud, String longitud, List<Parada> coordenadasSim);
 
         void makeRequestPostFin(String seleccionLin, String seleccionCol, String lat, String lng);
 

@@ -5,11 +5,8 @@ import android.content.Context;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.stcu.appcolectivo.interfaces.TrayectoARecorrerInterface;
 import com.stcu.appcolectivo.util.VolleySingleton;
@@ -41,7 +38,7 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
     Activity mActivity;
     Context mContext;
     RequestQueue requestQueue;
-    Coordenada parada;
+    Parada parada;
     private TrayectoARecorrerInterface.Presenter presenter;
     public TrayectoARecorrerModel(TrayectoARecorrerInterface.Presenter presenter, Context mContext, Activity mActivity) {
 
@@ -53,8 +50,8 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
 
 
     @Override
-    public List<Coordenada> consultaParadasRecorrido(String linea, String recorrido) throws ExecutionException, InterruptedException, TimeoutException, JSONException {
-        List<Coordenada> paradasRecorrido = new ArrayList<Coordenada>();
+    public List<Parada> consultaParadasRecorrido(String linea, String recorrido) throws ExecutionException, InterruptedException, TimeoutException, JSONException {
+        List<Parada> paradasRecorrido = new ArrayList<Parada>();
         String url = ipv4+"paradasParaApp/"+linea+"/"+recorrido;
 
         RequestFuture<JSONObject> future = RequestFuture.newFuture();
@@ -83,7 +80,7 @@ public class TrayectoARecorrerModel implements TrayectoARecorrerInterface.Model 
 
             String codigo= new JSONObject(paradaItem.getString("parada")).getString("codigo");
 
-            parada = new Coordenada();
+            parada = new Parada();
             parada.setLatitud(Double.parseDouble(latitud));
             parada.setLongitud(Double.parseDouble(longitud));
             parada.setDireccion(direccion);

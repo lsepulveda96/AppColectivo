@@ -10,7 +10,7 @@ import android.os.Parcelable;
 import com.gpmess.example.volley.app.R;
 import com.stcu.appcolectivo.interfaces.MainInterface;
 import com.stcu.appcolectivo.model.Colectivo;
-import com.stcu.appcolectivo.model.Coordenada;
+import com.stcu.appcolectivo.model.Parada;
 import com.stcu.appcolectivo.model.Linea;
 import com.stcu.appcolectivo.model.Recorrido;
 import com.stcu.appcolectivo.presenter.MainPresenter;
@@ -44,7 +44,7 @@ public class SplashActivity extends Activity implements MainInterface.View  {
     }
 
     @Override
-    public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial, List<Coordenada> coordenadasSim) {
+    public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial, List<Parada> coordenadasSim) {
     }
 
     @Override

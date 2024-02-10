@@ -19,8 +19,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.Parcelable;
 import android.text.InputType;
 import android.util.Log;
@@ -39,11 +37,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.bumptech.glide.Glide;
 import com.gpmess.example.volley.app.R;
 import com.stcu.appcolectivo.interfaces.MainInterface;
 import com.stcu.appcolectivo.model.Colectivo;
-import com.stcu.appcolectivo.model.Coordenada;
+import com.stcu.appcolectivo.model.Parada;
 import com.stcu.appcolectivo.model.Linea;
 import com.stcu.appcolectivo.model.Recorrido;
 import com.stcu.appcolectivo.presenter.MainPresenter;
@@ -74,7 +71,7 @@ public class MainActivity extends Activity implements MainInterface.View {
     List<Colectivo> colectivosDisponibles;
     List<Linea> lineasDisponibles;
     List<Recorrido> recorridosDisponibles;
-    List<Coordenada> coordenadasSim;
+    List<Parada> coordenadasSim;
     Boolean listasOkThread, listasEstanCargadas;
     Button btnGPS, btnIniciarServicio; //finServicio,
     TextView tvUbicacion, tvNetwork; //, tvColectivoSeleccionado, tvLineaSeleccionada;
@@ -539,7 +536,7 @@ public class MainActivity extends Activity implements MainInterface.View {
 
     // recibe respuesta ok para iniciar la simulacion, y envia los parametros necesarios por medio de intent.putExtra al activity SimulacionRecorridoActivity
     @Override
-    public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial, List<Coordenada> coordenadasSim) {
+    public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial, List<Parada> coordenadasSim) {
         try {
             JSONObject obj = new JSONObject(response);
             String respuesta = obj.getString("mensaje");
@@ -734,7 +731,7 @@ public class MainActivity extends Activity implements MainInterface.View {
         public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, Long fechaUbicacionI, String lat, String lng) {}
 
         @Override
-        public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial, List<Coordenada> coordenadasSim) {}
+        public void showResponsePostSimulacionOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, String latInicial, String lngInicial, List<Parada> coordenadasSim) {}
 
         @Override
         public void showResponse(String response) {}
@@ -793,7 +790,7 @@ public class MainActivity extends Activity implements MainInterface.View {
     } // fin thread para actulizar recorrido al modificar item linea
 
 
-    public class ThreadConsultaTrayectoASimular extends AsyncTask<String, String, List<Coordenada>> {
+    public class ThreadConsultaTrayectoASimular extends AsyncTask<String, String, List<Parada>> {
 
         private Context ctx;
         //TODO paso 6, cambiar item seleccion linea. ver como tomar el item seleccionado
@@ -810,16 +807,16 @@ public class MainActivity extends Activity implements MainInterface.View {
             ctx = hostContext;
         }
         @Override
-        protected List<Coordenada> doInBackground(String... strings) {
+        protected List<Parada> doInBackground(String... strings) {
 
-            coordenadasSim = new ArrayList<Coordenada>();
+            coordenadasSim = new ArrayList<Parada>();
             try {
                 coordenadasSim = presenter.consultaTrayectoASimular(seleccionLin2, seleccionRec2);
 
                 if (coordenadasSim.size() != 0) {
 //                    Toast.makeText( getApplicationContext() ,"Iniciando simulacion..", Toast.LENGTH_SHORT ).show();
                     System.out.println("iniciando simulacion..");
-                    Coordenada coordInicial = coordenadasSim.get( 0 ); // para cargar la coordenada inicial
+                    Parada coordInicial = coordenadasSim.get( 0 ); // para cargar la coordenada inicial
                     presenter.makeRequestPostSimulacion( seleccionLin2, seleccionCol2, seleccionRec2, String.valueOf( coordInicial.getLatitud() ), String.valueOf( coordInicial.getLongitud() ), coordenadasSim );
                     //aca tiene que venir la respuesta con "servicio iniciado" llamada desde el model presenter
                     //cambiar de activity a simulacionRecorrido
@@ -842,9 +839,9 @@ public class MainActivity extends Activity implements MainInterface.View {
 
 
         @Override
-        protected void onPostExecute(List<Coordenada> result){
+        protected void onPostExecute(List<Parada> result){
 
-            for (Coordenada coor: result) {
+            for (Parada coor: result) {
                 System.out.println("la lista de coordenadas a simular: " + coor.getDireccion());
             }
 

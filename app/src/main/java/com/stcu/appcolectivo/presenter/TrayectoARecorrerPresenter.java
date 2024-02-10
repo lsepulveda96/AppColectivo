@@ -5,7 +5,7 @@ import android.content.Context;
 
 import com.stcu.appcolectivo.interfaces.TrayectoARecorrerInterface;
 import com.stcu.appcolectivo.model.TrayectoARecorrerModel;
-import com.stcu.appcolectivo.model.Coordenada;
+import com.stcu.appcolectivo.model.Parada;
 
 import org.json.JSONException;
 
@@ -27,8 +27,8 @@ public class TrayectoARecorrerPresenter implements TrayectoARecorrerInterface.Pr
     }
 
     @Override
-    public List<Coordenada> consultaParadasRecorrido(String linea, String recorrido) throws JSONException, ExecutionException, InterruptedException, TimeoutException {
-        List<Coordenada> paradasRecorrido = model.consultaParadasRecorrido(linea,recorrido);
+    public List<Parada> consultaParadasRecorrido(String linea, String recorrido) throws JSONException, ExecutionException, InterruptedException, TimeoutException {
+        List<Parada> paradasRecorrido = model.consultaParadasRecorrido(linea,recorrido);
         return paradasRecorrido;
     }
 

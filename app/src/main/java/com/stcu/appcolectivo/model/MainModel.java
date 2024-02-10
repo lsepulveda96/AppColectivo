@@ -51,9 +51,9 @@ public class MainModel implements MainInterface.Model {
     Activity mActivity;
     Context mContext;
     RequestQueue requestQueue;
-    private List<Coordenada> listaCoordenadasTrayecto;
+    private List<Parada> listaCoordenadasTrayecto;
     private List<Recorrido> listaRecorridosActivos;
-    Coordenada coord;
+    Parada coord;
 
     private MainInterface.Presenter presenter;
 
@@ -156,9 +156,9 @@ public class MainModel implements MainInterface.Model {
      * @param seleccionRecDenom seleccion de uno de los recorridos activos de esa linea seleccionada
      * @return lista de coordenadas del trayecto seleccionado
      */
-    public List<Coordenada> consultaTrayectoASimular(String seleccionLineaDenom, String seleccionRecDenom) throws JSONException, ExecutionException, InterruptedException, TimeoutException {
+    public List<Parada> consultaTrayectoASimular(String seleccionLineaDenom, String seleccionRecDenom) throws JSONException, ExecutionException, InterruptedException, TimeoutException {
 
-        listaCoordenadasTrayecto = new ArrayList<Coordenada>();
+        listaCoordenadasTrayecto = new ArrayList<Parada>();
         String url = ipv4 + "trayectos/simulacion/" + seleccionLineaDenom +"/"+ seleccionRecDenom;
 
         RequestFuture<JSONObject> future = RequestFuture.newFuture();
@@ -185,7 +185,7 @@ public class MainModel implements MainInterface.Model {
 //            JSONObject coordLat = new JSONObject(coordSim.getString("parada")).getJSONObject("coordenada");
 //            String latitud = coordLat.getString("lat");
 
-            coord = new Coordenada();
+            coord = new Parada();
             coord.setLatitud(Double.parseDouble(latitud));
             coord.setLongitud(Double.parseDouble(longitud));
             listaCoordenadasTrayecto.add(coord);
@@ -293,7 +293,7 @@ public class MainModel implements MainInterface.Model {
      * @param lngInicial
      * @param coordenadasSim
      */
-    public void makeRequestPostSimulacion(final String seleccionLin, final String seleccionCol, final String seleccionRec, final String latInicial, final String lngInicial, List<Coordenada> coordenadasSim) {
+    public void makeRequestPostSimulacion(final String seleccionLin, final String seleccionCol, final String seleccionRec, final String latInicial, final String lngInicial, List<Parada> coordenadasSim) {
 
         final String url = ipv4+"inicio";
         final long fechaUbicacion = System.currentTimeMillis();
