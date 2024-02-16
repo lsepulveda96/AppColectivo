@@ -19,6 +19,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcelable;
 import android.text.InputType;
 import android.util.Log;
@@ -392,7 +394,7 @@ public class MainActivity extends Activity implements MainInterface.View {
                 Toast.makeText(MainActivity.this, "No se pudo obtener su ubicacion actual", Toast.LENGTH_SHORT).show();
                 // aca deberia ir el cambio de activity
             } else {
-                Toast.makeText(MainActivity.this, "servicio inciado", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, "servicio iniciado", Toast.LENGTH_SHORT).show();
                 new InicioServicio().execute();
             }
         }
@@ -407,17 +409,17 @@ public class MainActivity extends Activity implements MainInterface.View {
                 @Override
                 public void run() {
 
-                        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                            // TODO: Consider calling
-                            //    ActivityCompat#requestPermissions
-                            // here to request the missing permissions, and then overriding
-                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                            //                                          int[] grantResults)
-                            // to handle the case where the user grants the permission. See the documentation
-                            // for ActivityCompat#requestPermissions for more details.
-                            return;
-                        }
-                        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mVeggsterLocationListener);
+                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
+                    mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mVeggsterLocationListener);
                 }
             });
 
@@ -513,19 +515,19 @@ public class MainActivity extends Activity implements MainInterface.View {
     public void showResponseInicioServicioOk(String response, String seleccionLin, String seleccionCol, String seleccionRec, Long fechaUbicacionI, String lat, String lng) {
 
         try {
-        JSONObject obj = new JSONObject(response);
-        String respuesta = obj.getString("mensaje");
-        if(respuesta.equals("Servicio iniciado")) {
-            Intent intentInicioServicioActivity = new Intent(MainActivity.this, ColectivoEnServicioActivity.class);
-            intentInicioServicioActivity.putExtra("linea", seleccionLin);
-            intentInicioServicioActivity.putExtra("colectivo", seleccionCol);
-            intentInicioServicioActivity.putExtra("recorrido", seleccionRec);
-            intentInicioServicioActivity.putExtra("latitud", lat);
-            intentInicioServicioActivity.putExtra("longitud", lng);
-            intentInicioServicioActivity.putExtra("fechaUbicacion", String.valueOf(fechaUbicacionI));
-            setFechaUbicacionI(fechaUbicacionI);
-            this.startActivity(intentInicioServicioActivity);
-        }
+            JSONObject obj = new JSONObject(response);
+            String respuesta = obj.getString("mensaje");
+            if(respuesta.equals("Servicio iniciado")) {
+                Intent intentInicioServicioActivity = new Intent(MainActivity.this, ColectivoEnServicioActivity.class);
+                intentInicioServicioActivity.putExtra("linea", seleccionLin);
+                intentInicioServicioActivity.putExtra("colectivo", seleccionCol);
+                intentInicioServicioActivity.putExtra("recorrido", seleccionRec);
+                intentInicioServicioActivity.putExtra("latitud", lat);
+                intentInicioServicioActivity.putExtra("longitud", lng);
+                intentInicioServicioActivity.putExtra("fechaUbicacion", String.valueOf(fechaUbicacionI));
+                setFechaUbicacionI(fechaUbicacionI);
+                this.startActivity(intentInicioServicioActivity);
+            }
 
         } catch (JSONException e) {
             System.out.println("error al cargar el inicio de servicio" + e);
@@ -825,14 +827,12 @@ public class MainActivity extends Activity implements MainInterface.View {
                 }
 
 
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (TimeoutException e) {
-                throw new RuntimeException(e);
+            }
+            catch (ExecutionException | InterruptedException | TimeoutException | JSONException e) {
+                System.out.println("error al inciar simulacion: " + e);
+                //Toast.makeText( getApplicationContext(), "error al inciar simulacion" + e, Toast.LENGTH_LONG ).show();
+                Toaster.get().showToast(getApplicationContext(), "error al inciar simulacion" + e , Toast.LENGTH_SHORT);
+                return null;
             }
             return coordenadasSim;
         } // fin doInBackground
@@ -841,9 +841,10 @@ public class MainActivity extends Activity implements MainInterface.View {
         @Override
         protected void onPostExecute(List<Parada> result){
 
-            for (Parada coor: result) {
-                System.out.println("la lista de coordenadas a simular: " + coor.getDireccion());
-            }
+            if(result != null)
+                for (Parada coor: result) {
+                    System.out.println("la lista de coordenadas a simular: " + coor.getDireccion());
+                }
 
         } // fin onPostExcecute
 
@@ -891,6 +892,24 @@ public class MainActivity extends Activity implements MainInterface.View {
                 }
                 return;
             }
+        }
+    }
+
+    public enum Toaster {
+        INSTANCE;
+        private final Handler handler = new Handler(Looper.getMainLooper());
+        public void showToast(final Context context, final String message, final int length) {
+            handler.post(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context, message, length).show();
+                        }
+                    }
+            );
+        }
+        public static MainActivity.Toaster get() {
+            return INSTANCE;
         }
     }
 }

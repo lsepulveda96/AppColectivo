@@ -39,12 +39,10 @@ import java.util.concurrent.TimeoutException;
 public class MainModel implements MainInterface.Model {
 
     // ip local actual
-    public static String ipv4 = "http://192.168.0.105:50004/stcu2service/v1/mobile/";
-
-//    public static String ipv4 = "http://192.168.1.40:50004/stcu2service/v1/mobile/";
+//    public static String ipv4 = "http://192.168.0.105:50004/stcu2service/v1/mobile/";
 
     //ip remoto actual
-//    public static String ipv4 =  "http://138.36.99.248:50004/stcu2service/v1/mobile/";
+    public static String ipv4 =  "http://138.36.99.248:50004/stcu2service/v1/mobile/";
 
 
     static int timeOutRequest = 10; // en segundos
@@ -179,11 +177,6 @@ public class MainModel implements MainInterface.Model {
             String longitud = coordSim.getString("lng");
 
             System.out.println(" informacion recuperada de la nueva consulta trayectos a recorrer sim: " + latitud + " - " + longitud);
-//            JSONObject coordLng = new JSONObject(coordSim.getString("parada")).getJSONObject("coordenada");
-//            String longitud = coordLng.getString("lng");
-
-//            JSONObject coordLat = new JSONObject(coordSim.getString("parada")).getJSONObject("coordenada");
-//            String latitud = coordLat.getString("lat");
 
             coord = new Parada();
             coord.setLatitud(Double.parseDouble(latitud));

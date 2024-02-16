@@ -34,10 +34,12 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
     //public static double distanciaOffSetMov = 15.0;
     // private static double distanciaOffSetParada = 20.0; // en mts
     //public static int tiempoEnvioNuevaCoord = 9; // en segundos
-    public static double distanciaOffSetMov = 10.0;
-    private static double distanciaOffSetParada = 10.0; // en mts
-    public static int tiempoMaxDetenido = 30;
-    public static int tiempoEnvioNuevaCoord = 10; // en segundos
+
+    public static double distanciaOffSetMovLarga = 25.0;
+    public static double distanciaOffSetMov = 10.0; // si la distancia mov es menor a este num, envia coordenada cada menos tiempo
+    private static double distanciaOffSetParada = 25.0; // en mts // no tocar mas. 30. hay paradas que no estan justo en la calle y el trayecto si lo esta.
+    public static int tiempoMaxDetenido = 30; // no lo estoy usando aca. saque lo de que este detenido en simulacion
+    public static int tiempoEnvioNuevaCoord = 9; // en segundos // recomendable 9
     boolean coleEnParada = false;
 
 
@@ -171,11 +173,12 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                     int difSeg = (int)(fuActualD.getTime()-fuAntiguaD.getTime())/1000; // en segundos
 
                     // si esta detenido
+                    // si la distancia entre coordenadas es menor a distanciaOffSetMov no envia la coordenada
                     if(distancia < distanciaOffSetMov ){ // si es menor a 20.0 metros, esta detenido // que luego pueda ser configurable // 20.0
                         segundosDetenidoStr = segundosDetenidoStr + difSeg; // suma el tiempo total detenido // tambien se puede con cont++ cada 3 intentos envia
-                        tvEstado.setText("Unidad detenida");
+//                        tvEstado.setText("Unidad detenida");
                         //si esta detenido por mas de 'x' tiempo
-                        if(segundosDetenidoStr > tiempoMaxDetenido){ // si el tiempo que esta detenido es mayor a 17 seg envia el informe (configurable)
+                   /*     if(segundosDetenidoStr > tiempoMaxDetenido){ // si el tiempo que esta detenido es mayor a 17 seg envia el informe (configurable)
                             // solo si el tiempo detenido es mayor a x tiempo, envia aviso y muestra cartel aviso
                             SimulacionRecorridoActivity.this.runOnUiThread(new Runnable() {
                                 @Override
@@ -187,59 +190,80 @@ public class SimulacionRecorridoActivity extends Activity implements TrayectoARe
                                             .into(ivGifBus);
                                 }
                             });
-                        }
+                        }*/
 
-                        // enviar cada menos tiempo
 
-                    }else{ //fin if si el colectivo estaba parado
 
-                        // enviar coordenada cada mas tiempo
                         try {
-                            Thread.sleep(tiempoEnvioNuevaCoord*1000 );
+                            // envia coordenada cada menos tiempo
+                            long tiempoCoordMasRapido = Math.round(tiempoEnvioNuevaCoord / 3);
+                            System.out.println("envia coordenada cada: " +tiempoCoordMasRapido);
+                            Thread.sleep(tiempoCoordMasRapido * 1000);
                         } catch (InterruptedException e) {
                             System.out.println("error durmiendo el hilo");
                         }
+                    }
 
-                        // la distancia entre paradas fue MAYOR de 20 mts, el colectivo ESTA circulando
-                        // contador en 0 para que cuando se vuelve a parar la primera vez verifique si es parada
-                        contVerifParada = 0;
+                    else { //fin if si el colectivo estaba parado
+
                         try {
-                            // vuelve a verificar si esta desviado
-                            boolean esFin;
-                            esFin = detectarParada(paradasRecorrido,latActual,lngActual,linea,colectivo,recorrido);
-                            System.out.println("es parada final?: " + esFin);
-                            if(esFin) {
-                                finServicioSimple();
-                                finish();
-                            }else {
-                                System.out.println("no es parada final");
-                                presenter.makeRequestPostDetectarDesvio(linea, colectivo, recorrido, latActual, lngActual);
-                                System.out.println("enviando ubicacion..");
-                                presenter.makeRequestPostEnviarUbicacion(linea, colectivo, recorrido, getLat(), getLng());
-                                segundosDetenidoStr = 0; // resetea la suma
+                            System.out.println("+++++++++++++++++++++++++++++++ distancia recorrida" + distancia);
 
-                                // para que no se superpongan gif
-                                if (!coleEnParada) {
-                                    System.out.println("unidad en circulacion");
-                                    SimulacionRecorridoActivity.this.runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            tvEstado.setText("Unidad en circulacion");
-                                            ivGifBus.setVisibility(View.VISIBLE);
-                                            Glide.with(SimulacionRecorridoActivity.this)
-                                                    .load(R.drawable.bus_animation_fondo_violeta_circulando)
-                                                    .into(ivGifBus);
-                                        }
-                                    });
-                                }
+                            if(distancia > distanciaOffSetMovLarga ){
+                                long tiempoCoordMasLento = Math.round(tiempoEnvioNuevaCoord * 1.4);
+                                System.out.println("envia coordenada cada: " +tiempoCoordMasLento);
+                                // enviar coordenada cada mucho mas tiempo
+                                Thread.sleep(tiempoCoordMasLento * 1000);
+                            }else{
+                                // enviar coordenada cada mucho mas tiempo
+                                System.out.println("envia coordenada cada: " +tiempoEnvioNuevaCoord);
+                                Thread.sleep(tiempoEnvioNuevaCoord * 1000);
                             }
-                        } catch (ExecutionException | InterruptedException | TimeoutException e) {
-                            Toaster.get().showToast(getApplicationContext(), "error verificacion desvio, envio nueva ubicacion - 356" , Toast.LENGTH_SHORT);
-                            Toaster.get().showToast(getApplicationContext(), "error " + e.getMessage(), Toast.LENGTH_SHORT);
+                        } catch (InterruptedException e) {
+                            System.out.println("error durmiendo el hilo");
                         }
+                    }
+
+                    // la distancia entre paradas fue MAYOR de 20 mts, el colectivo ESTA circulando
+                    // contador en 0 para que cuando se vuelve a parar la primera vez verifique si es parada
+                    contVerifParada = 0;
+                    try {
+                        // vuelve a verificar si esta desviado
+                        boolean esFin;
+                        esFin = detectarParada(paradasRecorrido,latActual,lngActual,linea,colectivo,recorrido);
+                        System.out.println("es parada final?: " + esFin);
+                        if(esFin) {
+                            finServicioSimple();
+                            finish();
+                        }else {
+                            System.out.println("no es parada final");
+                            presenter.makeRequestPostDetectarDesvio(linea, colectivo, recorrido, latActual, lngActual);
+                            System.out.println("enviando ubicacion..");
+                            presenter.makeRequestPostEnviarUbicacion(linea, colectivo, recorrido, getLat(), getLng());
+                            segundosDetenidoStr = 0; // resetea la suma
+
+                            // para que no se superpongan gif
+                            if (!coleEnParada) {
+                                System.out.println("unidad en circulacion");
+                                SimulacionRecorridoActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        tvEstado.setText("Unidad en circulacion");
+                                        ivGifBus.setVisibility(View.VISIBLE);
+                                        Glide.with(SimulacionRecorridoActivity.this)
+                                                .load(R.drawable.bus_animation_fondo_violeta_circulando)
+                                                .into(ivGifBus);
+                                    }
+                                });
+                            }
+                        }
+                    } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                        Toaster.get().showToast(getApplicationContext(), "error verificacion desvio, envio nueva ubicacion - 356" , Toast.LENGTH_SHORT);
+                        Toaster.get().showToast(getApplicationContext(), "error " + e.getMessage(), Toast.LENGTH_SHORT);
+                    }
 
 
-                    } // fin else colectivo circulando
+//                    } // fin else colectivo circulando. este lo saque de cuando esta detenido
 
                     fechaUbicacionAntigua = fechaUbicacionActual;
                     latAntigua = String.valueOf(latActual);
